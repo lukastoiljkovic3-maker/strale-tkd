@@ -89,3 +89,23 @@ create policy "auth full access - daily"
   on public.daily_entries   for all to authenticated using (true) with check (true);
 create policy "auth full access - activities"
   on public.lead_activities for all to authenticated using (true) with check (true);
+
+-- 5) REALTIME — the SPA subscribes to postgres_changes on all three
+--    tables (live pipeline, daily-stat sync, time-to-close feed).
+--    REPLICA IDENTITY FULL so UPDATE/DELETE events carry the old row.
+alter table public.ghl_leads       replica identity full;
+alter table public.daily_entries   replica identity full;
+alter table public.lead_activities replica identity full;
+
+do $$
+declare t text;
+begin
+  foreach t in array array['ghl_leads','daily_entries','lead_activities'] loop
+    if not exists (
+      select 1 from pg_publication_tables
+      where pubname='supabase_realtime' and schemaname='public' and tablename=t
+    ) then
+      execute format('alter publication supabase_realtime add table public.%I', t);
+    end if;
+  end loop;
+end $$;
