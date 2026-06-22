@@ -3709,6 +3709,8 @@ function mapContact(c, lead_type){
 }
 
 async function syncLeadsFromGHL(){
+  if(syncLeadsFromGHL._busy) return;   // ignore overlapping syncs (no duplicate full GHL pulls)
+  syncLeadsFromGHL._busy = true;
   const btn=document.querySelector('.sync-btn');
   if(btn)btn.classList.add('spinning');
   try{
@@ -3730,25 +3732,16 @@ async function syncLeadsFromGHL(){
       if(!existing||priority.indexOf(r.lead_type)<priority.indexOf(existing.lead_type)) seen.set(r.id,r);
     });
     const rows=[...seen.values()];
-    // Before upserting, fetch existing tags so we MERGE rather than OVERWRITE.
-    // Without this, any tag added manually in the tracker would be wiped
-    // whenever GHL doesn't include it.
-    if (rows.length) {
-      const ids = rows.map(r => r.id);
-      const tagsByLead = new Map();
-      const F_CHUNK = 200;
-      for (let i = 0; i < ids.length; i += F_CHUNK) {
-        const {data: existingTags} = await sb.from('ghl_leads')
-          .select('id, tags').in('id', ids.slice(i, i + F_CHUNK));
-        (existingTags || []).forEach(r => tagsByLead.set(r.id, r.tags || []));
-      }
-      rows.forEach(r => {
-        const prev = tagsByLead.get(r.id) || [];
-        const incoming = r.tags || [];
-        const merged = [...new Set([...prev, ...incoming])];
-        r.tags = merged;
-      });
-    }
+    // Fetch ALL existing leads' id+tags ONCE — reused for BOTH the tag
+    // merge (so manually-added tracker tags aren't wiped when GHL omits
+    // them) AND the stale reconciliation below. Replaces the old per-chunk
+    // tag SELECTs (N/200 sequential round-trips) with a single query.
+    const {data:existing}=await sb.from('ghl_leads').select('id, tags').limit(20000);
+    const existingTags=new Map((existing||[]).map(r=>[r.id, r.tags||[]]));
+    rows.forEach(r=>{
+      const prev=existingTags.get(r.id)||[];
+      r.tags=[...new Set([...prev, ...(r.tags||[])])];
+    });
     if(rows.length){
       // Upsert in chunks to avoid request-size limits
       const CHUNK=500;
@@ -3760,20 +3753,16 @@ async function syncLeadsFromGHL(){
     // Full reconciliation: delete any Supabase rows no longer in GHL.
     // EXCEPTION: synthetic IDs starting with 'webinar-' or 'manual-' are
     // tracker-only leads (CSV-imported attendees who aren't in GHL yet) —
-    // skip them so the import survives the sync.
+    // skip them so the import survives the sync. Deletes run in parallel.
     const currentIds=new Set(rows.map(r=>r.id));
-    const {data:existing,error:fetchErr}=await sb.from('ghl_leads').select('id').limit(20000);
-    if(!fetchErr && existing){
-      const stale=existing
-        .filter(r => !currentIds.has(r.id))
-        .filter(r => !/^(webinar|manual)-/.test(r.id))  // keep CSV imports
-        .map(r => r.id);
-      const CHUNK=200;
-      for(let i=0;i<stale.length;i+=CHUNK){
-        const {error}=await sb.from('ghl_leads').delete().in('id',stale.slice(i,i+CHUNK));
-        if(error){console.error('Delete error:',error);break;}
-      }
-      if(stale.length) console.log(`Sync removed ${stale.length} stale leads not in GHL anymore.`);
+    const stale=[...existingTags.keys()]
+      .filter(id=>!currentIds.has(id))
+      .filter(id=>!/^(webinar|manual)-/.test(id));  // keep CSV imports
+    if(stale.length){
+      const CHUNK=200, delChunks=[];
+      for(let i=0;i<stale.length;i+=CHUNK) delChunks.push(stale.slice(i,i+CHUNK));
+      await Promise.all(delChunks.map(c=>sb.from('ghl_leads').delete().in('id',c)));
+      console.log(`Sync removed ${stale.length} stale leads not in GHL anymore.`);
     }
     await renderLeadsSection();
     // After GHL sync: auto-distribute unassigned leads round-robin
@@ -3789,6 +3778,7 @@ async function syncLeadsFromGHL(){
       `<div style="background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);border-radius:10px;padding:12px 16px;color:var(--red);font-size:12px;font-weight:600;margin-bottom:12px;">${msg}</div>`);
   }
   if(btn)btn.classList.remove('spinning');
+  syncLeadsFromGHL._busy = false;
 }
 
 async function setLeadsSubTab(tab){
