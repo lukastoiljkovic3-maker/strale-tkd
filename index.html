@@ -1113,6 +1113,24 @@ tr.row-flash > td { animation: row-flash 1.6s ease-out; }
 .kan-col.k-noshow { border-top:2px solid var(--yellow); } .kan-col.k-noshow .kan-col-ttl { color:var(--yellow); }
 @media (max-width:640px){ .mstat-row { grid-template-columns:1fr; gap:10px; margin-bottom:24px; } .mstat-val { font-size:26px; } .kanban { grid-template-columns:1fr 1fr; gap:8px; } }
 
+/* ── Kalendar tab (agenda) ── */
+.cal-wrap { width:100%; max-width:760px; margin:0 auto; }
+.cal-sec { margin-bottom:32px; }
+.cal-sec-lbl { font-size:10px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted2); margin-bottom:14px; }
+.cal-day { margin-bottom:18px; }
+.cal-day-hd { font-size:12px; font-weight:800; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:8px; text-transform:capitalize; }
+.cal-day-count { font-size:10px; font-weight:800; background:var(--s3); color:var(--muted); border-radius:99px; padding:2px 8px; }
+.cal-appt { display:flex; align-items:center; gap:14px; padding:13px 15px; background:var(--s1); border:1px solid var(--b); border-radius:12px; margin-bottom:8px; transition:border-color .15s; }
+.cal-appt:hover { border-color:var(--b2); }
+.cal-appt-time { flex-shrink:0; width:52px; font-size:14px; font-weight:800; color:var(--accent); display:flex; flex-direction:column; line-height:1.25; }
+.cal-appt-time span { font-size:10px; font-weight:600; color:var(--muted); }
+.cal-appt-main { flex:1; min-width:0; }
+.cal-appt-name { font-size:13.5px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cal-appt-sub { font-size:11px; color:var(--muted); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cal-appt-sub a { color:#38bdf8; text-decoration:none; }
+.cal-empty { font-size:13px; color:var(--muted); padding:22px; text-align:center; background:var(--s1); border:1px solid var(--b); border-radius:12px; }
+@media (max-width:640px){ .cal-appt-time { width:46px; font-size:13px; } }
+
 .ms { background:var(--s1); padding:32px 30px; display:flex; flex-direction:column; gap:8px; transition:background .2s; }
 .ms:hover { background:var(--s2); }
 .ms-lbl { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
@@ -2106,6 +2124,9 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
       <button class="tab active" data-member="leads" onclick="setTab('leads')">
         <span class="tab-pip" style="background:var(--green)"></span> Leads
       </button>
+      <button class="tab" data-member="kalendar" onclick="setTab('kalendar')">
+        <span class="tab-pip" style="background:#38bdf8"></span> Kalendar
+      </button>
       <button class="tab" data-member="metrics" onclick="setTab('metrics')">
         <span class="tab-pip" style="background:var(--yellow)"></span> Metrics
       </button>
@@ -2189,6 +2210,13 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
       <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
     </svg>
     <span>Leads</span>
+  </button>
+  <button class="bnav-btn" data-tab="kalendar" onclick="setTab('kalendar')" style="color:#38bdf8">
+    <div class="bnav-pip"></div>
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+    <span>Kalendar</span>
   </button>
   <button class="bnav-btn" data-tab="metrics" onclick="setTab('metrics')" style="color:var(--yellow)">
     <div class="bnav-pip"></div>
@@ -2426,6 +2454,12 @@ async function render() {
     kpi.innerHTML = '';
     mc.style.cssText = 'display:block;';
     await renderMetricsTab();
+    return;
+  }
+  if (currentTab === 'kalendar') {
+    kpi.innerHTML = '';
+    mc.style.cssText = 'display:block;';
+    await renderKalendarTab();
     return;
   }
   if (currentTab === 'wolf') {
@@ -3271,6 +3305,69 @@ async function renderMetricsTab(){
 }
 
 const _apptSt = a => String(a.appointmentStatus || a.appoinmentStatus || '').toLowerCase();
+
+/* ── Kalendar tab: agenda of GHL calendar appointments, grouped by day ── */
+async function renderKalendarTab(){
+  const el=document.getElementById('mainContent');
+  el.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:20px">⏳</div><div class="empty-text">Učitavam kalendar...</div></div>';
+  const now=Date.now();
+  const data=await fetch(`/api/ghl-appointments?start=${now-90*864e5}&end=${now+180*864e5}`).then(r=>r.json()).catch(()=>({error:'fetch'}));
+  if(data.error){
+    el.innerHTML=`<div class="empty" style="padding:40px"><div class="empty-icon" style="font-size:22px">📅</div><div class="empty-text">Kalendar trenutno nedostupan.<br><span style="color:var(--muted);font-size:12px">${esc(data.hint||data.error)}</span></div></div>`;
+    return;
+  }
+  const evs=(data.events||[]).filter(e=>!e.deleted).sort((a,b)=>String(a.startTime).localeCompare(String(b.startTime)));
+  const todayMid=new Date(); todayMid.setHours(0,0,0,0);
+  const todayKey=new Date().toISOString().slice(0,10);
+  const upcoming=evs.filter(e=>new Date(e.startTime)>=todayMid);
+  const past=evs.filter(e=>new Date(e.startTime)<todayMid).reverse();
+
+  const groupByDay=list=>{
+    const m=new Map();
+    list.forEach(e=>{const k=new Date(e.startTime).toISOString().slice(0,10);(m.get(k)||m.set(k,[]).get(k)).push(e);});
+    return [...m.entries()];
+  };
+  const dayHeader=k=>{
+    const d=new Date(k+'T00:00');
+    const lbl=d.toLocaleDateString('sr-RS',{weekday:'long',day:'numeric',month:'long'});
+    return k===todayKey?`<span style="color:var(--accent)">Danas</span> · ${lbl}`:lbl;
+  };
+  const card=e=>{
+    const d=new Date(e.startTime), end=e.endTime?new Date(e.endTime):null;
+    const t1=d.toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'});
+    const t2=end?end.toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'}):'';
+    const st=_apptSt(e);
+    const map={confirmed:{l:'Zakazano',c:'a-booked'},new:{l:'Zakazano',c:'a-booked'},booked:{l:'Zakazano',c:'a-booked'},showed:{l:'Došao',c:'a-showed'},noshow:{l:'Nije došao',c:'a-noshow'},cancelled:{l:'Otkazano',c:'a-cancel'},invalid:{l:'Nevažeće',c:'a-cancel'}};
+    const s=map[st]||{l:st||'—',c:'a-booked'};
+    const addr=e.address||''; const isUrl=/^https?:\/\//.test(addr);
+    const known=e.contactId && (cachedLeads||[]).some(l=>l.id===e.contactId);
+    const click=known?`onclick="openLeadDetail('${esc(e.contactId)}')" style="cursor:pointer"`:'';
+    return `<div class="cal-appt" ${click}>
+      <div class="cal-appt-time">${esc(t1)}${t2?`<span>${esc(t2)}</span>`:''}</div>
+      <div class="cal-appt-main">
+        <div class="cal-appt-name">${esc(e.title||'Poziv')}</div>
+        <div class="cal-appt-sub">${esc(e.calendarName||'')}${addr?(isUrl?` · <a href="${esc(addr)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🔗 Join Meet</a>`:` · 📍 ${esc(addr)}`):''}</div>
+      </div>
+      <span class="ldp-appt-status ${s.c}">${esc(s.l)}</span>
+    </div>`;
+  };
+  const section=(title,groups,emptyMsg)=>`<div class="cal-sec">
+    <div class="cal-sec-lbl">${title}</div>
+    ${groups.length?groups.map(([k,items])=>`<div class="cal-day"><div class="cal-day-hd">${dayHeader(k)}<span class="cal-day-count">${items.length}</span></div>${items.map(card).join('')}</div>`).join(''):`<div class="cal-empty">${emptyMsg}</div>`}
+  </div>`;
+
+  el.innerHTML=`<div class="cal-wrap">
+    <div class="metrics-logo-row">
+      <img src="straletkd-logo.png" alt="STRALETKD"/>
+      <div class="metrics-logo-row-text">
+        <div class="metrics-logo-row-name">Kalendar</div>
+        <div class="metrics-logo-row-sub">${upcoming.length} predstojećih · ${data.count||evs.length} ukupno</div>
+      </div>
+    </div>
+    ${section('Predstojeći pozivi',groupByDay(upcoming),'Nema zakazanih poziva.')}
+    ${past.length?section('Prošli pozivi',groupByDay(past).slice(0,20),''):''}
+  </div>`;
+}
 
 /* Polished hero metric cards: Booked meetings / Won deals / Cash collected */
 function renderHeroStats(appts, rows, host){
