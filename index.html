@@ -2007,6 +2007,8 @@ let leadsSubTab  = 'all';   // 'all' | 'qualified' | 'disqualified' | 'booked' |
 let leadsView    = 'list'; // 'list' | 'ads'
 let currentLeadId = null;
 let leadsSearch  = '';
+// Capture ?lead=<id> immediately (before Supabase may clean the URL) for deep-links from Slack.
+const DEEP_LEAD_ID = (() => { try { return new URLSearchParams(window.location.search).get('lead'); } catch(e) { return null; } })();
 let leadsShowFollowUp = false;  // when true, only show leads needing follow-up today
 let leadsShowStale    = false;  // when true, only show stale (untouched 14d+) leads
 let leadsTagFilter    = '';     // empty = no tag filter; otherwise exact tag string
@@ -2079,7 +2081,9 @@ async function signInWithGoogle() {
   document.getElementById('auth-error').style.display = 'none';
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin }
+    // preserve the current path + query (e.g. ?lead=<id> from a Slack link)
+    // so the deep-link survives the Google round-trip and opens after login
+    options: { redirectTo: window.location.origin + window.location.pathname + window.location.search }
   });
   if (error) {
     const errEl = document.getElementById('auth-error');
@@ -2147,8 +2151,7 @@ async function signOut() {
    notification button → https://tkdcrm.space/?lead={{contact.id}}). Fetches
    the lead if it isn't already in the current cache. */
 async function handleDeepLink(){
-  let id;
-  try { id = new URLSearchParams(window.location.search).get('lead'); } catch(e) { return; }
+  const id = DEEP_LEAD_ID;
   if (!id) return;
   let lead = (cachedLeads||[]).find(l => l.id === id);
   if (!lead) {
