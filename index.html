@@ -1087,6 +1087,32 @@ tr.row-flash > td { animation: row-flash 1.6s ease-out; }
 .metrics-grid.g2 { grid-template-columns:1fr 1fr; }
 .metrics-grid.g3 { grid-template-columns:repeat(3,1fr); }
 .metrics-grid.g4 { grid-template-columns:repeat(4,1fr); }
+
+/* ── Polished hero metric cards (Booked / Won / Cash) ── */
+.mstat-row { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:32px; }
+.mstat { background:linear-gradient(160deg,var(--s2),var(--s1)); border:1px solid var(--b); border-radius:16px; padding:20px; }
+.mstat-ic { width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:18px; margin-bottom:14px; }
+.mstat-lbl { font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); }
+.mstat-val { font-size:30px; font-weight:900; letter-spacing:-1px; margin-top:6px; line-height:1; }
+.mstat-sub { font-size:11px; color:var(--muted); margin-top:8px; }
+
+/* ── Closer kanban (Booked/Won/Lost/No-show) ── */
+.kanban { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.kan-col { background:var(--s1); border:1px solid var(--b); border-radius:14px; padding:12px; }
+.kan-col-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.kan-col-ttl { font-size:10px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; }
+.kan-count { font-size:11px; font-weight:800; background:var(--s3); border-radius:99px; padding:2px 8px; color:var(--muted); }
+.kan-card { background:var(--s2); border:1px solid var(--b); border-radius:10px; padding:10px 11px; margin-bottom:8px; }
+.kan-card:last-child { margin-bottom:0; }
+.kan-card-name { font-size:12.5px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.kan-card-meta { font-size:10.5px; color:var(--muted); margin-top:3px; }
+.kan-empty { font-size:11px; color:var(--muted2); padding:6px 2px; }
+.kan-col.k-booked { border-top:2px solid #38bdf8; } .kan-col.k-booked .kan-col-ttl { color:#38bdf8; }
+.kan-col.k-won { border-top:2px solid var(--green); } .kan-col.k-won .kan-col-ttl { color:var(--green); }
+.kan-col.k-lost { border-top:2px solid var(--red); } .kan-col.k-lost .kan-col-ttl { color:var(--red); }
+.kan-col.k-noshow { border-top:2px solid var(--yellow); } .kan-col.k-noshow .kan-col-ttl { color:var(--yellow); }
+@media (max-width:640px){ .mstat-row { grid-template-columns:1fr; gap:10px; margin-bottom:24px; } .mstat-val { font-size:26px; } .kanban { grid-template-columns:1fr 1fr; gap:8px; } }
+
 .ms { background:var(--s1); padding:32px 30px; display:flex; flex-direction:column; gap:8px; transition:background .2s; }
 .ms:hover { background:var(--s2); }
 .ms-lbl { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
@@ -3202,6 +3228,11 @@ async function renderMetricsTab(){
   el.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:20px">⏳</div><div class="empty-text">Učitavam...</div></div>';
 
   const sheetRows = await fetchSheetData().catch(()=>[]);
+  // Live GHL calendar appointments → hero "Booked" stat + closer board
+  const _now = Date.now();
+  const apptData = await fetch(`/api/ghl-appointments?start=${_now-180*864e5}&end=${_now+180*864e5}`)
+    .then(r => r.ok ? r.json() : {events:[]}).catch(() => ({events:[]}));
+  const appts = (apptData.events || []).filter(e => !e.deleted);
   // Background: reconcile won deals from GHL → CRM Closed status
   syncClosedFromSheet().then(r => showSheetSyncToast(r));
 
@@ -3215,7 +3246,11 @@ async function renderMetricsTab(){
       </div>
     </div>
 
+    <div id="hero-stats-section"></div>
+
     <div id="revenue-section"></div>
+
+    <div id="closers-board-section"></div>
 
     <div id="funnel-section"></div>
 
@@ -3225,12 +3260,71 @@ async function renderMetricsTab(){
 
   </div>`;
 
+  renderHeroStats(appts, sheetRows, document.getElementById('hero-stats-section'));
   // Revenue/clients table (GHL opportunities via /api/ghl-metrics)
   const _revSec = document.getElementById('revenue-section');
   if (_revSec) renderRevenue(sheetRows, _revSec);
+  renderClosersBoard(appts, sheetRows, document.getElementById('closers-board-section'));
   renderFunnelSection();
   renderTimeToCloseSection();
   renderAIInsightsSection();
+}
+
+const _apptSt = a => String(a.appointmentStatus || a.appoinmentStatus || '').toLowerCase();
+
+/* Polished hero metric cards: Booked meetings / Won deals / Cash collected */
+function renderHeroStats(appts, rows, host){
+  if(!host) return;
+  const booked = appts.filter(a => ['confirmed','new','booked'].includes(_apptSt(a))).length;
+  const won = rows.filter(r => r.status === 'polozeno');
+  const cash = won.reduce((s,r) => s + (r.challenge||0), 0);
+  host.innerHTML = `<div class="mstat-row">
+    <div class="mstat">
+      <div class="mstat-ic" style="background:rgba(56,189,248,.12);color:#38bdf8">📅</div>
+      <div class="mstat-lbl">Zakazani pozivi</div>
+      <div class="mstat-val" style="color:#38bdf8">${booked}</div>
+      <div class="mstat-sub">${appts.length} ukupno u kalendaru</div>
+    </div>
+    <div class="mstat">
+      <div class="mstat-ic" style="background:rgba(34,197,94,.12);color:var(--green)">🏆</div>
+      <div class="mstat-lbl">Zatvoreni klijenti</div>
+      <div class="mstat-val" style="color:var(--green)">${won.length}</div>
+      <div class="mstat-sub">Won deals</div>
+    </div>
+    <div class="mstat">
+      <div class="mstat-ic" style="background:rgba(232,114,12,.12);color:var(--accent)">💰</div>
+      <div class="mstat-lbl">Cash Collected</div>
+      <div class="mstat-val" style="color:var(--accent)">€${cash.toLocaleString('sr-RS')}</div>
+      <div class="mstat-sub">Naplaćeno</div>
+    </div>
+  </div>`;
+}
+
+/* Closer board (single closer = Mateja): Booked / Won / Lost / No-show.
+   Booked/Lost/No-show come from GHL calendar appointment statuses; Won = won opps. */
+function renderClosersBoard(appts, rows, host){
+  if(!host) return;
+  const inSt = (...s) => appts.filter(a => s.includes(_apptSt(a)));
+  const booked = inSt('confirmed','new','booked').sort((a,b)=>String(a.startTime).localeCompare(String(b.startTime)));
+  const noshow = inSt('noshow').sort((a,b)=>String(b.startTime).localeCompare(String(a.startTime)));
+  const lost   = inSt('cancelled','invalid').sort((a,b)=>String(b.startTime).localeCompare(String(a.startTime)));
+  const won    = rows.filter(r => r.status === 'polozeno');
+  const apptCard = a => {
+    const d = new Date(a.startTime);
+    const when = isNaN(d) ? '' : `${d.toLocaleDateString('sr-RS',{day:'numeric',month:'short'})} · ${d.toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'})}`;
+    return `<div class="kan-card"><div class="kan-card-name">${esc(a.title||'Poziv')}</div><div class="kan-card-meta">${esc(when)}</div></div>`;
+  };
+  const wonCard = r => `<div class="kan-card"><div class="kan-card-name">${esc(r.name)}</div><div class="kan-card-meta" style="color:var(--green)">€${(r.challenge||0).toLocaleString('sr-RS')}</div></div>`;
+  const col = (cls,title,items,render) => `<div class="kan-col ${cls}"><div class="kan-col-hd"><span class="kan-col-ttl">${title}</span><span class="kan-count">${items.length}</span></div>${items.length?items.slice(0,30).map(render).join(''):'<div class="kan-empty">—</div>'}</div>`;
+  host.innerHTML = `<div class="metrics-sec">
+    <div class="metrics-sec-lbl">CLOSER BOARD — Mateja</div>
+    <div class="kanban">
+      ${col('k-booked','Zakazano',booked,apptCard)}
+      ${col('k-won','Zatvoreno',won,wonCard)}
+      ${col('k-lost','Otkazano',lost,apptCard)}
+      ${col('k-noshow','Nije došao',noshow,apptCard)}
+    </div>
+  </div>`;
 }
 
 /* ── TIME-TO-CLOSE ─────────────────────────────────────────────
