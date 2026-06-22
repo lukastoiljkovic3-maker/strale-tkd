@@ -2283,6 +2283,9 @@ async function renderMetricsTab(){
   const apptData = await fetch(`/api/ghl-appointments?start=${_now-180*864e5}&end=${_now+180*864e5}`)
     .then(r => r.ok ? r.json() : {events:[]}).catch(() => ({events:[]}));
   const appts = (apptData.events || []).filter(e => !e.deleted);
+  // Closed leads + their tracker-entered close value (deal_value) → Cash Collected / Won
+  const { data: closedRaw } = await sb.from('ghl_leads').select('name, deal_value').eq('status', 'Closed');
+  const closedLeads = closedRaw || [];
   // Background: reconcile won deals from GHL → CRM Closed status
   syncClosedFromSheet().then(r => showSheetSyncToast(r));
 
@@ -2310,11 +2313,11 @@ async function renderMetricsTab(){
 
   </div>`;
 
-  renderHeroStats(appts, sheetRows, document.getElementById('hero-stats-section'));
+  renderHeroStats(appts, closedLeads, document.getElementById('hero-stats-section'));
   // Revenue/clients table (GHL opportunities via /api/ghl-metrics)
   const _revSec = document.getElementById('revenue-section');
   if (_revSec) renderRevenue(sheetRows, _revSec);
-  renderClosersBoard(appts, sheetRows, document.getElementById('closers-board-section'));
+  renderClosersBoard(appts, closedLeads, document.getElementById('closers-board-section'));
   renderFunnelSection();
   renderTimeToCloseSection();
   renderAIInsightsSection();
@@ -2386,11 +2389,12 @@ async function renderKalendarTab(){
 }
 
 /* Polished hero metric cards: Booked meetings / Won deals / Cash collected */
-function renderHeroStats(appts, rows, host){
+function renderHeroStats(appts, closedLeads, host){
   if(!host) return;
   const booked = appts.filter(a => ['confirmed','new','booked'].includes(_apptSt(a))).length;
-  const won = rows.filter(r => r.status === 'polozeno');
-  const cash = won.reduce((s,r) => s + (r.challenge||0), 0);
+  const wonCount = closedLeads.length;
+  const cash = closedLeads.reduce((s,l) => s + (Number(l.deal_value)||0), 0);
+  const withVal = closedLeads.filter(l => l.deal_value != null).length;
   host.innerHTML = `<div class="mstat-row">
     <div class="mstat">
       <div class="mstat-ic" style="background:rgba(56,189,248,.12);color:#38bdf8">📅</div>
@@ -2401,33 +2405,34 @@ function renderHeroStats(appts, rows, host){
     <div class="mstat">
       <div class="mstat-ic" style="background:rgba(34,197,94,.12);color:var(--green)">🏆</div>
       <div class="mstat-lbl">Zatvoreni klijenti</div>
-      <div class="mstat-val" style="color:var(--green)">${won.length}</div>
-      <div class="mstat-sub">Won deals</div>
+      <div class="mstat-val" style="color:var(--green)">${wonCount}</div>
+      <div class="mstat-sub">Status: Closed</div>
     </div>
     <div class="mstat">
       <div class="mstat-ic" style="background:rgba(232,114,12,.12);color:var(--accent)">💰</div>
       <div class="mstat-lbl">Cash Collected</div>
       <div class="mstat-val" style="color:var(--accent)">€${cash.toLocaleString('sr-RS')}</div>
-      <div class="mstat-sub">Naplaćeno</div>
+      <div class="mstat-sub">${withVal}/${wonCount} sa upisanom vrednošću</div>
     </div>
   </div>`;
 }
 
 /* Closer board (single closer = Mateja): Booked / Won / Lost / No-show.
-   Booked/Lost/No-show come from GHL calendar appointment statuses; Won = won opps. */
-function renderClosersBoard(appts, rows, host){
+   Booked/Lost/No-show come from GHL calendar appointment statuses; Won = tracker
+   Closed leads with their entered close value (deal_value). */
+function renderClosersBoard(appts, closedLeads, host){
   if(!host) return;
   const inSt = (...s) => appts.filter(a => s.includes(_apptSt(a)));
   const booked = inSt('confirmed','new','booked').sort((a,b)=>String(a.startTime).localeCompare(String(b.startTime)));
   const noshow = inSt('noshow').sort((a,b)=>String(b.startTime).localeCompare(String(a.startTime)));
   const lost   = inSt('cancelled','invalid').sort((a,b)=>String(b.startTime).localeCompare(String(a.startTime)));
-  const won    = rows.filter(r => r.status === 'polozeno');
+  const won    = [...closedLeads].sort((a,b)=>(Number(b.deal_value)||0)-(Number(a.deal_value)||0));
   const apptCard = a => {
     const d = new Date(a.startTime);
     const when = isNaN(d) ? '' : `${d.toLocaleDateString('sr-RS',{day:'numeric',month:'short'})} · ${d.toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'})}`;
     return `<div class="kan-card"><div class="kan-card-name">${esc(a.title||'Poziv')}</div><div class="kan-card-meta">${esc(when)}</div></div>`;
   };
-  const wonCard = r => `<div class="kan-card"><div class="kan-card-name">${esc(r.name)}</div><div class="kan-card-meta" style="color:var(--green)">€${(r.challenge||0).toLocaleString('sr-RS')}</div></div>`;
+  const wonCard = l => `<div class="kan-card"><div class="kan-card-name">${esc(l.name||'Klijent')}</div><div class="kan-card-meta" style="color:var(--green)">${l.deal_value!=null?'€'+Number(l.deal_value).toLocaleString('sr-RS'):'—'}</div></div>`;
   const col = (cls,title,items,render) => `<div class="kan-col ${cls}"><div class="kan-col-hd"><span class="kan-col-ttl">${title}</span><span class="kan-count">${items.length}</span></div>${items.length?items.slice(0,30).map(render).join(''):'<div class="kan-empty">—</div>'}</div>`;
   host.innerHTML = `<div class="metrics-sec">
     <div class="metrics-sec-lbl">CLOSER BOARD — Mateja</div>
