@@ -540,6 +540,13 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
 }
 .lc-deal-sel:focus { border-color:rgba(34,197,94,.4); background:rgba(34,197,94,.03); }
 .lc-deal-sel option, .lc-deal-sel optgroup { background:#1a1a22; color:#f0f0f4; }
+.lc-dealval-row { display:flex; align-items:center; gap:10px; }
+.lc-dealval-lbl { font-size:12px; font-weight:600; color:var(--muted); white-space:nowrap; }
+.lc-dealval-field { position:relative; flex:1; }
+.lc-dealval-cur { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--muted); font-weight:800; font-size:14px; pointer-events:none; }
+.lc-dealval-input { width:100%; padding:11px 14px 11px 28px; border-radius:10px; border:1px solid var(--b);
+  background:var(--s2); color:var(--green); font-family:var(--font); font-size:15px; font-weight:800; letter-spacing:-.3px; }
+.lc-dealval-input:focus { border-color:rgba(34,197,94,.4); background:rgba(34,197,94,.03); outline:none; }
 
 /* Note button */
 .lc-note-btn {
@@ -2128,12 +2135,30 @@ async function signOut() {
     clearInterval(tick);
     setProgress(100);
     setTimeout(hideLoader, 400);
+    handleDeepLink();   // ?lead=<contactId> → open that lead (e.g. from a Slack notification)
   });
 
   sb.channel('tracker')
     .on('postgres_changes',{event:'*',schema:'public',table:'ghl_leads'},()=>{if(currentTab==='leads')renderLeadsSection();})
     .subscribe();
 })();
+
+/* Deep-link: open a specific lead from ?lead=<ghl contactId> (e.g. a Slack
+   notification button → https://tkdcrm.space/?lead={{contact.id}}). Fetches
+   the lead if it isn't already in the current cache. */
+async function handleDeepLink(){
+  let id;
+  try { id = new URLSearchParams(window.location.search).get('lead'); } catch(e) { return; }
+  if (!id) return;
+  let lead = (cachedLeads||[]).find(l => l.id === id);
+  if (!lead) {
+    const { data } = await sb.from('ghl_leads').select('*').eq('id', id).single();
+    if (data) { cachedLeads.push(data); lead = data; }
+  }
+  if (!lead) return;
+  if (currentTab !== 'leads') setTab('leads');
+  setTimeout(() => openLeadDetail(id), currentTab !== 'leads' ? 350 : 60);
+}
 
 function updateMonthLabel() {
   document.getElementById('monthLabel').textContent = `${MONTHS[currentMonth]} ${currentYear}`;
@@ -4559,6 +4584,14 @@ function openLeadDetail(id){
           ${dealOpts}
         </select>
       </div>
+      <div class="ldp-subgap lc-dealval-row">
+        <span class="lc-dealval-lbl">Zatvoreno za</span>
+        <div class="lc-dealval-field">
+          <span class="lc-dealval-cur">€</span>
+          <input type="number" inputmode="decimal" min="0" step="1" class="lc-dealval-input" placeholder="0"
+                 value="${c.deal_value!=null?c.deal_value:''}" onchange="updateLeadDealValue('${esc(c.id)}',this.value)">
+        </div>
+      </div>
     </div>
 
     <div class="ldp-card">
@@ -4926,6 +4959,18 @@ async function updateLeadDeal(id,deal){
   if(!error){
     if(lead){lead.deal=deal||null;renderLeads(cachedLeads);
     logActivity(id,'deal',oldDeal,deal||null);}
+  }
+}
+
+async function updateLeadDealValue(id,val){
+  const lead=cachedLeads.find(l=>l.id===id);
+  const num = val==='' || val==null ? null : Number(val);
+  if (num!=null && (isNaN(num) || num<0)) return;
+  const oldVal = lead ? (lead.deal_value!=null ? lead.deal_value : null) : null;
+  const {error}=await sb.from('ghl_leads').update({deal_value:num}).eq('id',id);
+  if(!error){
+    if(lead){lead.deal_value=num;renderLeads(cachedLeads);}
+    logActivity(id,'deal_value',oldVal!=null?'€'+oldVal:null,num!=null?'€'+num:null);
   }
 }
 
