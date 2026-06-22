@@ -35,15 +35,13 @@ export default async function handler(req, res) {
 
     const hasTag = (c, ...tags) => tags.some(t => c.tags?.includes(t));
 
-    // STRALETKD funnel buckets (response keys kept stable for the SPA; relabel in UI later)
+    // STRALETKD VSL funnel buckets (no webinars)
     const qualified    = all.filter(c => hasTag(c, 'straletkd-qualified', 'budget-100-300', 'budget-300-1000', 'budget-1000-plus'));
     const disqualified = all.filter(c => hasTag(c, 'straletkd-disqualified', 'budget-under-100', 'dq'));
-    const webinarLead     = all.filter(c => hasTag(c, 'booked-call'));   // -> "Booked calls"
-    const webinarAttended = all.filter(c => hasTag(c, 'customer'));      // -> "Closed"
-    const webinar3105 = [];                                              // n/a for Strale
-    const leadMagnet      = [];                                          // n/a for Strale
+    const booked       = all.filter(c => hasTag(c, 'booked-call'));
+    const customer     = all.filter(c => hasTag(c, 'customer'));
 
-    res.status(200).json({ qualified, disqualified, webinarLead, webinarAttended, webinar3105, leadMagnet });
+    res.status(200).json({ qualified, disqualified, booked, customer });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

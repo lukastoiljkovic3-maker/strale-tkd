@@ -38,7 +38,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ summary: 'Nedovoljno podataka za AI sažetak. Popuni kvalifikaciju ili beleške i pokušaj ponovo.' });
   }
 
-  const systemPrompt = `Ti si pomoćnik prodajnom timu "Boris FX tima" (forex mentorstvo iz Srbije). Boris ton: chill, nikad ne jurimo nikoga, mi kvalifikujemo lidove — ne prodajemo. Nismo "setteri" ili "closeri", mi smo profesionalci sa 7+ godina iskustva. Tim zatvara klijente na funded naloge i bootcamp.
+  const systemPrompt = `Ti si pomoćnik prodajnom timu STRALETKD (forex mentorstvo iz Srbije). Ton: chill, nikad ne jurimo nikoga, mi kvalifikujemo lidove — ne prodajemo. Nismo "setteri" ili "closeri", mi smo profesionalci. Tim zatvara klijente na signale i funded naloge.
 
 Tvoj zadatak: na osnovu sirovih podataka o leadu, napiši kratak brief koji odgovara na pitanje "Da li je ovaj lead UOPŠTE za nas, i ako jeste, kako da ga kvalifikujemo?"
 

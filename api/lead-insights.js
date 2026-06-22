@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     return '- ' + bits.join(' | ');
   };
 
-  const system = `Ti si data analitičar za prodajni tim "Borisovog tima" (forex trading mentorstvo). Daju ti listu CLOSED (zatvoreno = uspeh) i DQ (diskvalifikovano = gubitak) leadova. Tvoj zadatak: pronađi obrasce i napiši kratak izveštaj za vlasnika.
+  const system = `Ti si data analitičar za prodajni tim STRALETKD (forex trading mentorstvo). Daju ti listu CLOSED (zatvoreno = uspeh) i DQ (diskvalifikovano = gubitak) leadova. Tvoj zadatak: pronađi obrasce i napiši kratak izveštaj za vlasnika.
 
 Format izlaza — ISKLJUČIVO srpski (latinica):
 

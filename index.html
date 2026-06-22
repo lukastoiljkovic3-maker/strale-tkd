@@ -1989,7 +1989,7 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 
 <!-- LOADING SCREEN -->
 <div id="loader">
-  <img id="loader-logo" src="theoneclublogo.png" alt="STRALETKD" />
+  <img id="loader-logo" src="straletkd-logo.png" alt="STRALETKD" />
   <div id="loader-bar-wrap">
     <div id="loader-bar"></div>
   </div>
@@ -1999,7 +1999,7 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 <header>
   <div class="logo">
     <div class="logo-img">
-      <img src="theoneclublogo.png" alt="STRALETKD" style="width:38px;height:38px;object-fit:contain;" />
+      <img src="straletkd-logo.png" alt="STRALETKD" style="width:38px;height:38px;object-fit:contain;" />
     </div>
     <div class="logo-words">
       <div class="logo-name">STRALETKD</div>
@@ -2142,7 +2142,7 @@ const GHL_CF    = {
   'qIUxzX862aqvd2DPSsTn': 'instagram'
 };
 let leadsFilter  = 'all';
-let leadsSubTab  = 'all';   // 'all' | 'qualified' | 'disqualified' | 'webinar_lead' | 'lead_magnet'
+let leadsSubTab  = 'all';   // 'all' | 'qualified' | 'disqualified' | 'booked' | 'customer'
 let leadsView    = 'list'; // 'list' | 'ads'
 let currentLeadId = null;
 let leadsSearch  = '';
@@ -2151,7 +2151,7 @@ let leadsShowStale    = false;  // when true, only show stale (untouched 14d+) l
 let leadsTagFilter    = '';     // empty = no tag filter; otherwise exact tag string
 let leadsSmartView    = false;  // when true, sort by score desc + hide cold
 let cachedLeads  = [];
-let leadCounts   = { all: 0, qualified: 0, disqualified: 0, webinar_lead: 0, webinar_attended: 0, webinar_3105: 0, lead_magnet: 0 };
+let leadCounts   = { all: 0, qualified: 0, disqualified: 0, booked: 0, customer: 0 };
 let openNotes    = new Set();
 let currentUserEmail = null;  // Set after auth; used as actor for activity log
 // Emails that see the Manager dashboard ('Pregled') tab. Add yours here.
@@ -3164,7 +3164,7 @@ async function renderMetricsTab(){
   el.innerHTML=`<div class="metrics-wrap">
 
     <div class="metrics-logo-row">
-      <img src="theoneclublogo.png" alt="STRALETKD"/>
+      <img src="straletkd-logo.png" alt="STRALETKD"/>
       <div class="metrics-logo-row-text">
         <div class="metrics-logo-row-name">STRALETKD</div>
         <div class="metrics-logo-row-sub">Prodajne Metrike</div>
@@ -3244,15 +3244,14 @@ async function renderTimeToCloseSection(){
   const median = arr => { if (!arr.length) return null; const s=[...arr].sort((a,b)=>a-b); return s[Math.floor(s.length/2)]; };
   const labelMap = {
     qualified: 'Qualified',
-    webinar_lead: 'Webinar Lead',
-    webinar_attended: 'Prisustvovao',
-    lead_magnet: 'Lead Magnet',
+    booked: 'Zakazan poziv',
+    customer: 'Klijent',
     disqualified: 'Disqualified',
     other: 'Ostalo',
   };
   const colorMap = {
-    qualified:'#E8720C', webinar_lead:'#a855f7', webinar_attended:'#10b981',
-    lead_magnet:'#eab308', disqualified:'#f43f5e', other:'#94a3b8',
+    qualified:'#E8720C', booked:'#38bdf8', customer:'#22c55e',
+    disqualified:'#f43f5e', other:'#94a3b8',
   };
 
   const sourceRows = Object.entries(bySource)
@@ -3589,32 +3588,32 @@ async function renderHeatmapSection(){
 }
 
 /* ── CONVERSION FUNNEL ───────────────────────────────────────────
- * Visualizes the webinar funnel: Webinar Lead → Attended → Qualified → Closed.
+ * Visualizes the VSL funnel: Leadovi → Kvalifikovani → Zakazan poziv → Zatvoreni.
  * Uses Supabase head counts on tracker tags, and ghl_leads.status='Closed'
- * for the bottom stage, restricted to contacts that ever had a webinar tag.
+ * for the bottom stage.
  * ─────────────────────────────────────────────────────────────── */
 async function renderFunnelSection(){
   const host = document.getElementById('funnel-section');
   if (!host) return;
   host.innerHTML = `<div class="metrics-sec">
-    <div class="metrics-sec-lbl">PRODAJNI LIJEVAK — Webinar Funnel</div>
+    <div class="metrics-sec-lbl">PRODAJNI LIJEVAK — VSL</div>
     <div style="padding:24px;text-align:center;color:var(--muted);font-size:12px">⏳ Učitavam...</div>
   </div>`;
 
-  const webinarTags = ['webinar-lead','qualified-webinar','disqualified-webinar','prisustvovao-webinaru'];
+  const qualTags = ['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus'];
 
-  const [regR, attR, qualR, closedR] = await Promise.all([
-    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags', webinarTags),
-    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags', ['prisustvovao-webinaru']),
-    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags', ['qualified-webinar']),
-    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags', webinarTags).eq('status','Closed'),
+  const [allR, qualR, bookedR, closedR] = await Promise.all([
+    sb.from('ghl_leads').select('id',{count:'exact',head:true}),
+    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags', qualTags),
+    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags', ['booked-call']),
+    sb.from('ghl_leads').select('id',{count:'exact',head:true}).eq('status','Closed'),
   ]);
 
   const stages = [
-    { key:'reg',    label:'Prijavili se na webinar',  count: regR.count||0,    color:'#E8720C' },
-    { key:'att',    label:'Prisustvovali webinaru',   count: attR.count||0,    color:'#a855f7' },
-    { key:'qual',   label:'Qualified (post-webinar)', count: qualR.count||0,   color:'#f59e0b' },
-    { key:'closed', label:'Closed',                   count: closedR.count||0, color:'#22c55e' },
+    { key:'lead',   label:'Leadovi',       count: allR.count||0,    color:'#E8720C' },
+    { key:'qual',   label:'Kvalifikovani', count: qualR.count||0,   color:'#f59e0b' },
+    { key:'booked', label:'Zakazan poziv', count: bookedR.count||0, color:'#38bdf8' },
+    { key:'closed', label:'Zatvoreni',     count: closedR.count||0, color:'#22c55e' },
   ];
   const top = stages[0].count || 1;
   const pctOf = n => Math.round((n / top) * 100);
@@ -3622,7 +3621,7 @@ async function renderFunnelSection(){
   const conv  = (a,b) => a === 0 ? 0 : Math.round((b/a) * 100);
 
   host.innerHTML = `<div class="metrics-sec">
-    <div class="metrics-sec-lbl">PRODAJNI LIJEVAK — Webinar Funnel</div>
+    <div class="metrics-sec-lbl">PRODAJNI LIJEVAK — VSL</div>
     <div class="funnel-wrap">
       ${stages.map((s, i) => {
         const w = pctOf(s.count);
@@ -3644,15 +3643,15 @@ async function renderFunnelSection(){
       }).join('')}
       <div class="funnel-summary">
         <div class="funnel-summary-row">
-          <span class="funnel-summary-lbl">Ukupna konverzija (prijava → close)</span>
+          <span class="funnel-summary-lbl">Ukupna konverzija (lead → zatvoren)</span>
           <span class="funnel-summary-val" style="color:var(--green)">${conv(stages[0].count, stages[3].count)}%</span>
         </div>
         <div class="funnel-summary-row">
-          <span class="funnel-summary-lbl">Show-up rate (prijava → prisustvo)</span>
+          <span class="funnel-summary-lbl">Kvalifikacija (lead → qualified)</span>
           <span class="funnel-summary-val">${conv(stages[0].count, stages[1].count)}%</span>
         </div>
         <div class="funnel-summary-row">
-          <span class="funnel-summary-lbl">Close rate qualified-a</span>
+          <span class="funnel-summary-lbl">Close rate (zakazan → zatvoren)</span>
           <span class="funnel-summary-val">${conv(stages[2].count, stages[3].count)}%</span>
         </div>
       </div>
@@ -3759,12 +3758,10 @@ async function loadLeads(lead_type){
   let q=sb.from('ghl_leads').select('*').order('date_added',{ascending:false}).limit(5000);
   if(lead_type && lead_type!=='all'){
     const tagMap={
-      qualified:['qualified','qualified-webinar'],
-      disqualified:['dq','disqualified-webinar'],
-      webinar_lead:['webinar-lead'],
-      webinar_attended:['prisustvovao-webinaru'],
-      webinar_3105:['vsl-v1','vsl-v2','vsl-v3','webinar-31.05','31-05-attended','vsl-1','vsl-2','vsl-3'],
-      lead_magnet:['lead-magnet'],
+      qualified:['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus'],
+      disqualified:['straletkd-disqualified','budget-under-100','dq'],
+      booked:['booked-call'],
+      customer:['customer'],
     };
     const tags=tagMap[lead_type]||[];
     if(tags.length) q=q.overlaps('tags',tags);
@@ -3914,7 +3911,7 @@ function findWaitingLeads(){
     if (arrived > cutoff) return false;  // arrived <15min ago
     // Only flag tracker-relevant leads
     const tags = l.tags || [];
-    if (!tags.some(t => ['qualified','qualified-webinar','webinar-lead','prisustvovao-webinaru'].includes(t))) return false;
+    if (!tags.some(t => ['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus','booked-call'].includes(t))) return false;
     return true;
   }).sort((a,b) => new Date(a.date_added) - new Date(b.date_added));
 }
@@ -4165,8 +4162,8 @@ function showRecycleToast(r){
 /* ─────────────────── LEAD SCORING ─────────────────────────────────
  * Heuristic 0–100 score, then bucketed into 🔥 hot / 🌤 warm / ❄️ cold.
  * Signals:
- *  + 35 if attended the webinar (prisustvovao-webinaru)
- *  + 25 if qualified-webinar tagged
+ *  + 35 if booked a call (booked-call)
+ *  + 25 if qualified (straletkd-qualified / budget tiers)
  *  + 15 if status = Follow Up (engaged but pending)
  *  + 20 if has follow-up date in future
  *  + 15 if added within last 3 days (recency)
@@ -4180,8 +4177,8 @@ function leadScore(l){
   if (l.status === 'DQ') return 0;
   let s = 20;
   const tags = l.tags || [];
-  if (tags.includes('prisustvovao-webinaru')) s += 35;
-  if (tags.includes('qualified-webinar') || tags.includes('qualified')) s += 25;
+  if (tags.includes('booked-call')) s += 35;
+  if (tags.some(t => ['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus'].includes(t))) s += 25;
   if (l.status === 'Follow Up') s += 15;
   const todayStr = new Date().toISOString().slice(0,10);
   if (l.follow_up_date && l.follow_up_date >= todayStr) s += 20;
@@ -4354,12 +4351,11 @@ function cleanPhone(p){
 }
 function waGreetingFor(lead){
   const firstName = (lead.name || '').split(' ')[0] || '';
-  const repName   = lead.assigned_to === 'mateja' ? 'Mateja'
-                  : lead.assigned_to === 'dusica' ? 'Dušica' : '';
-  const attended  = Array.isArray(lead.tags) && lead.tags.includes('prisustvovao-webinaru');
+  const repName   = lead.assigned_to === 'mateja' ? 'Mateja' : '';
+  const booked    = Array.isArray(lead.tags) && lead.tags.includes('booked-call');
   const name = firstName || '';
-  const intro = repName ? `ovde ${repName} iz Boris FX tima` : `javljam ti se iz Boris FX tima`;
-  const middle = attended ? `, vidim da si bio na predavanju u nedelju` : '';
+  const intro = repName ? `ovde ${repName} iz STRALETKD tima` : `javljam ti se iz STRALETKD tima`;
+  const middle = booked ? `, vidim da si zakazao poziv` : '';
   return `Ćao ${name}, ${intro}${middle}. Jel imaš sekund?`;
 }
 function waLink(lead){
@@ -4397,10 +4393,9 @@ function contactActions(lead, size = 'sm'){
  * the lead inside the Leads tab.
  * ─────────────────────────────────────────────────────────────── */
 const STL_TRACKER_TAGS = new Set([
-  'qualified','qualified-webinar',
-  'dq','disqualified-webinar',
-  'webinar-lead','prisustvovao-webinaru',
-  'lead-magnet'
+  'straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus',
+  'straletkd-disqualified','budget-under-100','dq',
+  'booked-call','customer'
 ]);
 const STL_POLL_MS    = 90000;
 const STL_STORAGE_KEY = 'toc:seen-lead-ids';
@@ -4701,16 +4696,14 @@ function stlStart(){
 }
 
 async function loadLeadCounts(){
-  const [allR,qR,dqR,wR,waR,wbR,lR]=await Promise.all([
+  const [allR,qR,dqR,bR,cR]=await Promise.all([
     sb.from('ghl_leads').select('id',{count:'exact',head:true}),
-    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',['qualified','qualified-webinar']),
-    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',['dq','disqualified-webinar']),
-    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',['webinar-lead']),
-    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',['prisustvovao-webinaru']),
-    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',['vsl-v1','vsl-v2','vsl-v3','webinar-31.05','31-05-attended','vsl-1','vsl-2','vsl-3']),
-    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',['lead-magnet']),
+    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus']),
+    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',['straletkd-disqualified','budget-under-100','dq']),
+    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',['booked-call']),
+    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',['customer']),
   ]);
-  return{all:allR.count||0,qualified:qR.count||0,disqualified:dqR.count||0,webinar_lead:wR.count||0,webinar_attended:waR.count||0,webinar_3105:wbR.count||0,lead_magnet:lR.count||0};
+  return{all:allR.count||0,qualified:qR.count||0,disqualified:dqR.count||0,booked:bR.count||0,customer:cR.count||0};
 }
 
 function mapContact(c, lead_type){
@@ -4743,24 +4736,21 @@ async function syncLeadsFromGHL(){
     if(json.error)throw new Error(json.error);
     // Merge all contacts by ID — tags stored from GHL, lead_type = highest priority match
     const seen=new Map();
-    // 31.05 takes precedence over everything else — these are the freshest
-    // webinar attendees and should always show '31.05.2026' as their type pill.
-    const priority=['webinar_3105','qualified','disqualified','webinar_attended','webinar_lead','lead_magnet'];
+    // Highest-priority bucket wins the lead_type pill: customer > booked > qualified > disqualified.
+    const priority=['customer','booked','qualified','disqualified'];
     [
-      ...(json.webinar3105||[]).map(c=>mapContact(c,'webinar_3105')),
+      ...(json.customer||[]).map(c=>mapContact(c,'customer')),
+      ...(json.booked||[]).map(c=>mapContact(c,'booked')),
       ...(json.qualified||[]).map(c=>mapContact(c,'qualified')),
       ...(json.disqualified||[]).map(c=>mapContact(c,'disqualified')),
-      ...(json.webinarAttended||[]).map(c=>mapContact(c,'webinar_attended')),
-      ...(json.webinarLead||[]).map(c=>mapContact(c,'webinar_lead')),
-      ...(json.leadMagnet||[]).map(c=>mapContact(c,'lead_magnet')),
     ].forEach(r=>{
       const existing=seen.get(r.id);
       if(!existing||priority.indexOf(r.lead_type)<priority.indexOf(existing.lead_type)) seen.set(r.id,r);
     });
     const rows=[...seen.values()];
     // Before upserting, fetch existing tags so we MERGE rather than OVERWRITE.
-    // Without this, any tag added manually or via CSV import (e.g.
-    // prisustvovao-31-05-2026) would be wiped when GHL doesn't include it.
+    // Without this, any tag added manually in the tracker would be wiped
+    // whenever GHL doesn't include it.
     if (rows.length) {
       const ids = rows.map(r => r.id);
       const tagsByLead = new Map();
@@ -4956,7 +4946,7 @@ async function toggleAdsView(){
 async function loadCampaignData(){
   const {data,error}=await sb.from('ghl_leads')
     .select('utm_campaign,utm_content,utm_source,utm_medium,status,deal,lead_type,tags')
-    .overlaps('tags',['webinar-lead','qualified-webinar','disqualified-webinar'])
+    .overlaps('tags',['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus','straletkd-disqualified','budget-under-100','booked-call','customer'])
     .limit(5000);
   if(error||!data) return [];
   const isId=v=>v&&/^\d{10,}$/.test(v.trim());
@@ -5240,7 +5230,7 @@ function computeLeads(){
 // Builds just the <tr> rows HTML for the leads table.
 function buildLeadRows(leads){
   const todayStr=new Date().toISOString().slice(0,10);
-  const typePill=t=>t==='qualified'?'<span class="ltr-type type-q">Qualified</span>':t==='disqualified'?'<span class="ltr-type type-dq">Disqualified</span>':t==='webinar_lead'?'<span class="ltr-type type-wb">Webinar</span>':t==='webinar_attended'?'<span class="ltr-type type-wa">17.05.2026</span>':t==='webinar_3105'?'<span class="ltr-type type-wb2">31.05.2026</span>':'<span class="ltr-type type-lm">Lead Magnet</span>';
+  const typePill=t=>t==='qualified'?'<span class="ltr-type type-q">Qualified</span>':t==='disqualified'?'<span class="ltr-type type-dq">Disqualified</span>':t==='booked'?'<span class="ltr-type type-wb">Zakazan poziv</span>':t==='customer'?'<span class="ltr-type type-wa">Klijent</span>':'';
   return leads.map(c=>{
     const initials=(c.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     const avCls=c.assigned_to==='mateja'?'av-m':c.assigned_to==='dusica'?'av-d':'';
@@ -5483,17 +5473,11 @@ function renderLeads(all){
       <button class="lsb-btn tab-dq ${leadsSubTab==='disqualified'?'active':''}" onclick="setLeadsSubTab('disqualified')">
         <span class="lsb-count">${leadCounts.disqualified}</span><span class="lsb-label">Disqualified</span>
       </button>
-      <button class="lsb-btn tab-wb ${leadsSubTab==='webinar_lead'?'active':''}" onclick="setLeadsSubTab('webinar_lead')">
-        <span class="lsb-count">${leadCounts.webinar_lead}</span><span class="lsb-label">Webinar</span>
+      <button class="lsb-btn tab-wb ${leadsSubTab==='booked'?'active':''}" onclick="setLeadsSubTab('booked')">
+        <span class="lsb-count">${leadCounts.booked}</span><span class="lsb-label">Zakazan poziv</span>
       </button>
-      <button class="lsb-btn tab-wa ${leadsSubTab==='webinar_attended'?'active':''}" onclick="setLeadsSubTab('webinar_attended')">
-        <span class="lsb-count">${leadCounts.webinar_attended}</span><span class="lsb-label">17.05.2026</span>
-      </button>
-      <button class="lsb-btn tab-wb2 ${leadsSubTab==='webinar_3105'?'active':''}" onclick="setLeadsSubTab('webinar_3105')">
-        <span class="lsb-count">${leadCounts.webinar_3105}</span><span class="lsb-label">31.05.2026</span>
-      </button>
-      <button class="lsb-btn tab-lm ${leadsSubTab==='lead_magnet'?'active':''}" onclick="setLeadsSubTab('lead_magnet')">
-        <span class="lsb-count">${leadCounts.lead_magnet}</span><span class="lsb-label">Lead Magnet</span>
+      <button class="lsb-btn tab-wa ${leadsSubTab==='customer'?'active':''}" onclick="setLeadsSubTab('customer')">
+        <span class="lsb-count">${leadCounts.customer}</span><span class="lsb-label">Klijent</span>
       </button>
     </div>
 
@@ -5557,7 +5541,7 @@ function openLeadDetail(id){
   const todayStr=new Date().toISOString().slice(0,10);
   const initials=(c.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   const avCls=c.assigned_to==='mateja'?'av-m':c.assigned_to==='dusica'?'av-d':'';
-  const typePillMap={qualified:'<span class="ltr-type type-q">Qualified</span>',disqualified:'<span class="ltr-type type-dq">Disqualified</span>',webinar_lead:'<span class="ltr-type type-wb">Webinar</span>',webinar_attended:'<span class="ltr-type type-wa">17.05.2026</span>',webinar_3105:'<span class="ltr-type type-wb2">31.05.2026</span>',lead_magnet:'<span class="ltr-type type-lm">Lead Magnet</span>'};
+  const typePillMap={qualified:'<span class="ltr-type type-q">Qualified</span>',disqualified:'<span class="ltr-type type-dq">Disqualified</span>',booked:'<span class="ltr-type type-wb">Zakazan poziv</span>',customer:'<span class="ltr-type type-wa">Klijent</span>'};
   const stOpts=['Novi','Follow Up','Closed','DQ'].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('');
   let fuCls=''; if(c.follow_up_date){fuCls=c.follow_up_date===todayStr?'fu-today':c.follow_up_date<todayStr?'fu-overdue':'';}
   const dealOpts=Object.entries(DEALS).map(([k,v])=>`<option value="${k}" ${c.deal===k?'selected':''}>${v.icon} ${v.label} — ${v.price}</option>`).join('');
@@ -5697,7 +5681,7 @@ function renderLeadCard(lead, subTab){
   const stCls='status-'+st.replace(/\s+/g,'-');
   // Type-specific accent override when not assigned
   const typeAccent = !assigned
-    ? (subTab==='dq'?'style="--lc:var(--red)"':subTab==='lead_magnet'?'style="--lc:var(--yellow)"':'')
+    ? (subTab==='dq'||subTab==='disqualified'?'style="--lc:var(--red)"':subTab==='customer'?'style="--lc:var(--green)"':subTab==='booked'?'style="--lc:#38bdf8"':'')
     : '';
   const noteOpen=openNotes.has(lead.id);
   const notePrev=lead.notes?(lead.notes.length>52?lead.notes.substring(0,52)+'…':lead.notes):null;

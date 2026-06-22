@@ -3,8 +3,8 @@
 //   → { message }
 const MODEL = 'claude-haiku-4-5';
 
-// ─────────────────── BORIS FX BRAND VOICE ─────────────────────
-// Boris ton: chill, never chases, confident. We don't pursue leads —
+// ─────────────────── STRALETKD — SETTER VOICE ─────────────────────
+// Setter ton: chill, never chases, confident. We don't pursue leads —
 // they pursue us. Every message qualifies whether the lead is a fit,
 // not whether they'll buy. Casual, friend-to-friend Serbian. Logic
 // over pressure. Mi nikog ne jurimo puskom — idi kod drugih slobodno.
@@ -16,13 +16,13 @@ const MODEL = 'claude-haiku-4-5';
 // ────────────────────────────────────────────────────────────────
 
 const SCENARIO_PROMPTS = {
-  'first-touch': `Ovo je PRVA poruka leadu koji je bio na predavanju u nedelju (ili je samo prijavljen).
+  'first-touch': `Ovo je PRVA poruka leadu koji je popunio prijavu preko VSL-a (i možda zakazao poziv).
 
 Format (drži se ovog tačno):
-"Ćao [ime], ovde [rep] iz Boris FX tima, vidim da si bio na predavanju u nedelju. Jel imaš sekund?"
+"Ćao [ime], ovde [rep] iz STRALETKD tima, vidim da si popunio prijavu. Jel imaš sekund?"
 
-Ako NIJE prisustvovao predavanju:
-"Ćao [ime], ovde [rep] iz Boris FX tima. Jel imaš sekund?"
+Ako je već zakazao poziv:
+"Ćao [ime], ovde [rep] iz STRALETKD tima, vidim da si zakazao poziv. Jel imaš sekund?"
 
 Ako ime nije poznato — preskoči ", [ime]".
 Ako rep nije poznat — koristi "javljam ti se" umesto "ovde [rep]".
@@ -123,7 +123,7 @@ NIKAD:
 - Emocionalne ucene`,
 };
 
-const BASE_RULES = `OPŠTA PRAVILA — STRIKTNO (BORIS FX BRAND VOICE):
+const BASE_RULES = `OPŠTA PRAVILA — STRIKTNO (STRALETKD — SETTER VOICE):
 
 JEZIK & FORMAT:
 - ISKLJUČIVO srpski, latinica.
@@ -132,15 +132,15 @@ JEZIK & FORMAT:
 - Maks 2 rečenice (3 samo izuzetno).
 
 ZABRANJENO (NIKAD):
-- Reč "webinar" — uvek "predavanje".
-- "Funded", "paketi", "10K/25K/50K", "Bootcamp", "kapital", "challenge" u prvoj poruci.
+- Ne pominji "webinar"/"predavanje" — Strale nema predavanja, lead je došao preko VSL-a.
+- "Funded", "signali", cene, "paketi", "challenge" u prvoj poruci.
 - Velika obećanja ("zaradi", "uspeh", "transformacija", "promeniće ti život").
 - Sales fraze ("specijalna ponuda", "ne propusti", "idealna prilika", "ekskluzivno").
 - Molbe i izvinjavanja ("molim te", "izvini što smetam", "samo da te podsetim").
 - "Kada ti odgovara da se čujemo na 10 min".
 - Generičnost ("javljam se da pitam jesi razmislio").
 
-BORIS FX VIBE — OBAVEZNO:
+SETTER VIBE — OBAVEZNO:
 - Chill, opušteno, nikad u žurbi.
 - Mi ne jurimo nikoga. Lead nas zove, ne mi njega.
 - Confidence: "ako je za tebe — okej, ako nije — slobodno idi dalje".
@@ -165,9 +165,8 @@ export default async function handler(req, res) {
   const scenarioPrompt = SCENARIO_PROMPTS[scenario] || SCENARIO_PROMPTS['first-touch'];
 
   const firstName = (lead.name || '').split(' ')[0] || '';
-  const repName = lead.assigned_to === 'mateja' ? 'Mateja'
-               : lead.assigned_to === 'dusica' ? 'Dušica' : '';
-  const attended = (lead.tags || []).includes('prisustvovao-webinaru');
+  const repName = lead.assigned_to === 'mateja' ? 'Mateja' : '';
+  const booked = (lead.tags || []).includes('booked-call');
 
   const ctx = [];
   if (lead.experience)    ctx.push(`Iskustvo: ${lead.experience}`);
@@ -181,7 +180,7 @@ export default async function handler(req, res) {
   const userPrompt = `Lead:
 Ime: ${firstName || 'nepoznato'}
 ${repName ? `Šalje: ${repName}` : ''}
-${attended ? 'Prisustvovao predavanju: DA' : 'Prisustvovao predavanju: NE/nepoznato'}
+${booked ? 'Zakazao poziv: DA' : 'Zakazao poziv: NE/nepoznato'}
 ${ctx.length ? ctx.join('\n') : '(Nema dodatnih detalja.)'}
 
 Napiši poruku.`;
