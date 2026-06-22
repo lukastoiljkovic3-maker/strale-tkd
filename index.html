@@ -962,6 +962,58 @@ tr.row-flash > td { animation: row-flash 1.6s ease-out; }
 .ldp-ab-m { background:rgba(168,85,247,.12); color:var(--mateja); border-color:rgba(168,85,247,.3); }
 .ldp-ab-d { background:rgba(249,115,22,.12); color:var(--dusica); border-color:rgba(249,115,22,.3); }
 
+/* ── Mochi-style sectioned detail panel ── */
+.ldp-card { background: var(--s1); border: 1px solid var(--b); border-radius: 14px; padding: 16px; }
+.ldp-card .ldp-sec-lbl { margin-bottom: 12px; }
+.ldp-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.ldp-chip { display:inline-flex; align-items:center; gap:6px; padding:7px 11px; border-radius:9px; background:var(--s3); border:1px solid var(--b); font-size:11.5px; color:var(--text); font-weight:600; text-decoration:none; max-width:100%; }
+.ldp-chip span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ldp-chip svg { width:13px; height:13px; color:var(--muted); flex-shrink:0; }
+.ldp-chip:hover { border-color:var(--b2); color:var(--text); }
+.ldp-badges { display:flex; flex-wrap:wrap; gap:6px; margin:0 0 14px; }
+.ldp-badge { display:inline-flex; align-items:center; padding:5px 10px; border-radius:99px; font-size:10px; font-weight:800; letter-spacing:.3px; text-transform:uppercase; }
+.ldp-badge.b-q { background:rgba(34,197,94,.12); color:var(--green); }
+.ldp-badge.b-dq { background:rgba(244,63,94,.12); color:var(--red); }
+.ldp-badge.b-booked { background:rgba(56,189,248,.12); color:#38bdf8; }
+.ldp-badge.b-customer { background:rgba(168,85,247,.12); color:var(--mateja); }
+.ldp-subgap { margin-top:14px; }
+
+/* collapsible sections (native <details>) */
+.ldp-collap { background:var(--s1); border:1px solid var(--b); border-radius:14px; overflow:hidden; }
+.ldp-collap > summary { list-style:none; cursor:pointer; display:flex; align-items:center; gap:8px; padding:15px 16px; font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted2); user-select:none; }
+.ldp-collap > summary::-webkit-details-marker { display:none; }
+.ldp-collap > summary:hover { color:var(--muted); }
+.ldp-collap .chev { margin-left:auto; transition:transform .2s; color:var(--muted2); display:flex; }
+.ldp-collap[open] > summary .chev { transform:rotate(90deg); }
+.ldp-collap-body { padding:0 16px 16px; }
+
+/* appointments / booking block */
+.ldp-appt { display:flex; gap:11px; padding:11px 12px; border-radius:11px; background:var(--s3); border:1px solid var(--b); align-items:center; }
+.ldp-appt + .ldp-appt { margin-top:8px; }
+.ldp-appt-date { display:flex; flex-direction:column; align-items:center; justify-content:center; width:46px; flex-shrink:0; border-radius:9px; background:var(--s2); border:1px solid var(--b); padding:6px 0; }
+.ldp-appt-date.up { background:var(--ag); border-color:rgba(232,114,12,.3); }
+.ldp-appt-date .d-dow { font-size:8px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); }
+.ldp-appt-date .d-day { font-size:12px; font-weight:800; color:var(--text); text-align:center; line-height:1.2; }
+.ldp-appt-date.up .d-day { color:var(--accent); }
+.ldp-appt-main { flex:1; min-width:0; }
+.ldp-appt-title { font-size:13px; font-weight:700; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ldp-appt-time { font-size:11px; color:var(--muted); margin-top:2px; }
+.ldp-appt-loc { font-size:11px; margin-top:3px; color:var(--muted); }
+.ldp-appt-loc a { color:#38bdf8; text-decoration:none; }
+.ldp-appt-status { flex-shrink:0; padding:4px 9px; border-radius:99px; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.3px; }
+.ldp-appt-status.a-booked { background:rgba(56,189,248,.12); color:#38bdf8; }
+.ldp-appt-status.a-showed { background:rgba(34,197,94,.12); color:var(--green); }
+.ldp-appt-status.a-noshow { background:rgba(244,63,94,.12); color:var(--red); }
+.ldp-appt-status.a-cancel { background:var(--s2); color:var(--muted); }
+.ldp-appt-empty { font-size:12px; color:var(--muted); padding:6px 2px; }
+
+/* attribution / email key-value rows */
+.ldp-kv { display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid var(--b); font-size:12px; }
+.ldp-kv:last-child { border-bottom:none; }
+.ldp-kv label { color:var(--muted); font-weight:600; text-transform:none; letter-spacing:0; flex-shrink:0; }
+.ldp-kv span { color:var(--text); font-weight:600; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+.ldp-empty { font-size:12px; color:var(--muted); }
+
 @media (max-width: 640px) {
   .leads-stat-bar { flex-wrap: wrap; }
   .lsb-btn { min-width: calc(50% - 1px); padding: 12px 8px; }
@@ -5545,19 +5597,68 @@ function openLeadDetail(id){
     c.qualification?{l:'Kvalifikacija',v:c.qualification,full:true}:null,
   ].filter(Boolean);
   const meta=[c.phone,c.email,c.instagram?`@${c.instagram.replace('@','')}`:''].filter(Boolean);
+  const badgeMap={qualified:{l:'Kvalifikovan',c:'b-q'},disqualified:{l:'Diskvalifikovan',c:'b-dq'},booked:{l:'Zakazan poziv',c:'b-booked'},customer:{l:'Klijent',c:'b-customer'}};
+  const lb=badgeMap[c.lead_type];
+  const igClean=c.instagram?c.instagram.replace('@','').replace(/^https?:\/\/(www\.)?instagram\.com\//,'').replace(/\/$/,''):'';
+  const utmRows=[['Izvor',c.utm_source],['Medij',c.utm_medium],['Kampanja',c.utm_campaign],['Sadržaj',c.utm_content]].filter(([,v])=>v);
 
   const ov=document.getElementById('ldpAv');
   ov.className=`ldp-av ${avCls}`; ov.textContent=initials;
   document.getElementById('ldpName').textContent=c.name||'Nepoznat';
   document.getElementById('ldpMeta').innerHTML=meta.map(p=>`<span>${esc(p)}</span>`).join('<span style="margin:0 5px;opacity:.3">·</span>');
   document.getElementById('ldpBody').innerHTML=`
-    <div style="margin-bottom:14px">
+    <div class="ldp-card">
       <div class="ldp-sec-lbl">✨ AI Sažetak</div>
       <div id="ai-summary-body" class="ai-summary-host"></div>
     </div>
-    ${c.phone?`<div style="margin-bottom:14px">
-      <div class="ldp-sec-lbl">Kontakt</div>
-      <div class="ldp-call-outcomes">
+
+    <div class="ldp-card">
+      <div class="ldp-sec-lbl">Lead Info & Status</div>
+      ${lb?`<div class="ldp-badges"><span class="ldp-badge ${lb.c}">${lb.l}</span></div>`:''}
+      <div class="ldp-chips">
+        ${c.phone?`<a class="ldp-chip" href="${telLink(c.phone)||'#'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>${esc(c.phone)}</span></a>`:''}
+        ${c.email?`<a class="ldp-chip" href="mailto:${esc(c.email)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg><span>${esc(c.email)}</span></a>`:''}
+        ${igClean?`<a class="ldp-chip" href="https://instagram.com/${esc(igClean)}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg><span>@${esc(igClean)}</span></a>`:''}
+      </div>
+      <div class="ldp-status-grid ldp-subgap">
+        <button class="ldp-st-btn ${c.status==='Novi'?'ldp-st-novi':''}" onclick="updateLeadStatus('${esc(c.id)}','Novi')">Novi</button>
+        <button class="ldp-st-btn ${c.status==='Follow Up'?'ldp-st-fu':''}" onclick="updateLeadStatus('${esc(c.id)}','Follow Up')">Follow Up</button>
+        <button class="ldp-st-btn ${c.status==='Closed'?'ldp-st-closed':''}" onclick="updateLeadStatus('${esc(c.id)}','Closed')">Closed</button>
+        <button class="ldp-st-btn ${c.status==='DQ'?'ldp-st-dq':''}" onclick="updateLeadStatus('${esc(c.id)}','DQ')">DQ</button>
+      </div>
+      <div class="ldp-assign-row">
+        <button class="ldp-assign-btn ${c.assigned_to==='mateja'?'ldp-ab-m':''}" onclick="assignLeadPanel('${esc(c.id)}','mateja')">
+          <span style="font-size:15px;font-weight:900;font-family:var(--font)">M</span> Mateja
+        </button>
+      </div>
+      <div class="ldp-subgap">
+        <select class="lc-deal-sel" style="width:100%" onchange="updateLeadDeal('${esc(c.id)}',this.value)">
+          <option value="">— Nema deala —</option>
+          ${dealOpts}
+        </select>
+      </div>
+    </div>
+
+    <div class="ldp-card">
+      <div class="ldp-sec-lbl">Podsetnik</div>
+      <button type="button" class="ldp-fu-btn" onclick="(this.querySelector('.ldp-fu-native')||{}).showPicker?this.querySelector('.ldp-fu-native').showPicker():0">
+        <span class="ldp-fu-icon">📅</span>
+        <span class="ldp-fu-text ${c.follow_up_date?(fuCls||'has-date'):''}">${c.follow_up_date?new Date(c.follow_up_date+'T00:00').toLocaleDateString('sr-RS',{day:'numeric',month:'long',year:'numeric'}):'Postavi follow-up datum'}</span>
+        <svg class="ldp-fu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <input type="date" class="ldp-fu-native" value="${c.follow_up_date||''}" onclick="event.stopPropagation();try{this.showPicker()}catch(e){}" onchange="updateLeadFollowUpPanel('${esc(c.id)}',this.value,this)" />
+      </button>
+      <div class="ldp-sec-lbl ldp-subgap" style="border:none;padding:0;margin-bottom:8px">Snooze ${isSnoozed(c.id)?`<span style="color:var(--yellow);font-weight:700;text-transform:none;letter-spacing:.3px">do ${new Date((loadSnoozeMap()[c.id])+'T00:00').toLocaleDateString('sr-RS')}</span>`:''}</div>
+      <div class="ldp-snooze-row">
+        <button class="ldp-snooze-btn" onclick="snoozeLead('${esc(c.id)}', (function(){const d=new Date();d.setDate(d.getDate()+3);return d.toISOString().slice(0,10);})())">3 dana</button>
+        <button class="ldp-snooze-btn" onclick="snoozeLead('${esc(c.id)}', (function(){const d=new Date();d.setDate(d.getDate()+7);return d.toISOString().slice(0,10);})())">1 nedelja</button>
+        <button class="ldp-snooze-btn" onclick="snoozeLead('${esc(c.id)}', (function(){const d=new Date();d.setMonth(d.getMonth()+1);return d.toISOString().slice(0,10);})())">1 mesec</button>
+        ${isSnoozed(c.id)?`<button class="ldp-snooze-btn ldp-snooze-clear" onclick="snoozeLead('${esc(c.id)}', null)">Otkaži snooze</button>`:''}
+      </div>
+    </div>
+
+    <div class="ldp-card">
+      <div class="ldp-sec-lbl">Poziv & Zakazivanje</div>
+      ${c.phone?`<div class="ldp-call-outcomes">
         <button class="ldp-co-btn ldp-co-ans"  onclick="logCallOutcome('${esc(c.id)}','Javio se')">📞 Javio se</button>
         <button class="ldp-co-btn ldp-co-noans" onclick="logCallOutcome('${esc(c.id)}','Nije javio')">⏱ Nije javio</button>
         <button class="ldp-co-btn ldp-co-vm"   onclick="logCallOutcome('${esc(c.id)}','Govorna pošta')">🎙 Pošta</button>
@@ -5578,67 +5679,94 @@ function openLeadDetail(id){
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.555-5.338 11.891-11.893 11.891a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.711.306 1.265.489 1.697.626.713.226 1.362.194 1.875.118.572-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
           WhatsApp
         </a>`:''}
-      </div>
-    </div>`:''}
-    <div>
-      <div class="ldp-sec-lbl">Status & Assign</div>
-      <div class="ldp-status-grid">
-        <button class="ldp-st-btn ${c.status==='Novi'?'ldp-st-novi':''}" onclick="updateLeadStatus('${esc(c.id)}','Novi')">Novi</button>
-        <button class="ldp-st-btn ${c.status==='Follow Up'?'ldp-st-fu':''}" onclick="updateLeadStatus('${esc(c.id)}','Follow Up')">Follow Up</button>
-        <button class="ldp-st-btn ${c.status==='Closed'?'ldp-st-closed':''}" onclick="updateLeadStatus('${esc(c.id)}','Closed')">Closed</button>
-        <button class="ldp-st-btn ${c.status==='DQ'?'ldp-st-dq':''}" onclick="updateLeadStatus('${esc(c.id)}','DQ')">DQ</button>
-      </div>
-      <div class="ldp-assign-row">
-        <button class="ldp-assign-btn ${c.assigned_to==='mateja'?'ldp-ab-m':''}" onclick="assignLeadPanel('${esc(c.id)}','mateja')">
-          <span style="font-size:15px;font-weight:900;font-family:var(--font)">M</span> Mateja
-        </button>
-      </div>
-      <div style="margin-top:12px">${typePillMap[c.lead_type]||''}</div>
+      </div>`:''}
+      <div class="ldp-sec-lbl ldp-subgap" style="border:none;padding:0;margin-bottom:8px">Zakazani pozivi</div>
+      <div id="ldpBookingList"><div class="ldp-appt-empty">Učitavanje…</div></div>
     </div>
-    <div>
-      <div class="ldp-sec-lbl">Follow Up</div>
-      <button type="button" class="ldp-fu-btn" onclick="(this.querySelector('.ldp-fu-native')||{}).showPicker?this.querySelector('.ldp-fu-native').showPicker():0">
-        <span class="ldp-fu-icon">📅</span>
-        <span class="ldp-fu-text ${c.follow_up_date?(fuCls||'has-date'):''}">${c.follow_up_date?new Date(c.follow_up_date+'T00:00').toLocaleDateString('sr-RS',{day:'numeric',month:'long',year:'numeric'}):'Postavi datum'}</span>
-        <svg class="ldp-fu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        <input type="date" class="ldp-fu-native" value="${c.follow_up_date||''}" onclick="event.stopPropagation();try{this.showPicker()}catch(e){}" onchange="updateLeadFollowUpPanel('${esc(c.id)}',this.value,this)" />
-      </button>
-    </div>
-    <div>
-      <div class="ldp-sec-lbl">Snooze ${isSnoozed(c.id)?`<span style="color:var(--yellow);font-weight:700;text-transform:none;letter-spacing:.3px">do ${new Date((loadSnoozeMap()[c.id])+'T00:00').toLocaleDateString('sr-RS')}</span>`:''}</div>
-      <div class="ldp-snooze-row">
-        <button class="ldp-snooze-btn" onclick="snoozeLead('${esc(c.id)}', (function(){const d=new Date();d.setDate(d.getDate()+3);return d.toISOString().slice(0,10);})())">3 dana</button>
-        <button class="ldp-snooze-btn" onclick="snoozeLead('${esc(c.id)}', (function(){const d=new Date();d.setDate(d.getDate()+7);return d.toISOString().slice(0,10);})())">1 nedelja</button>
-        <button class="ldp-snooze-btn" onclick="snoozeLead('${esc(c.id)}', (function(){const d=new Date();d.setMonth(d.getMonth()+1);return d.toISOString().slice(0,10);})())">1 mesec</button>
-        ${isSnoozed(c.id)?`<button class="ldp-snooze-btn ldp-snooze-clear" onclick="snoozeLead('${esc(c.id)}', null)">Otkaži snooze</button>`:''}
-      </div>
-    </div>
-    ${fields.length?`<div>
-      <div class="ldp-sec-lbl">Kvalifikacija</div>
-      <div class="ldp-field-grid">
-        ${fields.map(f=>`<div class="ldp-field ${f.full?'full':''}"><label>${f.l}</label><span>${esc(f.v)}</span></div>`).join('')}
-      </div>
-    </div>`:''}
-    <div>
-      <div class="ldp-sec-lbl">Paket / Deal</div>
-      <select class="lc-deal-sel" style="width:100%" onchange="updateLeadDeal('${esc(c.id)}',this.value)">
-        <option value="">— Nema deala —</option>
-        ${dealOpts}
-      </select>
-    </div>
-    <div>
-      <div class="ldp-sec-lbl">Beleška</div>
+
+    <div class="ldp-card">
+      <div class="ldp-sec-lbl">Beleške tima</div>
       <textarea class="lc-note-input" style="width:100%;min-height:90px" placeholder="Dodaj belešku…" onblur="saveLeadNote('${esc(c.id)}',this.value)">${esc(c.notes||'')}</textarea>
     </div>
-    <div>
-      <div class="ldp-sec-lbl">Istorija aktivnosti</div>
+
+    ${fields.length?`<details class="ldp-collap">
+      <summary>Kvalifikacioni formular<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></summary>
+      <div class="ldp-collap-body">
+        <div class="ldp-field-grid">
+          ${fields.map(f=>`<div class="ldp-field ${f.full?'full':''}"><label>${f.l}</label><span>${esc(f.v)}</span></div>`).join('')}
+        </div>
+      </div>
+    </details>`:''}
+
+    <details class="ldp-collap">
+      <summary>Atribucija / UTM<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></summary>
+      <div class="ldp-collap-body">
+        ${utmRows.length?utmRows.map(([l,v])=>`<div class="ldp-kv"><label>${l}</label><span>${esc(v)}</span></div>`).join(''):'<div class="ldp-empty">Nema podataka o atribuciji za ovog leada.</div>'}
+      </div>
+    </details>
+
+    <div class="ldp-card">
+      <div class="ldp-sec-lbl">Email Angažovanje</div>
+      ${c.email?`<div class="ldp-kv"><label>Email</label><span>${esc(c.email)}</span></div><div class="ldp-empty" style="padding-top:8px">Podaci o otvaranju/klikovima dolaze uskoro.</div>`:'<div class="ldp-empty">Nema email adrese za ovog leada.</div>'}
+    </div>
+
+    <div class="ldp-card">
+      <div class="ldp-sec-lbl">Istorija Aktivnosti</div>
       <div id="ldpActivityList" class="lat-host"></div>
     </div>
-    <div style="font-size:10px;color:var(--muted);padding-top:4px">Dodat: ${c.date_added?new Date(c.date_added).toLocaleDateString('sr-RS'):''}</div>
+
+    <div style="font-size:10px;color:var(--muted);padding-top:2px;text-align:center">Dodat: ${c.date_added?new Date(c.date_added).toLocaleDateString('sr-RS'):'—'}</div>
   `;
   document.getElementById('leadDetailOverlay').classList.add('open');
   renderLeadActivityInto('ldpActivityList', c.id);
   renderLeadSummary(c);
+  renderLeadBookings('ldpBookingList', c.id);
+}
+
+/* ─── Lead-detail booking block: fetch this contact's GHL appointments ─── */
+async function renderLeadBookings(elId, contactId){
+  const host=document.getElementById(elId);
+  if(!host) return;
+  try{
+    const now=Date.now();
+    const start=now-180*864e5, end=now+180*864e5;
+    const r=await fetch(`/api/ghl-appointments?contactId=${encodeURIComponent(contactId)}&start=${start}&end=${end}`);
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok){
+      host.innerHTML=`<div class="ldp-appt-empty">Kalendar nedostupan${j&&j.hint?` — ${esc(j.hint)}`:''}</div>`;
+      return;
+    }
+    const evs=(j.events||[]).filter(e=>!e.deleted);
+    if(!evs.length){ host.innerHTML='<div class="ldp-appt-empty">Nema zakazanih poziva.</div>'; return; }
+    // newest first
+    evs.sort((a,b)=>String(b.startTime).localeCompare(String(a.startTime)));
+    host.innerHTML=evs.map(renderApptRow).join('');
+  }catch(e){
+    host.innerHTML='<div class="ldp-appt-empty">Greška pri učitavanju poziva.</div>';
+  }
+}
+
+function renderApptRow(e){
+  const start=new Date(e.startTime), end=e.endTime?new Date(e.endTime):null;
+  const dow=start.toLocaleDateString('sr-RS',{weekday:'short'});
+  const day=start.toLocaleDateString('sr-RS',{day:'numeric',month:'short'});
+  const t1=start.toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'});
+  const t2=end?end.toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'}):'';
+  const st=String(e.appointmentStatus||e.appoinmentStatus||'').toLowerCase();
+  const map={confirmed:{l:'Zakazano',c:'a-booked'},new:{l:'Zakazano',c:'a-booked'},booked:{l:'Zakazano',c:'a-booked'},showed:{l:'Došao',c:'a-showed'},noshow:{l:'Nije došao',c:'a-noshow'},cancelled:{l:'Otkazano',c:'a-cancel'},invalid:{l:'Nevažeće',c:'a-cancel'}};
+  const s=map[st]||{l:st||'—',c:'a-booked'};
+  const addr=e.address||'';
+  const isUrl=/^https?:\/\//.test(addr);
+  const upcoming=start.getTime()>Date.now() && (s.c==='a-booked');
+  return `<div class="ldp-appt">
+    <div class="ldp-appt-date ${upcoming?'up':''}"><span class="d-dow">${esc(dow)}</span><span class="d-day">${esc(day)}</span></div>
+    <div class="ldp-appt-main">
+      <div class="ldp-appt-title">${esc(e.calendarName||e.title||'Poziv')}</div>
+      <div class="ldp-appt-time">${esc(t1)}${t2?'–'+esc(t2):''}</div>
+      ${addr?`<div class="ldp-appt-loc">${isUrl?`<a href="${esc(addr)}" target="_blank" rel="noopener">🔗 Join Meet</a>`:`📍 ${esc(addr)}`}</div>`:''}
+    </div>
+    <span class="ldp-appt-status ${s.c}">${esc(s.l)}</span>
+  </div>`;
 }
 
 function closeLeadDetail(){
