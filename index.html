@@ -2007,8 +2007,18 @@ let leadsSubTab  = 'all';   // 'all' | 'qualified' | 'disqualified' | 'booked' |
 let leadsView    = 'list'; // 'list' | 'ads'
 let currentLeadId = null;
 let leadsSearch  = '';
-// Capture ?lead=<id> immediately (before Supabase may clean the URL) for deep-links from Slack.
+// Capture ?lead=<id> immediately (before Supabase cleans the URL) for deep-links from Slack.
+// Persist it to localStorage so it survives the Google OAuth round-trip (which returns to the bare origin).
 const DEEP_LEAD_ID = (() => { try { return new URLSearchParams(window.location.search).get('lead'); } catch(e) { return null; } })();
+if (DEEP_LEAD_ID) { try { localStorage.setItem('stl_deeplink', JSON.stringify({ id: DEEP_LEAD_ID, t: Date.now() })); } catch(e) {} }
+function leadTypeFromTags(tags){
+  tags = tags || [];
+  if (tags.includes('customer')) return 'customer';
+  if (tags.includes('booked-call')) return 'booked';
+  if (tags.some(t => ['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus'].includes(t))) return 'qualified';
+  if (tags.some(t => ['straletkd-disqualified','budget-under-100','dq'].includes(t))) return 'disqualified';
+  return 'qualified';
+}
 let leadsShowFollowUp = false;  // when true, only show leads needing follow-up today
 let leadsShowStale    = false;  // when true, only show stale (untouched 14d+) leads
 let leadsTagFilter    = '';     // empty = no tag filter; otherwise exact tag string
@@ -2081,9 +2091,10 @@ async function signInWithGoogle() {
   document.getElementById('auth-error').style.display = 'none';
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
-    // preserve the current path + query (e.g. ?lead=<id> from a Slack link)
-    // so the deep-link survives the Google round-trip and opens after login
-    options: { redirectTo: window.location.origin + window.location.pathname + window.location.search }
+    // Keep the bare origin (matches Supabase's allowed redirect URLs). The
+    // deep-link ?lead=<id> is carried across login via localStorage instead,
+    // so it survives the OAuth round-trip regardless of URL rewriting.
+    options: { redirectTo: window.location.origin }
   });
   if (error) {
     const errEl = document.getElementById('auth-error');
@@ -2151,12 +2162,36 @@ async function signOut() {
    notification button → https://tkdcrm.space/?lead={{contact.id}}). Fetches
    the lead if it isn't already in the current cache. */
 async function handleDeepLink(){
-  const id = DEEP_LEAD_ID;
+  // id from the current URL, or from localStorage (survives the Google OAuth round-trip)
+  let id = DEEP_LEAD_ID;
+  if (!id) {
+    try {
+      const raw = localStorage.getItem('stl_deeplink');
+      if (raw) { const o = JSON.parse(raw); if (o && o.id && (Date.now() - o.t) < 15*60000) id = o.id; }
+    } catch(e) {}
+  }
   if (!id) return;
+  try { localStorage.removeItem('stl_deeplink'); } catch(e) {}
+
   let lead = (cachedLeads||[]).find(l => l.id === id);
+  // not in the loaded view → try the tracker DB
   if (!lead) {
     const { data } = await sb.from('ghl_leads').select('*').eq('id', id).single();
     if (data) { cachedLeads.push(data); lead = data; }
+  }
+  // still missing (e.g. brand-new lead not synced yet) → fetch live from GHL
+  if (!lead) {
+    try {
+      const r = await fetch(`/api/ghl-contact?id=${encodeURIComponent(id)}`);
+      if (r.ok) {
+        const j = await r.json();
+        if (j && j.contact) {
+          lead = mapContact(j.contact, leadTypeFromTags(j.contact.tags));
+          lead.status = 'Novi';
+          cachedLeads.push(lead);
+        }
+      }
+    } catch(e) {}
   }
   if (!lead) return;
   if (currentTab !== 'leads') setTab('leads');
