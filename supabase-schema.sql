@@ -1,7 +1,7 @@
 -- ============================================================
 --  STRALETKD — SALES TRACKER  ·  Supabase schema (clean install)
 --  Run ONCE on a brand-new Supabase project:  SQL Editor → paste → Run.
---  Consolidates the old 14 One Club migrations into one script.
+--  Full schema in one script (tables + RLS + constraints).
 --  Adapted for STRALE: single closer (Mateja).
 -- ============================================================
 
