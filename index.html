@@ -2169,23 +2169,15 @@ function getTargets() {
 }
 function saveTargets(t) { localStorage.setItem('toc_targets', JSON.stringify(t)); }
 
-// Deal prices for commission calc
-const DEAL_PRICES = {
-  funded_10k: 150, funded_25k: 330, funded_50k: 450,
-  funded_100k: 650, funded_200k: 1200, funded_400k: 2200,
-  bootcamp_live: 350, bootcamp_recorded: 500, bootcamp_recorded_plan: 600,
-};
+// Strale deal value comes from the GHL opportunity (closer enters €). CPA is
+// variable (lot-based, min. deposit $300); funded accounts are priced per deal.
+// No fixed package prices, so DEAL_PRICES stays empty and revenue = opportunities.
+const DEAL_PRICES = {};
 
 const DEALS = {
-  funded_10k:        { label: 'Funded 10K',       price: '$150',    icon: '🏆' },
-  funded_25k:        { label: 'Funded 25K',       price: '$330',    icon: '🏆' },
-  funded_50k:        { label: 'Funded 50K',       price: '$450',    icon: '⭐' },
-  funded_100k:       { label: 'Funded 100K',      price: '$650',    icon: '💎' },
-  funded_200k:       { label: 'Funded 200K',      price: '$1,200',  icon: '💎' },
-  funded_400k:       { label: 'Funded 400K',      price: '$2,200',  icon: '💎' },
-  bootcamp_live:          { label: 'Live Bootcamp',             price: '350 EUR',     icon: '📚' },
-  bootcamp_recorded:      { label: 'Bootcamp Snimak',           price: '500 EUR',     icon: '📹' },
-  bootcamp_recorded_plan: { label: 'Bootcamp Snimak (2×300)',   price: '2 × 300 EUR', icon: '📹' },
+  cpa:         { label: 'CPA (min. depozit $300)', price: 'var.', icon: '📈' },
+  funded_100k: { label: 'Funded 100K',             price: '—',    icon: '💎' },
+  funded_200k: { label: 'Funded 200K',             price: '—',    icon: '💎' },
 };
 
 let currentTab = 'leads';
@@ -5746,19 +5738,9 @@ function renderLeadCard(lead, subTab){
       <span class="lc-deal-lbl">PAKET</span>
       <select class="lc-deal-sel" onchange="updateLeadDeal('${esc(lead.id)}',this.value)">
         <option value="">— Nije odabran —</option>
-        <optgroup label="Funded Challenge (One-Step)">
-          <option value="funded_10k"  ${lead.deal==='funded_10k' ?'selected':''}>🏆 Funded 10K — $150</option>
-          <option value="funded_25k"  ${lead.deal==='funded_25k' ?'selected':''}>🏆 Funded 25K — $330</option>
-          <option value="funded_50k"  ${lead.deal==='funded_50k' ?'selected':''}>⭐ Funded 50K — $450 (Optimalno)</option>
-          <option value="funded_100k" ${lead.deal==='funded_100k'?'selected':''}>💎 Funded 100K — $650</option>
-          <option value="funded_200k" ${lead.deal==='funded_200k'?'selected':''}>💎 Funded 200K — $1,200</option>
-          <option value="funded_400k" ${lead.deal==='funded_400k'?'selected':''}>💎 Funded 400K — $2,200</option>
-        </optgroup>
-        <optgroup label="Edukacija">
-          <option value="bootcamp_live"          ${lead.deal==='bootcamp_live'         ?'selected':''}>📚 Live Bootcamp — 350 EUR</option>
-          <option value="bootcamp_recorded"      ${lead.deal==='bootcamp_recorded'     ?'selected':''}>📹 Bootcamp Snimak — 500 EUR</option>
-          <option value="bootcamp_recorded_plan" ${lead.deal==='bootcamp_recorded_plan'?'selected':''}>📹 Bootcamp Snimak — 2 × 300 EUR</option>
-        </optgroup>
+        <option value="cpa"         ${lead.deal==='cpa'        ?'selected':''}>📈 CPA (min. depozit $300)</option>
+        <option value="funded_100k" ${lead.deal==='funded_100k'?'selected':''}>💎 Funded 100K</option>
+        <option value="funded_200k" ${lead.deal==='funded_200k'?'selected':''}>💎 Funded 200K</option>
       </select>
     </div>
 
@@ -5918,9 +5900,8 @@ function _normName(s){
   return _normLow(s).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ');
 }
 function _challengeToDeal(amount){
-  const m = { 10000:'funded_10k', 25000:'funded_25k', 50000:'funded_50k',
-              100000:'funded_100k', 200000:'funded_200k', 400000:'funded_400k' };
-  return m[Number(amount)] || null;
+  // Strale deal type (CPA / funded) is set manually, not derived from the € amount.
+  return null;
 }
 
 let _sheetSyncRunning = false;
