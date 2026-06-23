@@ -296,10 +296,12 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
   width:100%; padding:8px 12px 8px 36px; border-radius:99px;
   border:1px solid var(--b); background:var(--s2); color:var(--text);
   font-family:var(--font); font-size:12px; font-weight:500; outline:none;
-  transition:border-color .15s;
+  transition:border-color .15s, box-shadow .25s ease-out, background .15s;
 }
 .leads-search::placeholder { color:var(--muted); }
-.leads-search:focus { border-color:var(--b2); background:var(--s3); }
+.leads-search:focus { border-color:rgba(232,114,12,.5); background:var(--s3);
+  box-shadow:0 0 0 3px rgba(232,114,12,.12), 0 0 24px rgba(232,114,12,.22); }
+@media (max-width:640px){ .leads-search { font-size:16px; } }  /* iOS: prevent focus-zoom */
 
 /* Follow-up date on card */
 .lc-fu-row { display:flex; align-items:center; gap:8px; margin-top:10px; }
@@ -1796,6 +1798,23 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 }
 .auth-google-btn:hover { background: #f0f0f0; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,0,0,.4); }
 .auth-google-btn svg { flex-shrink: 0; }
+/* shiny orange button (iOS-safe: hover effects gated behind real hover) */
+.shiny-btn { position:relative; width:100%; margin-top:8px; padding:2px; border:none; border-radius:16px; cursor:pointer;
+  background:radial-gradient(circle 80px at 80% -10%, #ffffff, #181b1b); -webkit-tap-highlight-color:transparent; }
+.shiny-btn::before { content:''; position:absolute; top:0; right:0; width:65%; height:60%; border-radius:120px; z-index:-1;
+  box-shadow:0 0 22px rgba(232,114,12,.4); transition:box-shadow .3s ease-out; }
+.shiny-btn::after { content:''; position:absolute; bottom:0; left:0; width:50px; height:50%; border-radius:17px; pointer-events:none;
+  background:radial-gradient(circle 60px at 0% 100%, #ffb866, rgba(232,114,12,.31), transparent);
+  box-shadow:-2px 9px 40px rgba(232,114,12,.28); transition:width .3s ease-out, box-shadow .3s ease-out; }
+.shiny-btn-inner { position:relative; z-index:2; display:flex; align-items:center; justify-content:center; gap:10px;
+  padding:14px 24px; border-radius:14px; color:#fff; font-family:var(--font); font-size:15px; font-weight:600; letter-spacing:.1px;
+  background:radial-gradient(circle 80px at 80% -50%, #6e6e6e, #0f1111); transition:transform .3s ease-out; }
+@media (hover:hover){
+  .shiny-btn:hover::before { box-shadow:0 0 42px rgba(232,114,12,.65); }
+  .shiny-btn:hover::after { width:92px; box-shadow:-4px 1px 46px rgba(232,114,12,.45); }
+  .shiny-btn:hover .shiny-btn-inner { transform:scale(1.03); }
+}
+.shiny-btn:active .shiny-btn-inner { transform:scale(.98); }
 .auth-error { font-size: 12px; color: var(--red); background: rgba(244,63,94,.08); border: 1px solid rgba(244,63,94,.2); border-radius: 8px; padding: 10px 16px; width: 100%; }
 .auth-divider { display: none; }
 .auth-logo { display: none; }
@@ -1879,9 +1898,11 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
     <div class="auth-title">STRALETKD</div>
     <div class="auth-sub">Sales Dashboard</div>
     <div id="auth-error" style="display:none" class="auth-error"></div>
-    <button class="auth-google-btn" onclick="signInWithGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
-      Sign in with Google
+    <button class="shiny-btn" onclick="signInWithGoogle()">
+      <span class="shiny-btn-inner">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+        Sign in with Google
+      </span>
     </button>
   </div>
 </div>
