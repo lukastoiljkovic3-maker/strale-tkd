@@ -2430,6 +2430,21 @@ async function renderKalendarTab(){
 }
 
 /* Polished hero metric cards: Booked meetings / Won deals / Cash collected */
+/* count-up animation for metric values (easeOutCubic, ~0.9s) */
+function countUpEls(root){
+  if(!root) return;
+  root.querySelectorAll('.mstat-count').forEach(el => {
+    const target = parseFloat(el.dataset.target) || 0;
+    const cash = el.dataset.cash === '1';
+    const fmt = v => cash ? '€'+Math.round(v).toLocaleString('sr-RS') : String(Math.round(v));
+    const start = performance.now(), dur = 900;
+    (function frame(now){
+      const p = Math.min((now - start)/dur, 1), e = 1 - Math.pow(1-p, 3);
+      el.textContent = fmt(e * target);
+      if (p < 1) requestAnimationFrame(frame); else el.textContent = fmt(target);
+    })(start);
+  });
+}
 function renderHeroStats(appts, closedLeads, host){
   if(!host) return;
   const booked = appts.filter(a => ['confirmed','new','booked'].includes(_apptSt(a))).length;
@@ -2440,22 +2455,23 @@ function renderHeroStats(appts, closedLeads, host){
     <div class="mstat">
       <div class="mstat-ic" style="background:rgba(56,189,248,.12);color:#38bdf8">📅</div>
       <div class="mstat-lbl">Zakazani pozivi</div>
-      <div class="mstat-val" style="color:#38bdf8">${booked}</div>
+      <div class="mstat-val mstat-count" data-target="${booked}" style="color:#38bdf8">${booked}</div>
       <div class="mstat-sub">${appts.length} ukupno u kalendaru</div>
     </div>
     <div class="mstat">
       <div class="mstat-ic" style="background:rgba(34,197,94,.12);color:var(--green)">🏆</div>
       <div class="mstat-lbl">Zatvoreni klijenti</div>
-      <div class="mstat-val" style="color:var(--green)">${wonCount}</div>
+      <div class="mstat-val mstat-count" data-target="${wonCount}" style="color:var(--green)">${wonCount}</div>
       <div class="mstat-sub">Status: Closed</div>
     </div>
     <div class="mstat">
       <div class="mstat-ic" style="background:rgba(232,114,12,.12);color:var(--accent)">💰</div>
       <div class="mstat-lbl">Cash Collected</div>
-      <div class="mstat-val" style="color:var(--accent)">€${cash.toLocaleString('sr-RS')}</div>
+      <div class="mstat-val mstat-count" data-target="${cash}" data-cash="1" style="color:var(--accent)">€${cash.toLocaleString('sr-RS')}</div>
       <div class="mstat-sub">${withVal}/${wonCount} sa upisanom vrednošću</div>
     </div>
   </div>`;
+  countUpEls(host);
 }
 
 /* Closer board (single closer = Mateja): Booked / Won / Lost / No-show.
