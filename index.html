@@ -978,6 +978,16 @@ tr.row-flash > td { animation: row-flash 1.6s ease-out; }
 .ldp-kv label { color:var(--muted); font-weight:600; text-transform:none; letter-spacing:0; flex-shrink:0; }
 .ldp-kv span { color:var(--text); font-weight:600; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
 .ldp-empty { font-size:12px; color:var(--muted); }
+/* lead tag editor */
+.ldp-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.ldp-tag { display:inline-flex; align-items:center; gap:5px; padding:5px 7px 5px 11px; border-radius:8px; font-size:11px; font-weight:600;
+  background:var(--s3); border:1px solid var(--b); color:var(--text); }
+.ldp-tag button { background:none; border:none; color:var(--muted); cursor:pointer; font-size:11px; line-height:1; padding:3px; border-radius:5px; display:flex; align-items:center; }
+.ldp-tag button:hover { color:var(--red); background:rgba(244,63,94,.1); }
+.ldp-tag-input { width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--b); background:var(--s2); color:var(--text);
+  font-family:var(--font); font-size:13px; transition:border-color .15s, box-shadow .2s; }
+.ldp-tag-input:focus { outline:none; border-color:rgba(232,114,12,.45); box-shadow:0 0 0 3px rgba(232,114,12,.1); }
+@media (max-width:640px){ .ldp-tag-input { font-size:16px; } }
 .ldp-delete-btn { width:100%; display:flex; align-items:center; justify-content:center; gap:8px;
   padding:12px; margin-top:4px; border-radius:11px; cursor:pointer; font-family:var(--font);
   font-size:12.5px; font-weight:700; color:var(--red);
@@ -4714,6 +4724,12 @@ function openLeadDetail(id){
       <textarea class="lc-note-input" style="width:100%;min-height:90px" placeholder="Dodaj belešku…" onblur="saveLeadNote('${esc(c.id)}',this.value)">${esc(c.notes||'')}</textarea>
     </div>
 
+    <div class="ldp-card">
+      <div class="ldp-sec-lbl">Tagovi</div>
+      <div class="ldp-tags" id="ldpTags">${(c.tags||[]).map(t=>`<span class="ldp-tag">${esc(t)}<button onclick="removeLeadTag('${esc(c.id)}','${esc(t)}')" aria-label="Ukloni">&#10005;</button></span>`).join('')||'<span class="ldp-empty">Nema tagova</span>'}</div>
+      <input class="ldp-tag-input" placeholder="Dodaj tag + Enter" onkeydown="if(event.key==='Enter'){event.preventDefault();addLeadTag('${esc(c.id)}',this.value);this.value='';}">
+    </div>
+
     ${fields.length?`<details class="ldp-collap">
       <summary>Kvalifikacioni formular<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></summary>
       <div class="ldp-collap-body">
@@ -5070,6 +5086,38 @@ async function updateLeadDeal(id,deal){
   if(!error){
     if(lead){lead.deal=deal||null;renderLeads(cachedLeads);
     logActivity(id,'deal',oldDeal,deal||null);}
+  }
+}
+
+function renderLeadTags(id){
+  const host=document.getElementById('ldpTags'); if(!host) return;
+  const lead=(cachedLeads||[]).find(l=>l.id===id); if(!lead) return;
+  host.innerHTML=(lead.tags||[]).map(t=>`<span class="ldp-tag">${esc(t)}<button onclick="removeLeadTag('${esc(id)}','${esc(t)}')" aria-label="Ukloni">&#10005;</button></span>`).join('')||'<span class="ldp-empty">Nema tagova</span>';
+}
+async function addLeadTag(id, raw){
+  const tag=(raw||'').trim();
+  if(!tag) return;
+  const lead=(cachedLeads||[]).find(l=>l.id===id); if(!lead) return;
+  const tags=lead.tags||[];
+  if(tags.some(t=>t.toLowerCase()===tag.toLowerCase())) return;
+  const next=[...tags, tag];
+  const {error}=await sb.from('ghl_leads').update({tags:next}).eq('id',id);
+  if(error){ alert('Greška pri dodavanju taga: '+error.message); return; }
+  lead.tags=next; renderLeadTags(id); refreshLeadRows();
+  logActivity(id,'tag',null,tag);
+  if(!/^(webinar|manual)-/.test(id)){
+    fetch('/api/ghl-update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contactId:id,addTags:[tag]})}).catch(()=>{});
+  }
+}
+async function removeLeadTag(id, tag){
+  const lead=(cachedLeads||[]).find(l=>l.id===id); if(!lead) return;
+  const next=(lead.tags||[]).filter(t=>t!==tag);
+  const {error}=await sb.from('ghl_leads').update({tags:next}).eq('id',id);
+  if(error){ alert('Greška pri brisanju taga: '+error.message); return; }
+  lead.tags=next; renderLeadTags(id); refreshLeadRows();
+  logActivity(id,'tag',tag,null);
+  if(!/^(webinar|manual)-/.test(id)){
+    fetch('/api/ghl-update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contactId:id,removeTags:[tag]})}).catch(()=>{});
   }
 }
 
