@@ -40,7 +40,7 @@ create table if not exists public.ghl_leads (
   synced_at      timestamptz,
   created_at     timestamptz not null default now(),
   constraint ghl_leads_assigned_chk
-    check (assigned_to is null or assigned_to in ('mateja'))
+    check (assigned_to is null or assigned_to in ('nikola'))
 );
 create index if not exists idx_leads_status     on public.ghl_leads(status);
 create index if not exists idx_leads_lead_type  on public.ghl_leads(lead_type);
@@ -61,7 +61,7 @@ create table if not exists public.daily_entries (
   followup   int  not null default 0,
   close      int  not null default 0,
   updated_at timestamptz not null default now(),
-  constraint daily_entries_member_chk check (member in ('mateja')),
+  constraint daily_entries_member_chk check (member in ('nikola')),
   constraint daily_entries_uq unique (member, year, month, day)
 );
 

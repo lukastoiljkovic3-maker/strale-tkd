@@ -36,7 +36,7 @@
   --green:    #22c55e;
   --red:      #f43f5e;
   --yellow:   #eab308;
-  --mateja:   #a855f7;
+  --nikola:   #a855f7;
   --dusica:   #f97316;
   --r:        14px;
   --font:     'Inter', system-ui, sans-serif;
@@ -105,11 +105,11 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
   color: var(--text);
   box-shadow: 0 1px 8px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.07);
 }
-.tab.active[data-member="mateja"] { color: var(--mateja); }
+.tab.active[data-member="nikola"] { color: var(--nikola); }
 .tab.active[data-member="dusica"] { color: var(--dusica); }
 [data-member="dusica"] .tab-pip { background: var(--dusica); }
 .tab-pip { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-[data-member="mateja"] .tab-pip { background: var(--mateja); }
+[data-member="nikola"] .tab-pip { background: var(--nikola); }
 
 .btn-add {
   display: flex; align-items: center; gap: 8px;
@@ -191,7 +191,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
   position: relative; overflow: hidden;
 }
 .mc-av img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
-.mc-av.mateja { box-shadow: 0 0 0 2px rgba(168,85,247,.45), 0 0 20px rgba(168,85,247,.2); }
+.mc-av.nikola { box-shadow: 0 0 0 2px rgba(168,85,247,.45), 0 0 20px rgba(168,85,247,.2); }
 .mc-av.dusica { box-shadow: 0 0 0 2px rgba(249,115,22,.45), 0 0 20px rgba(249,115,22,.2); }
 .mc-name { font-size: 18px; font-weight: 900; line-height: 1.1; letter-spacing: -.3px; }
 .mc-role { font-size: 10px; color: var(--muted); font-weight: 600; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
@@ -460,7 +460,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
   transform:translateY(-3px);
   box-shadow:0 20px 60px rgba(0,0,0,.5);
 }
-.lead-card.assigned-mateja { --lc:var(--mateja); }
+.lead-card.assigned-nikola { --lc:var(--nikola); }
 .lead-card.assigned-dusica { --lc:var(--dusica); }
 .lead-card.status-Closed   { --lc:var(--green); }
 .lead-card.status-DQ       { --lc:var(--red); opacity:.5; }
@@ -473,7 +473,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
   font-size:14px; font-weight:900; letter-spacing:-.5px; color:var(--text);
   background:var(--s3); border:1px solid var(--b2);
 }
-.lc-av.av-m { background:rgba(168,85,247,.12); color:var(--mateja); border-color:rgba(168,85,247,.25); }
+.lc-av.av-m { background:rgba(168,85,247,.12); color:var(--nikola); border-color:rgba(168,85,247,.25); }
 .lc-av.av-d { background:rgba(249,115,22,.12); color:var(--dusica); border-color:rgba(249,115,22,.25); }
 .lc-info { flex:1; min-width:0; }
 .lc-name { font-size:16px; font-weight:800; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-.2px; }
@@ -519,7 +519,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
   letter-spacing:.2px;
 }
 .lc-ab:hover { border-color:var(--b2); color:var(--text); }
-.lc-ab.on-m  { background:rgba(168,85,247,.12); color:var(--mateja); border-color:rgba(168,85,247,.3); }
+.lc-ab.on-m  { background:rgba(168,85,247,.12); color:var(--nikola); border-color:rgba(168,85,247,.3); }
 .lc-ab.on-d  { background:rgba(249,115,22,.12); color:var(--dusica); border-color:rgba(249,115,22,.3); }
 .lc-ab img   { width:18px; height:18px; border-radius:50%; object-fit:cover; }
 .lc-stsel {
@@ -644,7 +644,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
 .smart-btn {
   padding:7px 14px; border-radius:99px;
   border:1px solid rgba(168,85,247,.35); background:rgba(168,85,247,.06);
-  color:var(--mateja); font-family:var(--font); font-size:11px; font-weight:700;
+  color:var(--nikola); font-family:var(--font); font-size:11px; font-weight:700;
   cursor:pointer; transition:all .2s; letter-spacing:.3px;
   display:flex; align-items:center; gap:4px;
 }
@@ -676,13 +676,13 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
 .ai-gen-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(168,85,247,.3); }
 .ai-regen-btn {
   background: transparent; border: 1px solid rgba(168,85,247,.3);
-  color: var(--mateja); padding: 4px 9px; border-radius: 6px;
+  color: var(--nikola); padding: 4px 9px; border-radius: 6px;
   cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 700;
 }
 .ai-regen-btn:hover { background: rgba(168,85,247,.1); }
 .ai-spinner {
   display: inline-block; width: 14px; height: 14px;
-  border: 2px solid rgba(168,85,247,.2); border-top-color: var(--mateja);
+  border: 2px solid rgba(168,85,247,.2); border-top-color: var(--nikola);
   border-radius: 50%; animation: ai-spin .8s linear infinite;
 }
 @keyframes ai-spin { to { transform: rotate(360deg); } }
@@ -768,7 +768,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
   display: flex; align-items: center; justify-content: center;
   font-size: 11px; font-weight: 800; background: var(--s3); border: 1px solid var(--b2); color: var(--text);
 }
-.ltr-av.av-m { background: rgba(168,85,247,.12); color: var(--mateja); border-color: rgba(168,85,247,.25); }
+.ltr-av.av-m { background: rgba(168,85,247,.12); color: var(--nikola); border-color: rgba(168,85,247,.25); }
 .ltr-av.av-d { background: rgba(249,115,22,.12); color: var(--dusica); border-color: rgba(249,115,22,.25); }
 .ltr-name { font-size: 13px; font-weight: 700; line-height: 1.2; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
 .ltr-sub  { font-size: 10px; color: var(--muted); margin-top: 1px; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
@@ -822,7 +822,7 @@ tr.row-flash > td { animation: row-flash 1.6s ease-out; }
   color: var(--muted); font-family: var(--font);
 }
 .ltr-ab:hover { border-color: var(--b2); color: var(--text); }
-.ltr-ab.on-m { background: rgba(168,85,247,.15); color: var(--mateja); border-color: rgba(168,85,247,.3); }
+.ltr-ab.on-m { background: rgba(168,85,247,.15); color: var(--nikola); border-color: rgba(168,85,247,.3); }
 .ltr-ab.on-d { background: rgba(249,115,22,.15); color: var(--dusica); border-color: rgba(249,115,22,.3); }
 .ltr-fu {
   padding: 5px 8px; border-radius: 8px; border: 1px solid var(--b);
@@ -860,7 +860,7 @@ tr.row-flash > td { animation: row-flash 1.6s ease-out; }
   display: flex; align-items: center; justify-content: center;
   font-size: 14px; font-weight: 900; background: var(--s3); border: 1px solid var(--b2);
 }
-.ldp-av.av-m { background: rgba(168,85,247,.12); color: var(--mateja); border-color: rgba(168,85,247,.25); }
+.ldp-av.av-m { background: rgba(168,85,247,.12); color: var(--nikola); border-color: rgba(168,85,247,.25); }
 .ldp-av.av-d { background: rgba(249,115,22,.12); color: var(--dusica); border-color: rgba(249,115,22,.25); }
 .ldp-name { font-size: 16px; font-weight: 800; letter-spacing: -.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ldp-meta { font-size: 11px; color: var(--muted); margin-top: 3px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100%; }
@@ -924,7 +924,7 @@ tr.row-flash > td { animation: row-flash 1.6s ease-out; }
   touch-action:manipulation;
 }
 .ldp-assign-btn:hover { border-color:var(--b2); color:var(--text); }
-.ldp-ab-m { background:rgba(168,85,247,.12); color:var(--mateja); border-color:rgba(168,85,247,.3); }
+.ldp-ab-m { background:rgba(168,85,247,.12); color:var(--nikola); border-color:rgba(168,85,247,.3); }
 .ldp-ab-d { background:rgba(249,115,22,.12); color:var(--dusica); border-color:rgba(249,115,22,.3); }
 
 /* ── Mochi-style sectioned detail panel ── */
@@ -940,7 +940,7 @@ tr.row-flash > td { animation: row-flash 1.6s ease-out; }
 .ldp-badge.b-q { background:rgba(34,197,94,.12); color:var(--green); }
 .ldp-badge.b-dq { background:rgba(244,63,94,.12); color:var(--red); }
 .ldp-badge.b-booked { background:rgba(56,189,248,.12); color:#38bdf8; }
-.ldp-badge.b-customer { background:rgba(168,85,247,.12); color:var(--mateja); }
+.ldp-badge.b-customer { background:rgba(168,85,247,.12); color:var(--nikola); }
 .ldp-subgap { margin-top:14px; }
 
 /* collapsible sections (native <details>) */
@@ -1202,7 +1202,7 @@ tr.row-flash > td { animation: row-flash 1.6s ease-out; }
   background: linear-gradient(135deg, rgba(168,85,247,.06), rgba(168,85,247,.01));
   border: 1px solid rgba(168,85,247,.2); border-radius: 12px;
 }
-.insights-body strong { color: var(--mateja); font-size: 12px; letter-spacing: .8px; text-transform: uppercase; display: block; margin: 10px 0 6px; }
+.insights-body strong { color: var(--nikola); font-size: 12px; letter-spacing: .8px; text-transform: uppercase; display: block; margin: 10px 0 6px; }
 .insights-body strong:first-child { margin-top: 0; }
 .insight-bullet { padding: 3px 0; color: var(--text); }
 .insight-spacer { height: 8px; }
@@ -1329,7 +1329,7 @@ tr.ltr-selected:hover { background: rgba(34,197,94,.10); }
   transition: all .12s; font-family: inherit;
 }
 .bulk-btn:hover { border-color: var(--b2); transform: translateY(-1px); }
-.bulk-btn.bulk-m { color: var(--mateja); border-color: rgba(168,85,247,.35); }
+.bulk-btn.bulk-m { color: var(--nikola); border-color: rgba(168,85,247,.35); }
 .bulk-btn.bulk-d { color: var(--dusica); border-color: rgba(249,115,22,.35); }
 .bulk-btn.bulk-dq { color: var(--red); border-color: rgba(244,63,94,.35); }
 .bulk-btn.bulk-clear { color: var(--muted); }
@@ -1367,7 +1367,7 @@ tr.ltr-selected:hover { background: rgba(34,197,94,.10); }
 .ldp-contact-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
 .ldp-ca-btn.ldp-ca-ai {
   background: linear-gradient(135deg, rgba(168,85,247,.12), rgba(147,51,234,.08));
-  border-color: rgba(168,85,247,.4); color: var(--mateja);
+  border-color: rgba(168,85,247,.4); color: var(--nikola);
   font-weight: 800;
 }
 .ldp-ca-btn.ldp-ca-ai:hover {
@@ -2035,8 +2035,8 @@ const MONTHS3  = ['JAN','FEB','MAR','APR','MAJ','JUN','JUL','AVG','SEP','OKT','N
 const DAYS_SR  = ['Ned','Pon','Uto','Sre','Čet','Pet','Sub'];
 
 // Strale Supabase project (publishable/anon key — safe in browser, protected by RLS).
-const SUPABASE_URL = 'https://kxeknxfimljcreozsmln.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_zyHe8vocm6dNNP_e-ngvaQ_tTvRQex0';
+const SUPABASE_URL = 'https://gopysmvvfinuvaczyput.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_JkkZVdJwIyb_mY3m4S2oMQ_8ZfDR-Uu';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const GHL_TOKEN = '';
@@ -2474,7 +2474,7 @@ function renderHeroStats(appts, closedLeads, host){
   countUpEls(host);
 }
 
-/* Closer board (single closer = Mateja): Booked / Won / Lost / No-show.
+/* Closer board (single closer = Nikola): Booked / Won / Lost / No-show.
    Booked/Lost/No-show come from GHL calendar appointment statuses; Won = tracker
    Closed leads with their entered close value (deal_value). */
 function renderClosersBoard(appts, closedLeads, host){
@@ -2492,7 +2492,7 @@ function renderClosersBoard(appts, closedLeads, host){
   const wonCard = l => `<div class="kan-card"><div class="kan-card-name">${esc(l.name||'Klijent')}</div><div class="kan-card-meta" style="color:var(--green)">${l.deal_value!=null?'€'+Number(l.deal_value).toLocaleString('sr-RS'):'—'}</div></div>`;
   const col = (cls,title,items,render) => `<div class="kan-col ${cls}"><div class="kan-col-hd"><span class="kan-col-ttl">${title}</span><span class="kan-count">${items.length}</span></div>${items.length?items.slice(0,30).map(render).join(''):'<div class="kan-empty">—</div>'}</div>`;
   host.innerHTML = `<div class="metrics-sec">
-    <div class="metrics-sec-lbl">CLOSER BOARD — Mateja</div>
+    <div class="metrics-sec-lbl">CLOSER BOARD — Nikola</div>
     <div class="kanban">
       ${col('k-booked','Zakazano',booked,apptCard)}
       ${col('k-won','Zatvoreno',won,wonCard)}
@@ -2582,7 +2582,7 @@ async function renderTimeToCloseSection(){
 
   const repRows = Object.entries(byRep).map(([rep, arr]) => {
     const m = median(arr);
-    const color = rep === 'mateja' ? 'var(--mateja)' : rep === 'dusica' ? 'var(--dusica)' : '#94a3b8';
+    const color = rep === 'nikola' ? 'var(--nikola)' : rep === 'dusica' ? 'var(--dusica)' : '#94a3b8';
     return `<div class="ttc-row">
       <div class="ttc-row-label" style="color:${color}">${cap(rep)}</div>
       <div class="ttc-row-bar"><div class="ttc-row-fill" style="width:${Math.min(100, m*3)}%;background:${color}"></div></div>
@@ -2825,7 +2825,7 @@ async function renderCommissionSection(){
     return{total,byDeal,count:memberDeals.length};
   };
 
-  const cM=calcComm('mateja'), cD=calcComm('dusica');
+  const cM=calcComm('nikola'), cD=calcComm('dusica');
 
   const dealRows=(byDeal)=>Object.entries(byDeal).map(([key,cnt])=>{
     const d=DEALS[key];
@@ -2852,7 +2852,7 @@ async function renderCommissionSection(){
   return`<div class="metrics-sec">
     <div class="metrics-sec-lbl">PROVIZIJA — Svi Zatvoreni Dealovi</div>
     <div class="comm-grid">
-      ${commCell('Mateja','mateja',cM,'var(--mateja)')}
+      ${commCell('Nikola','nikola',cM,'var(--nikola)')}
       ${commCell('Dusica','dusica',cD,'var(--dusica)')}
     </div>
   </div>`;
@@ -2975,7 +2975,7 @@ async function loadFirstResponseStats(){
   const { data: leadsData } = await sb.from('ghl_leads')
     .select('id, assigned_to, date_added')
     .in('id', ids);
-  const perRep = { mateja: [], dusica: [] };
+  const perRep = { nikola: [], dusica: [] };
   (leadsData||[]).forEach(l => {
     if (!l.assigned_to || !l.date_added) return;
     const first = firstByLead.get(l.id);
@@ -3159,7 +3159,7 @@ function updatePanelAssignButtons(assignedTo){
   row.querySelectorAll('.ldp-assign-btn').forEach(btn => {
     btn.classList.remove('ldp-ab-m', 'ldp-ab-d');
     const label = btn.textContent.trim().toLowerCase();
-    if (assignedTo === 'mateja' && label.includes('mateja')) btn.classList.add('ldp-ab-m');
+    if (assignedTo === 'nikola' && label.includes('nikola')) btn.classList.add('ldp-ab-m');
     if (assignedTo === 'dusica' && label.includes('dusica')) btn.classList.add('ldp-ab-d');
   });
 }
@@ -3483,7 +3483,7 @@ function cleanPhone(p){
 }
 function waGreetingFor(lead){
   const firstName = (lead.name || '').split(' ')[0] || '';
-  const repName   = lead.assigned_to === 'mateja' ? 'Mateja' : '';
+  const repName   = lead.assigned_to === 'nikola' ? 'Nikola' : '';
   const booked    = Array.isArray(lead.tags) && lead.tags.includes('booked-call');
   const name = firstName || '';
   const intro = repName ? `ovde ${repName} iz STRALETKD tima` : `javljam ti se iz STRALETKD tima`;
@@ -4320,7 +4320,7 @@ function computeLeads(){
     });
   }
   let leads=searched;
-  if(leadsFilter==='mateja')        leads=searched.filter(l=>keepAlways(l)||l.assigned_to==='mateja');
+  if(leadsFilter==='nikola')        leads=searched.filter(l=>keepAlways(l)||l.assigned_to==='nikola');
   else if(leadsFilter==='dusica')   leads=searched.filter(l=>keepAlways(l)||l.assigned_to==='dusica');
   else if(leadsFilter==='unassigned') leads=searched.filter(l=>keepAlways(l)||!l.assigned_to);
   if(leadsSmartView){
@@ -4342,7 +4342,7 @@ function computeLeads(){
   }
   const fc={
     all:searched.length,
-    mateja:searched.filter(l=>l.assigned_to==='mateja').length,
+    nikola:searched.filter(l=>l.assigned_to==='nikola').length,
     dusica:searched.filter(l=>l.assigned_to==='dusica').length,
     unassigned:searched.filter(l=>!l.assigned_to).length,
   };
@@ -4355,7 +4355,7 @@ function buildLeadRows(leads){
   const typePill=t=>t==='qualified'?'<span class="ltr-type type-q">Qualified</span>':t==='disqualified'?'<span class="ltr-type type-dq">Disqualified</span>':t==='booked'?'<span class="ltr-type type-wb">Zakazan poziv</span>':t==='customer'?'<span class="ltr-type type-wa">Klijent</span>':'';
   return leads.map(c=>{
     const initials=(c.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const avCls=c.assigned_to==='mateja'?'av-m':c.assigned_to==='dusica'?'av-d':'';
+    const avCls=c.assigned_to==='nikola'?'av-m':c.assigned_to==='dusica'?'av-d':'';
     const meta=[c.phone,c.instagram?`@${c.instagram.replace('@','')}`:''].filter(Boolean).join(' · ');
     const stOpts=['Novi','Follow Up','Closed','DQ'].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('');
     let fuCls=''; if(c.follow_up_date){fuCls=c.follow_up_date===todayStr?'fu-today':c.follow_up_date<todayStr?'fu-overdue':'';}
@@ -4379,7 +4379,7 @@ function buildLeadRows(leads){
       </td>
       <td class="col-desk" onclick="event.stopPropagation()">
         <div class="ltr-assign">
-          <button class="ltr-ab ${c.assigned_to==='mateja'?'on-m':''}" onclick="assignLead('${esc(c.id)}','mateja')">M</button>
+          <button class="ltr-ab ${c.assigned_to==='nikola'?'on-m':''}" onclick="assignLead('${esc(c.id)}','nikola')">M</button>
         </div>
       </td>
       <td class="col-desk" onclick="event.stopPropagation()">
@@ -4433,7 +4433,7 @@ function renderBulkBar(){
     <div class="bulk-sep"></div>
     <div class="bulk-group">
       <span class="bulk-lbl">Dodeli</span>
-      <button class="bulk-btn bulk-m" onclick="bulkAssign('mateja')">Mateja</button>
+      <button class="bulk-btn bulk-m" onclick="bulkAssign('nikola')">Nikola</button>
       <button class="bulk-btn" onclick="bulkAssign(null)">Niko</button>
     </div>
     <div class="bulk-sep"></div>
@@ -4610,7 +4610,7 @@ function renderLeads(all){
       </div>
       <div class="leads-filter" id="leadsFilterBar">
         <button class="filter-btn ${leadsFilter==='all'?'active':''}" data-filter="all" onclick="filterLeads('all')">Svi (${fc.all})</button>
-        <button class="filter-btn ${leadsFilter==='mateja'?'active':''}" data-filter="mateja" onclick="filterLeads('mateja')">Mateja</button>
+        <button class="filter-btn ${leadsFilter==='nikola'?'active':''}" data-filter="nikola" onclick="filterLeads('nikola')">Nikola</button>
         <button class="filter-btn ${leadsFilter==='unassigned'?'active':''}" data-filter="unassigned" onclick="filterLeads('unassigned')">Nedodeljeni</button>
       </div>
       <button class="smart-btn ${leadsSmartView?'active':''}" onclick="toggleSmartView()" title="Prikaži samo hot/warm leadove, sortirano po skoru">
@@ -4662,7 +4662,7 @@ function openLeadDetail(id){
   currentLeadId=id;
   const todayStr=new Date().toISOString().slice(0,10);
   const initials=(c.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  const avCls=c.assigned_to==='mateja'?'av-m':c.assigned_to==='dusica'?'av-d':'';
+  const avCls=c.assigned_to==='nikola'?'av-m':c.assigned_to==='dusica'?'av-d':'';
   const typePillMap={qualified:'<span class="ltr-type type-q">Qualified</span>',disqualified:'<span class="ltr-type type-dq">Disqualified</span>',booked:'<span class="ltr-type type-wb">Zakazan poziv</span>',customer:'<span class="ltr-type type-wa">Klijent</span>'};
   const stOpts=['Novi','Follow Up','Closed','DQ'].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('');
   let fuCls=''; if(c.follow_up_date){fuCls=c.follow_up_date===todayStr?'fu-today':c.follow_up_date<todayStr?'fu-overdue':'';}
@@ -4705,8 +4705,8 @@ function openLeadDetail(id){
         <button class="ldp-st-btn ${c.status==='DQ'?'ldp-st-dq':''}" onclick="updateLeadStatus('${esc(c.id)}','DQ')">DQ</button>
       </div>
       <div class="ldp-assign-row">
-        <button class="ldp-assign-btn ${c.assigned_to==='mateja'?'ldp-ab-m':''}" onclick="assignLeadPanel('${esc(c.id)}','mateja')">
-          <span style="font-size:15px;font-weight:900;font-family:var(--font)">M</span> Mateja
+        <button class="ldp-assign-btn ${c.assigned_to==='nikola'?'ldp-ab-m':''}" onclick="assignLeadPanel('${esc(c.id)}','nikola')">
+          <span style="font-size:15px;font-weight:900;font-family:var(--font)">M</span> Nikola
         </button>
       </div>
       <div class="ldp-subgap">
@@ -4943,7 +4943,7 @@ function renderLeadCard(lead, subTab){
   // Avatar initials
   const words=(lead.name||'?').trim().split(/\s+/);
   const initials=(words[0]?.[0]||'')+(words[1]?.[0]||'');
-  const avCls=assigned==='mateja'?'av-m':assigned==='dusica'?'av-d':'';
+  const avCls=assigned==='nikola'?'av-m':assigned==='dusica'?'av-d':'';
 
   // Status pill
   const stPillCls={'Novi':'s-novi','Follow Up':'s-followup','Closed':'s-closed','DQ':'s-dq'}[st]||'s-novi';
@@ -4983,8 +4983,8 @@ function renderLeadCard(lead, subTab){
 
     <div class="lc-actions" style="margin-top:14px">
       <div class="lc-assign">
-        <button class="lc-ab ${assigned==='mateja'?'on-m':''}" onclick="assignLead('${esc(lead.id)}','mateja')">
-          <img src="mateja.png" onerror="this.style.display='none'"/> Mateja
+        <button class="lc-ab ${assigned==='nikola'?'on-m':''}" onclick="assignLead('${esc(lead.id)}','nikola')">
+          <img src="nikola.png" onerror="this.style.display='none'"/> Nikola
         </button>
       </div>
       <select class="lc-stsel" onchange="updateLeadStatus('${esc(lead.id)}',this.value)">
@@ -5196,7 +5196,7 @@ const SHEET_ID='';
  * Metrics tab or revenue section is loaded.
  * ─────────────────────────────────────────────────────────────── */
 const CLOSER_TO_MEMBER = {
-  'mateja': 'mateja',
+  'nikola': 'nikola',
   'dusica': 'dusica',
   'dušica': 'dusica',
 };
@@ -5304,11 +5304,11 @@ async function syncClosedFromSheet(opts = {}){
 
 /* ─────────────────── AUTO ROUND-ROBIN ASSIGNMENT ──────────────────
  * Fairly distributes unassigned tracker-relevant leads between
- * Mateja and Dušica. Whoever has fewer open leads (status not in
+ * Nikola and Dušica. Whoever has fewer open leads (status not in
  * Closed/DQ) gets the next one. Activity log records each.
  * ─────────────────────────────────────────────────────────────── */
 async function autoAssignUnassigned(){
-  // Single closer (Mateja): claim every unassigned, open, qualified lead.
+  // Single closer (Nikola): claim every unassigned, open, qualified lead.
   const { data, error } = await sb.from('ghl_leads')
     .select('id,date_added,tags,status')
     .is('assigned_to', null)
@@ -5320,14 +5320,14 @@ async function autoAssignUnassigned(){
 
   let assignedM = 0;
   for (const lead of data) {
-    const { error: upErr } = await sb.from('ghl_leads').update({ assigned_to: 'mateja' }).eq('id', lead.id);
+    const { error: upErr } = await sb.from('ghl_leads').update({ assigned_to: 'nikola' }).eq('id', lead.id);
     if (upErr) continue;
-    logActivity(lead.id, 'assign', null, 'mateja');
+    logActivity(lead.id, 'assign', null, 'nikola');
     assignedM++;
     const cached = (cachedLeads||[]).find(l => l.id === lead.id);
-    if (cached) cached.assigned_to = 'mateja';
+    if (cached) cached.assigned_to = 'nikola';
   }
-  return { assigned: assignedM, mateja: assignedM };
+  return { assigned: assignedM, nikola: assignedM };
 }
 
 function showRoundRobinToast(r){

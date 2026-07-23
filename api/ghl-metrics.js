@@ -2,7 +2,7 @@
 // Pulls opportunities and maps them to the row shape the SPA's renderRevenue()
 // already expects: { name, challenge, email, date, closer, status }.
 //   status: 'polozeno' = won (cash collected) · 'u toku' = open (pipeline)
-// Single closer (Mateja), so any assigned opp is labelled "Mateja".
+// Single closer (Nikola), so any assigned opp is labelled "Nikola".
 
 const GHL_TOKEN = process.env.GHL_TOKEN;
 const GHL_LOC   = 'oZbpjiMjX93qmnQUFB6R';
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
         challenge: Number(o.monetaryValue || 0),
         email:     o.contact?.email || '',
         date:      o.lastStatusChangeAt || o.createdAt || o.dateAdded || null,
-        closer:    o.assignedTo ? 'Mateja' : '',
+        closer:    o.assignedTo ? 'Nikola' : '',
         status:    o.status === 'won' ? 'polozeno' : 'u toku',
       }))
       .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));

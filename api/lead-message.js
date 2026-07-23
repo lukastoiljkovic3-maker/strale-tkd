@@ -165,7 +165,7 @@ export default async function handler(req, res) {
   const scenarioPrompt = SCENARIO_PROMPTS[scenario] || SCENARIO_PROMPTS['first-touch'];
 
   const firstName = (lead.name || '').split(' ')[0] || '';
-  const repName = lead.assigned_to === 'mateja' ? 'Mateja' : '';
+  const repName = lead.assigned_to === 'nikola' ? 'Nikola' : '';
   const booked = (lead.tags || []).includes('booked-call');
 
   const ctx = [];
