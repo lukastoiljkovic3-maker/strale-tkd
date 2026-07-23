@@ -1908,6 +1908,22 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
   50%  { opacity: 1; }
   100% { opacity: 0; transform: translateY(-50%) scaleX(1); transform-origin: left; }
 }
+
+/* 21st.dev ports (vanilla): skeleton shimmer + spotlight-card (id 2220), orange. */
+.sk { position:relative; overflow:hidden; background:rgba(255,255,255,.045); border-radius:10px; }
+.sk::after { content:""; position:absolute; inset:0; transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);
+  animation:skSweep 1.4s ease-in-out infinite; }
+@keyframes skSweep { 100% { transform:translateX(100%); } }
+.sk-card { border:1px solid var(--b); border-radius:16px; padding:16px; background:linear-gradient(160deg,var(--s2),var(--s1)); }
+.sk-line { height:12px; margin:8px 0; }
+.spot { position:relative; }
+.spot::before { content:""; position:absolute; inset:0; border-radius:inherit; opacity:0; z-index:0;
+  background:radial-gradient(300px circle at var(--mx,50%) var(--my,50%), rgba(232,114,12,.13), transparent 65%);
+  transition:opacity .35s ease; pointer-events:none; }
+.spot:hover::before { opacity:1; }
+@media (prefers-reduced-motion: reduce){ .sk::after { animation:none; } }
+
 </style>
 </head>
 <body>
@@ -2154,6 +2170,16 @@ async function signOut() {
 }
 
 /* ── INIT ── */
+
+(() => { let raf = 0, ev = null;
+  document.addEventListener('mousemove', e => { ev = e; if (raf) return;
+    raf = requestAnimationFrame(() => { raf = 0;
+      const t = ev.target && ev.target.closest ? ev.target.closest('.spot') : null;
+      if (!t) return; const r = t.getBoundingClientRect();
+      t.style.setProperty('--mx', (ev.clientX - r.left) + 'px');
+      t.style.setProperty('--my', (ev.clientY - r.top) + 'px'); }); }, { passive: true });
+})();
+
 (async function init() {
   const now = new Date();
   currentYear = now.getFullYear();
@@ -2198,6 +2224,10 @@ async function signOut() {
     setProgress(100);
     setTimeout(hideLoader, 400);
     handleDeepLink();   // ?lead=<contactId> → open that lead (e.g. from a Slack notification)
+  
+    sb.from('ghl_leads').select('id',{count:'exact',head:true}).then(r => {
+      if ((r.count ?? 0) === 0 && typeof syncLeadsFromGHL === 'function') syncLeadsFromGHL();
+    });
   });
 
   sb.channel('tracker')
@@ -2316,7 +2346,7 @@ function setMetricsPeriod(p){ metricsPeriod=p; renderMetricsTab(); }
 /* ── TREND CHART DATA ── */
 async function renderMetricsTab(){
   const el=document.getElementById('mainContent');
-  el.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:20px">⏳</div><div class="empty-text">Učitavam...</div></div>';
+  el.innerHTML='<div style="display:grid;gap:10px"><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div></div>';
 
   const sheetRows = await fetchSheetData().catch(()=>[]);
   // Live GHL calendar appointments → hero "Booked" stat + closer board
@@ -2369,7 +2399,7 @@ const _apptSt = a => String(a.appointmentStatus || a.appoinmentStatus || '').toL
 /* ── Kalendar tab: agenda of GHL calendar appointments, grouped by day ── */
 async function renderKalendarTab(){
   const el=document.getElementById('mainContent');
-  el.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:20px">⏳</div><div class="empty-text">Učitavam kalendar...</div></div>';
+  el.innerHTML='<div style="display:grid;gap:10px"><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div></div>';
   const now=Date.now();
   const data=await fetch(`/api/ghl-appointments?start=${now-90*864e5}&end=${now+180*864e5}`).then(r=>r.json()).catch(()=>({error:'fetch'}));
   if(data.error){
@@ -2452,19 +2482,19 @@ function renderHeroStats(appts, closedLeads, host){
   const cash = closedLeads.reduce((s,l) => s + (Number(l.deal_value)||0), 0);
   const withVal = closedLeads.filter(l => l.deal_value != null).length;
   host.innerHTML = `<div class="mstat-row">
-    <div class="mstat">
+    <div class="mstat spot">
       <div class="mstat-ic" style="background:rgba(56,189,248,.12);color:#38bdf8">📅</div>
       <div class="mstat-lbl">Zakazani pozivi</div>
       <div class="mstat-val mstat-count" data-target="${booked}" style="color:#38bdf8">${booked}</div>
       <div class="mstat-sub">${appts.length} ukupno u kalendaru</div>
     </div>
-    <div class="mstat">
+    <div class="mstat spot">
       <div class="mstat-ic" style="background:rgba(34,197,94,.12);color:var(--green)">🏆</div>
       <div class="mstat-lbl">Zatvoreni klijenti</div>
       <div class="mstat-val mstat-count" data-target="${wonCount}" style="color:var(--green)">${wonCount}</div>
       <div class="mstat-sub">Status: Closed</div>
     </div>
-    <div class="mstat">
+    <div class="mstat spot">
       <div class="mstat-ic" style="background:rgba(232,114,12,.12);color:var(--accent)">💰</div>
       <div class="mstat-lbl">Cash Collected</div>
       <div class="mstat-val mstat-count" data-target="${cash}" data-cash="1" style="color:var(--accent)">€${cash.toLocaleString('sr-RS')}</div>
@@ -2512,7 +2542,7 @@ async function renderTimeToCloseSection(){
   if (!host) return;
   host.innerHTML = `<div class="metrics-sec">
     <div class="metrics-sec-lbl">VREME DO ZATVARANJA — Po izvoru</div>
-    <div style="padding:24px;text-align:center;color:var(--muted);font-size:12px">⏳ Učitavam...</div>
+    <div style="display:grid;gap:10px"><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div></div>
   </div>`;
 
   // 1) Get all closed leads + their lead_type
@@ -2697,7 +2727,7 @@ async function renderFunnelSection(){
   if (!host) return;
   host.innerHTML = `<div class="metrics-sec">
     <div class="metrics-sec-lbl">PRODAJNI LIJEVAK — VSL</div>
-    <div style="padding:24px;text-align:center;color:var(--muted);font-size:12px">⏳ Učitavam...</div>
+    <div style="display:grid;gap:10px"><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div></div>
   </div>`;
 
   const qualTags = ['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus'];
@@ -3451,7 +3481,7 @@ function timeAgoSr(iso){
 async function renderLeadActivityInto(elId, leadId){
   const host = document.getElementById(elId);
   if (!host) return;
-  host.innerHTML = `<div style="text-align:center;padding:18px;color:var(--muted);font-size:12px">⏳ Učitavam...</div>`;
+  host.innerHTML = `<div style="display:grid;gap:10px"><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div></div>`;
   const items = await loadLeadActivities(leadId, 25);
   if (!items.length) {
     host.innerHTML = `<div style="text-align:center;padding:18px;color:var(--muted);font-size:12px">Nema zabeleženih izmena. Sve buduće akcije će se logovati ovde.</div>`;
@@ -4958,7 +4988,7 @@ function renderLeadCard(lead, subTab){
 
   const hasDeal=lead.deal&&DEALS[lead.deal];
 
-  return `<div class="lead-card ${asCls} ${stCls}" ${typeAccent}>
+  return `<div class="lead-card spot ${asCls} ${stCls}" ${typeAccent}>
     <div class="lc-head">
       <div class="lc-av ${avCls}">${initials.toUpperCase()||'?'}</div>
       <div class="lc-info">
