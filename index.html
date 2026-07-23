@@ -4736,7 +4736,7 @@ function openLeadDetail(id){
       </div>
       <div class="ldp-assign-row">
         <button class="ldp-assign-btn ${c.assigned_to==='nikola'?'ldp-ab-m':''}" onclick="assignLeadPanel('${esc(c.id)}','nikola')">
-          <span style="font-size:15px;font-weight:900;font-family:var(--font)">M</span> Nikola
+          <span style="font-size:15px;font-weight:900;font-family:var(--font)">N</span> Nikola
         </button>
       </div>
       <div class="ldp-subgap">
@@ -5291,6 +5291,10 @@ async function syncClosedFromSheet(opts = {}){
       const match = (e && byEmail.get(e)) || (n && byName.get(n));
       if (!match) continue;
       matchCount++;
+      /* CJURE-CRM FIX PORTED: GHL auto-creates an OPEN opportunity per lead —
+         only WON ('polozeno') opportunities may close a lead. Open pipeline
+         rows must never flip status. */
+      if (row.status !== 'polozeno') continue;
       const patch = {};
       if (match.status !== 'Closed') patch.status = 'Closed';
       const dealKey = _challengeToDeal(row.challenge);
