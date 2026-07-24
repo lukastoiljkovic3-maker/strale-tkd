@@ -1221,6 +1221,13 @@ tr.row-flash > td { animation: row-flash 1.6s ease-out; }
 .fnl-card-val { font-size:26px; font-weight:900; letter-spacing:-1px; line-height:1; color:var(--text); }
 .fnl-stream-wrap { position:relative; border:1px solid var(--b); border-radius:0 0 14px 14px; background:var(--s1); overflow:hidden; }
 .fnl-stream { display:block; width:100%; height:210px; }
+/* 21st.dev reveal: river sweeps in from the left, badges pop in staggered.
+   Transform/opacity only — no layout animation. */
+.fnl-stream path { transform-origin:0 50%; animation:fnl-reveal .9s cubic-bezier(.16,1,.3,1) both; }
+@keyframes fnl-reveal { from { transform:scaleX(.55); opacity:0; } to { transform:scaleX(1); opacity:1; } }
+.fnl-badge { animation:fnl-badge-in .5s cubic-bezier(.16,1,.3,1) both; animation-delay:calc(.4s + var(--i,0)*.14s); }
+@keyframes fnl-badge-in { from { opacity:0; transform:translate(-50%,-20%) scale(.8); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .fnl-stream path, .fnl-badge { animation:none; } }
 .fnl-badge { position:absolute; top:50%; transform:translate(-50%,-50%); display:inline-flex; align-items:center; gap:5px;
   background:var(--s3); border:1px solid var(--b2); border-radius:99px; padding:5px 11px;
   font-size:11px; font-weight:800; color:var(--text); white-space:nowrap; box-shadow:0 2px 10px rgba(0,0,0,.35); }
@@ -1945,7 +1952,7 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 
 <!-- LOADING SCREEN -->
 <div id="loader">
-  <img id="loader-logo" src="straletkd-logo.png" alt="STRALETKD" />
+  <img id="loader-logo" src="strale-mark-t.png" alt="STRALETKD" />
   <div id="loader-bar-wrap">
     <div id="loader-bar"></div>
   </div>
@@ -1955,7 +1962,7 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 <header>
   <div class="logo">
     <div class="logo-img">
-      <img src="straletkd-logo.png" alt="STRALETKD" style="width:38px;height:38px;object-fit:contain;" />
+      <img src="strale-mark-t.png" alt="STRALETKD" style="width:38px;height:38px;object-fit:contain;" />
     </div>
     <div class="logo-words">
       <div class="logo-name">STRALETKD</div>
@@ -2117,6 +2124,11 @@ const DEALS = {
 };
 
 let currentTab = 'leads';
+/* Async tab renders can outlive a tab switch — a slow Metrics fetch must not
+   paint over Leads. Every top-level renderer takes a sequence number and
+   bails if a newer render started or the user moved to another tab. */
+let _renderSeq = 0;
+const staleRender = (seq, tab) => seq !== _renderSeq || currentTab !== tab;
 let metricsRefreshInterval = null;
 let currentYear, currentMonth;
 
@@ -2346,6 +2358,7 @@ function setMetricsPeriod(p){ metricsPeriod=p; renderMetricsTab(); }
 /* ── TREND CHART DATA ── */
 async function renderMetricsTab(){
   const el=document.getElementById('mainContent');
+  const _seq = ++_renderSeq;
   el.innerHTML='<div style="display:grid;gap:10px"><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div></div>';
 
   const sheetRows = await fetchSheetData().catch(()=>[]);
@@ -2357,13 +2370,14 @@ async function renderMetricsTab(){
   // Closed leads + their tracker-entered close value (deal_value) → Cash Collected / Won
   const { data: closedRaw } = await sb.from('ghl_leads').select('name, deal_value').eq('status', 'Closed');
   const closedLeads = closedRaw || [];
+  if (staleRender(_seq, 'metrics')) return;
   // Background: reconcile won deals from GHL → CRM Closed status
   syncClosedFromSheet().then(r => showSheetSyncToast(r));
 
   el.innerHTML=`<div class="metrics-wrap">
 
     <div class="metrics-logo-row">
-      <img src="straletkd-logo.png" alt="STRALETKD"/>
+      <img src="strale-mark-t.png" alt="STRALETKD"/>
       <div class="metrics-logo-row-text">
         <div class="metrics-logo-row-name">STRALETKD</div>
         <div class="metrics-logo-row-sub">Prodajne Metrike</div>
@@ -2389,7 +2403,7 @@ async function renderMetricsTab(){
   const _revSec = document.getElementById('revenue-section');
   if (_revSec) renderRevenue(sheetRows, _revSec);
   renderClosersBoard(appts, closedLeads, document.getElementById('closers-board-section'));
-  renderFunnelSection();
+  renderFunnelSection(appts);
   renderTimeToCloseSection();
   renderAIInsightsSection();
 }
@@ -2399,9 +2413,11 @@ const _apptSt = a => String(a.appointmentStatus || a.appoinmentStatus || '').toL
 /* ── Kalendar tab: agenda of GHL calendar appointments, grouped by day ── */
 async function renderKalendarTab(){
   const el=document.getElementById('mainContent');
+  const _seq = ++_renderSeq;
   el.innerHTML='<div style="display:grid;gap:10px"><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div></div>';
   const now=Date.now();
   const data=await fetch(`/api/ghl-appointments?start=${now-90*864e5}&end=${now+180*864e5}`).then(r=>r.json()).catch(()=>({error:'fetch'}));
+  if (staleRender(_seq, 'kalendar')) return;
   if(data.error){
     el.innerHTML=`<div class="empty" style="padding:40px"><div class="empty-icon" style="font-size:22px">📅</div><div class="empty-text">Kalendar trenutno nedostupan.<br><span style="color:var(--muted);font-size:12px">${esc(data.hint||data.error)}</span></div></div>`;
     return;
@@ -2448,7 +2464,7 @@ async function renderKalendarTab(){
 
   el.innerHTML=`<div class="cal-wrap">
     <div class="metrics-logo-row">
-      <img src="straletkd-logo.png" alt="STRALETKD"/>
+      <img src="strale-mark-t.png" alt="STRALETKD"/>
       <div class="metrics-logo-row-text">
         <div class="metrics-logo-row-name">Kalendar</div>
         <div class="metrics-logo-row-sub">${upcoming.length} predstojećih · ${data.count||evs.length} ukupno</div>
@@ -2466,7 +2482,7 @@ function countUpEls(root){
   root.querySelectorAll('.mstat-count').forEach(el => {
     const target = parseFloat(el.dataset.target) || 0;
     const cash = el.dataset.cash === '1';
-    const fmt = v => cash ? '€'+Math.round(v).toLocaleString('sr-RS') : String(Math.round(v));
+    const fmt = v => cash ? '€'+Math.round(v).toLocaleString('sr-RS') : Math.round(v).toLocaleString('sr-RS');
     const start = performance.now(), dur = 900;
     (function frame(now){
       const p = Math.min((now - start)/dur, 1), e = 1 - Math.pow(1-p, 3);
@@ -2722,7 +2738,7 @@ function renderInsightsContent(host, text, ts){
  *   - Last activity time
  * + team-wide totals at the top.
  * ─────────────────────────────────────────────────────────────── */
-async function renderFunnelSection(){
+async function renderFunnelSection(appts = []){
   const host = document.getElementById('funnel-section');
   if (!host) return;
   host.innerHTML = `<div class="metrics-sec">
@@ -2747,10 +2763,18 @@ async function renderFunnelSection(){
     booked:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
     closed:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
   };
+  // Booked calls: the 'booked-call' tag is rarely set by the GHL workflow, so
+  // the real source of truth is the calendar feed — unique contacts holding a
+  // non-cancelled appointment. Take whichever count is higher.
+  const calBooked = new Set(
+    appts.filter(a => _apptSt(a) !== 'cancelled')
+         .map(a => a.contactId || String(a.email || '').toLowerCase() || a.id)
+         .filter(Boolean)
+  ).size;
   const stages = [
     { key:'lead',   label:'Leadovi',       count: allR.count||0,    color:'#E8720C' },
     { key:'qual',   label:'Kvalifikovani', count: qualR.count||0,   color:'#f59e0b' },
-    { key:'booked', label:'Zakazan poziv', count: bookedR.count||0, color:'#38bdf8' },
+    { key:'booked', label:'Zakazan poziv', count: Math.max(bookedR.count||0, calBooked), color:'#38bdf8' },
     { key:'closed', label:'Zatvoreni',     count: closedR.count||0, color:'#22c55e' },
   ];
   const conv = (a,b) => a === 0 ? 0 : Math.round((b/a) * 100);
@@ -2768,7 +2792,7 @@ async function renderFunnelSection(){
   let badges = '';
   for (let i=1;i<n;i++){
     const leftPct = ((i-0.5)/(n-1))*100;
-    badges += `<div class="fnl-badge" style="left:${leftPct}%">${conv(stages[i-1].count, stages[i].count)}% ${arrowSvg}</div>`;
+    badges += `<div class="fnl-badge" style="left:${leftPct}%;--i:${i-1}">${conv(stages[i-1].count, stages[i].count)}% ${arrowSvg}</div>`;
   }
 
   host.innerHTML = `<div class="metrics-sec">
@@ -2776,7 +2800,7 @@ async function renderFunnelSection(){
     <div class="fnl-cards">
       ${stages.map(s => `<div class="fnl-card">
         <div class="fnl-card-hd" style="color:${s.color}">${ICON[s.key]}<span style="color:var(--muted)">${s.label}</span></div>
-        <div class="fnl-card-val">${s.count.toLocaleString('sr-RS')}</div>
+        <div class="fnl-card-val mstat-count" data-target="${s.count}">${s.count.toLocaleString('sr-RS')}</div>
       </div>`).join('')}
     </div>
     <div class="fnl-stream-wrap">
@@ -2794,6 +2818,7 @@ async function renderFunnelSection(){
       <div class="fnl-foot-item"><span class="fnl-foot-dot" style="background:#38bdf8"></span>Close rate (zakazan → zatvoren): <b>${conv(stages[2].count, stages[3].count)}%</b></div>
     </div>
   </div>`;
+  countUpEls(host);
 }
 
 /* ── TARGETS ── */
@@ -3970,7 +3995,9 @@ async function setLeadsSubTab(tab){
 }
 
 async function renderLeadsSection(){
+  const _seq = ++_renderSeq;
   [cachedLeads, leadCounts]=await Promise.all([loadLeads(leadsSubTab), loadLeadCounts()]);
+  if (staleRender(_seq, 'leads')) return;
   if(leadsView==='ads') { await renderAdsView(); return; }
   renderLeads(cachedLeads);
   // After initial render, attach last-activity per lead and refresh rows.
@@ -4146,7 +4173,9 @@ function updateAdSpendCell(key, amount){
 
 async function renderAdsView(){
   const el=document.getElementById('mainContent');
+  const _seq = ++_renderSeq;
   const campaigns=await loadCampaignData();
+  if (staleRender(_seq, 'leads')) return;
   const maxLeads=campaigns[0]?.leads||1;
   const srcPill=s=>{
     const cls=s.includes('facebook')?'src-facebook':s.includes('instagram')?'src-instagram':s.includes('google')?'src-google':'';
