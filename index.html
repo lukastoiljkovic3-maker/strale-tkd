@@ -2588,7 +2588,13 @@ async function signOut() {
   });
 
   sb.channel('tracker')
-    .on('postgres_changes',{event:'*',schema:'public',table:'ghl_leads'},()=>{if(currentTab==='leads')renderLeadsSection();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'ghl_leads'},()=>{
+      // Debounced: GHL auto-sync touches ~1000 rows at once — without this the
+      // burst of realtime events fired hundreds of concurrent reloads.
+      if(currentTab!=='leads')return;
+      clearTimeout(window._rtLeadsTimer);
+      window._rtLeadsTimer=setTimeout(()=>{if(currentTab==='leads')renderLeadsSection();},1500);
+    })
     .subscribe();
 })();
 
@@ -2693,6 +2699,7 @@ async function render() {
   if (currentTab === 'leads') {
     kpi.innerHTML = '';
     mc.style.cssText = 'display:block;';
+    if ((cachedLeads||[]).length) renderLeads(cachedLeads); // instant view from cache while fresh data loads
     await renderLeadsSection();
     return;
   }
@@ -6354,14 +6361,25 @@ function showSheetSyncToast(result){
 }
 
 async function fetchSheetData(){
-  // Revenue/clients now come straight from GHL opportunities via /api/ghl-metrics,
-  // mapped to the same {name,challenge,email,date,closer,status} shape the UI used
-  // for the old Google Sheet. status: 'polozeno' = won · 'u toku' = open pipeline.
-  const res=await fetch('/api/ghl-metrics');
-  if(!res.ok) throw new Error(`API HTTP ${res.status}`);
-  const json=await res.json();
-  if(json.error) throw new Error(json.error);
-  return (json.rows||[]).filter(r=>r.name);
+  // Revenue/clients come straight from the tracker DB (ghl_leads) — the CRM is
+  // the source of truth (closers set status + "Zatvoreno za" here), NOT GHL.
+  // Same row shape as the old feed: {name,challenge,email,date,closer,status}
+  // status: 'polozeno' = Closed · 'rezervacija' = booked, not yet closed · 'u toku' = open deal.
+  const {data,error}=await sb.from('ghl_leads')
+    .select('name,email,status,lead_type,assigned_to,deal,deal_value,date_added')
+    .order('date_added',{ascending:false})
+    .limit(5000);
+  if(error) throw new Error(error.message);
+  return (data||[]).map(l=>{
+    const val=(l.deal_value!=null&&Number(l.deal_value)>0)?Number(l.deal_value):((l.deal&&DEAL_PRICES[l.deal])?DEAL_PRICES[l.deal]:0);
+    let st=null;
+    if(l.status==='Closed') st='polozeno';
+    else if(l.status==='DQ') st=null;
+    else if(l.lead_type==='booked') st='rezervacija';
+    else if(val>0) st='u toku';
+    if(!st) return null;
+    return {name:l.name||'',challenge:val,email:l.email||'',date:l.date_added,closer:(l.assigned_to?l.assigned_to.charAt(0).toUpperCase()+l.assigned_to.slice(1):'—'),status:st};
+  }).filter(r=>r&&r.name&&(r.challenge>0||r.status!=='u toku'));
 }
 
 function parseGvizDate(d){
