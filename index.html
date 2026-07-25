@@ -4696,7 +4696,12 @@ function maybeStartOnboarding(){
   try { if (localStorage.getItem('crmOnboarded') === '1') return; } catch(e) { return; }
   sb.auth.getSession().then(({ data: { session } }) => { if (session && _tourI === -1) startTour(); }).catch(() => {});
 }
-function startTour(){ _tourI = -1; tourNext(); }
+function startTour(){
+  // Mark as seen the moment it starts — one showing per device, ever,
+  // even if the rep reloads mid-tour instead of finishing it.
+  try { localStorage.setItem('crmOnboarded', '1'); } catch(e) {}
+  _tourI = -1; tourNext();
+}
 function endTour(){
   try { localStorage.setItem('crmOnboarded', '1'); } catch(e) {}
   const n = document.getElementById('tour-root'); if (n) n.remove();
