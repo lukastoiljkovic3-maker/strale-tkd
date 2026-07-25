@@ -672,6 +672,37 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
 .tab-loading-spin { width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,.12); border-top-color: #fff; animation: spin .7s linear infinite; }
 .kpi-grid:empty { display: none; }
 
+/* ── NO-SHOW CHASER ── */
+.nsc-card { background: var(--s1); border: 1px solid var(--b); border-radius: 12px; padding: 14px 18px; margin: 4px 0 16px; }
+.nsc-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.nsc-title { font-size: 12.5px; color: var(--text); font-weight: 600; }
+.nsc-sub { font-size: 11px; color: var(--muted); font-weight: 500; margin-left: 10px; }
+.nsc-count { font-size: 11px; font-weight: 700; color: var(--red); background: rgba(248,113,113,.1); padding: 3px 10px; border-radius: 99px; }
+.nsc-list { margin-top: 10px; display: flex; flex-direction: column; }
+.nsc-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid rgba(255,255,255,.05); cursor: pointer; }
+.nsc-row:hover .nsc-name { color: #fff; }
+.nsc-name { font-size: 12.5px; font-weight: 600; color: var(--text); }
+.nsc-when { font-size: 11px; color: var(--muted); }
+.nsc-actions { margin-left: auto; display: inline-flex; gap: 6px; }
+.nsc-btn { font-size: 11px; font-weight: 600; color: #A1A1AA; border: 1px solid #27272A; border-radius: 6px; padding: 3px 10px; text-decoration: none; transition: color .12s, border-color .12s; }
+.nsc-btn:hover { color: #E4E4E7; border-color: #3F3F46; }
+.nsc-wa { color: #4ADE80; border-color: rgba(74,222,128,.25); }
+
+/* ── DUPLICATE MERGE MODAL ── */
+.merge-overlay { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,.6); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; padding: 20px; }
+.merge-overlay.open { display: flex; }
+.merge-panel { background: var(--s1); border: 1px solid var(--b); border-radius: 16px; width: min(560px, 100%); max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; }
+.merge-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--b); font-size: 13px; font-weight: 800; }
+.merge-body { overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
+.merge-group { border: 1px solid var(--b); border-radius: 12px; padding: 14px; }
+.merge-key { font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 8px; display: flex; gap: 6px; align-items: center; }
+.merge-lead { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid rgba(255,255,255,.04); }
+.merge-lead.primary .merge-nm { color: #fff; }
+.merge-nm { font-size: 13px; font-weight: 700; }
+.merge-meta { font-size: 11px; color: var(--muted); }
+.merge-tag-primary { margin-left: auto; font-size: 9.5px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--green); background: rgba(34,197,94,.14); padding: 2px 8px; border-radius: 6px; }
+.merge-btn { margin-top: 12px; width: 100%; }
+
 @media (max-width: 640px) {
   .mochi-tabs { width: 100%; }
   .mtab { flex: 1; justify-content: center; padding: 9px 6px; font-size: 11px; }
@@ -2866,6 +2897,61 @@ async function renderKalendarTab(){
   renderCalUI();
 }
 
+/* ── NO-SHOW CHASER ─────────────────────────
+   Show rate from the last 30 days of appointments + a chase list of
+   recent no-shows with call/WhatsApp shortcuts. Renders empty when the
+   calendar source carries no showed/no-show statuses (native bookings). */
+function noShowChaserHtml(){
+  if(!_calCache) return '';
+  const LOC=(typeof _LOC!=='undefined')?_LOC:'sr-RS';
+  const now=Date.now(), d30=now-30*864e5, d14=now-14*864e5;
+  let showed=0,noshow=0;
+  const chase=[];
+  _calCache.evs.forEach(e=>{
+    const ts=new Date(e.startTime).getTime();
+    if(isNaN(ts)||ts<d30||ts>now) return;
+    const st=_apptSt(e);
+    if(st==='showed') showed++;
+    else if(st==='noshow'){ noshow++; if(ts>=d14) chase.push(e); }
+  });
+  const total=showed+noshow;
+  if(!total) return '';
+  const rate=Math.round(showed/total*100);
+  const rateCol=rate>=70?'var(--green)':rate>=50?'var(--yellow)':'var(--red)';
+  chase.sort((a,b)=>String(b.startTime).localeCompare(String(a.startTime)));
+  const rows=chase.slice(0,12).map(e=>{
+    const lead=_calCache.leadById.get(e.contactId);
+    const nm=(lead&&lead.name)||String(e.title||'Poziv').split('·')[0].trim();
+    const ph=(lead&&lead.phone)||e.phone||'';
+    const when=new Date(e.startTime).toLocaleDateString(LOC,{day:'numeric',month:'short'});
+    const wa=ph?waLink({phone:ph,name:nm}):'';
+    return `<div class="nsc-row" ${e.contactId?`onclick="calChaserOpen('${esc(e.contactId)}')"`:''}>
+      <span class="nsc-name">${esc(nm)}</span><span class="nsc-when">${esc(when)}</span>
+      <span class="nsc-actions">
+        ${telLink(ph)?`<a class="nsc-btn" href="${telLink(ph)}" onclick="event.stopPropagation()">Pozovi</a>`:''}
+        ${wa?`<a class="nsc-btn nsc-wa" href="${wa}" target="_blank" rel="noopener" onclick="event.stopPropagation()">WhatsApp</a>`:''}
+      </span>
+    </div>`;
+  }).join('');
+  return `<div class="nsc-card">
+    <div class="nsc-head">
+      <span class="nsc-title">Show rate (30d): <b style="color:${rateCol}">${rate}%</b><span class="nsc-sub">${showed} došlo · ${noshow} no-show</span></span>
+      ${chase.length?`<span class="nsc-count">${chase.length} no-show za praćenje (14d)</span>`:''}
+    </div>
+    ${rows?`<div class="nsc-list">${rows}</div>`:''}
+  </div>`;
+}
+function calChaserOpen(id){
+  (async()=>{
+    try{
+      const l=await ensureLead(id);
+      if(!l) return;
+      if(!(cachedLeads||[]).find(x=>x.id===id)) cachedLeads.push(l);
+      openLeadDetail(id);
+    }catch(e){}
+  })();
+}
+
 function renderCalUI(){
   const el = document.getElementById('mainContent');
   if (!el || currentTab !== 'kalendar' || !_calCache) return;
@@ -2909,7 +2995,7 @@ function renderCalUI(){
       <span class="tg-range">${rangeLbl}</span>
       ${statsHtml(counts)}
       ${viewsHtml}
-    </div>`;
+    </div>${noShowChaserHtml()}`;
 
   /* ── Month overview ── */
   if (_calView === 'month'){
@@ -4635,6 +4721,87 @@ function findLeadDuplicates(){
   return groups;
 }
 
+/* ── ONE-CLICK DUPLICATE MERGE ──────────────
+   Merge a dupe group into its OLDEST lead: coalesce empty fields, union
+   tags, concat notes, keep the strongest status, move activities, then
+   delete the absorbed rows (and their GHL contacts so sync won't re-add). */
+function openMergeModal(){
+  const groups=findLeadDuplicates();
+  if(!groups.length){ alert('Nema duplikata.'); return; }
+  let host=document.getElementById('mergeModal');
+  if(!host){
+    host=document.createElement('div');
+    host.id='mergeModal'; host.className='merge-overlay';
+    host.onclick=e=>{ if(e.target===host) closeMergeModal(); };
+    document.body.appendChild(host);
+  }
+  host._groups=groups;
+  host.innerHTML=`<div class="merge-panel">
+    <div class="merge-head"><span>Duplikati · ${groups.length} ${groups.length===1?'grupa':'grupe'}</span><button class="ldp-close" onclick="closeMergeModal()">✕</button></div>
+    <div class="merge-body">${groups.map((g,i)=>{
+      const leads=g.leads.slice().sort((a,b)=>String(a.date_added||'').localeCompare(String(b.date_added||'')));
+      return `<div class="merge-group" id="mg-${i}">
+        <div class="merge-key">${g.type==='phone'?UI.phone:UI.mail} ${esc(g.key)}</div>
+        ${leads.map((l,j)=>`<div class="merge-lead ${j===0?'primary':''}">
+          <span class="merge-nm">${esc(l.name||'—')}</span>
+          <span class="merge-meta">${esc(fmtLeadDate(l.date_added)||'')} · ${esc(l.status||'')}${l.deal_value?` · €${l.deal_value}`:''}</span>
+          ${j===0?'<span class="merge-tag-primary">zadržava se</span>':''}
+        </div>`).join('')}
+        <button class="btn btn-primary merge-btn" onclick="mergeDupGroup(${i})">Spoji u jedan</button>
+      </div>`;
+    }).join('')}</div>
+  </div>`;
+  host.classList.add('open');
+}
+function closeMergeModal(){ const h=document.getElementById('mergeModal'); if(h) h.classList.remove('open'); }
+
+async function mergeDupGroup(idx){
+  const host=document.getElementById('mergeModal');
+  const g=host&&host._groups&&host._groups[idx];
+  if(!g) return;
+  const leads=g.leads.slice().sort((a,b)=>String(a.date_added||'').localeCompare(String(b.date_added||'')));
+  const target=leads[0], dupes=leads.slice(1);
+  if(!confirm(`Spojiti ${leads.length} leada u "${target.name||'—'}"?\n\nOstali će biti obrisani (i iz GHL-a). Ovo se ne može poništiti.`)) return;
+  const gEl=document.getElementById('mg-'+idx);
+  if(gEl) gEl.style.opacity='.5';
+  const RANK={'DQ':0,'Novi':1,'Follow Up':2,'Closed':3};
+  const patch={};
+  dupes.forEach(d=>{
+    ['phone','email','instagram','experience','time_frame','knowledge','qualification','pain_point','utm_source','utm_medium','utm_campaign','utm_content','deal','follow_up_date','assigned_to'].forEach(f=>{
+      if(!target[f]&&d[f]&&patch[f]==null) patch[f]=d[f];
+    });
+    if(d.deal_value&&!target.deal_value&&patch.deal_value==null) patch.deal_value=d.deal_value;
+    if(d.notes){ const cur=patch.notes!=null?patch.notes:(target.notes||''); patch.notes=(cur?cur+'\n---\n':'')+d.notes; }
+    patch.tags=[...new Set([...(patch.tags||target.tags||[]),...(d.tags||[])])];
+    const curSt=patch.status??target.status;
+    if((RANK[d.status]??1)>(RANK[curSt]??1)) patch.status=d.status;
+  });
+  try{
+    if(Object.keys(patch).length){
+      let {error}=await sb.from('ghl_leads').update(patch).eq('id',target.id);
+      if(error&&/deal_value/i.test(error.message||'')){ delete patch.deal_value; ({error}=await sb.from('ghl_leads').update(patch).eq('id',target.id)); }
+      if(error) throw error;
+      Object.assign(target,patch);
+    }
+    for(const d of dupes){
+      try{ await sb.from('lead_activities').update({lead_id:target.id}).eq('lead_id',d.id); }catch(e){}
+      if(!/^(webinar|manual)-/.test(d.id)){
+        await fetch('/api/ghl-delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contactId:d.id})}).catch(()=>{});
+      }
+      await sb.from('ghl_leads').delete().eq('id',d.id);
+      const ci=(cachedLeads||[]).findIndex(x=>x.id===d.id);
+      if(ci>=0) cachedLeads.splice(ci,1);
+    }
+    logActivity(target.id,'merge',null,`spojeno ${dupes.length+1} duplikata`);
+    if(gEl) gEl.remove();
+    refreshLeadRows();
+    if(!findLeadDuplicates().length){ closeMergeModal(); renderLeads(cachedLeads); }
+  }catch(e){
+    alert('Greška pri spajanju: '+(e.message||e));
+    if(gEl) gEl.style.opacity='1';
+  }
+}
+
 /* ─────────────────── SNOOZE ──────────────────────────────────────
  * Stores per-lead "hide until" date in localStorage. Snoozed leads
  * are hidden from the default leads view unless explicitly toggled.
@@ -5017,11 +5184,8 @@ async function toggleAdsView(){
 }
 
 async function loadCampaignData(){
-  const {data,error}=await sb.from('ghl_leads')
-    .select('utm_campaign,utm_content,utm_source,utm_medium,status,deal,lead_type,tags')
-    .overlaps('tags',['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus','straletkd-disqualified','budget-under-100','booked-call','customer'])
-    .limit(5000);
-  if(error||!data) return [];
+  const data=await sbFetchAllLeads(q=>q.overlaps('tags',['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus','straletkd-disqualified','budget-under-100','booked-call','customer']));
+  if(!data.length) return [];
   const isId=v=>v&&/^\d{10,}$/.test(v.trim());
   const fmt=v=>!v||isId(v)?null:v;
   const fmtCampaign=v=>!v||isId(v)?'Nepoznata kampanja':v.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
@@ -5040,8 +5204,8 @@ async function loadCampaignData(){
     map[key].leads++;
     if(r.status==='Closed') {
       map[key].closes++;
-      const price = r.deal && DEAL_PRICES[r.deal];
-      if (price) map[key].revenue += price;
+      const rv=(r.deal_value!=null&&Number(r.deal_value)>0)?Number(r.deal_value):((r.deal&&DEAL_PRICES[r.deal])||0);
+      if (rv) map[key].revenue += rv;
     }
   });
   return Object.values(map).sort((a,b)=>b.leads-a.leads);
@@ -5581,11 +5745,11 @@ function renderLeads(all){
       <div class="wait-banner-count">${waiting.length}</div>
     </div>`:'';})()}
 
-    ${(()=>{const dupes=findLeadDuplicates();return dupes.length?`<div class="dupe-banner" style="margin-bottom:16px" onclick="alert('Pronađeno ${dupes.length} grupa duplikata.\\n\\n'+${JSON.stringify(dupes.slice(0,8).map(g=>`${g.type==='phone'?'${UI.phone}':'${UI.mail}'} ${g.key} → ${g.leads.map(l=>l.name||'?').join(', ')}`).join('\\n'))})">
+    ${(()=>{const dupes=findLeadDuplicates();return dupes.length?`<div class="dupe-banner" style="margin-bottom:16px" onclick="openMergeModal()">
       <div class="dupe-banner-icon">${UI.alert}</div>
       <div class="dupe-banner-text">
         <div class="dupe-banner-title">Mogući duplikati</div>
-        <div class="dupe-banner-sub">${dupes.length} ${dupes.length===1?'grupa lead-ova':'grupe lead-ova'} sa istim telefonom/emailom · klikni za detalje</div>
+        <div class="dupe-banner-sub">${dupes.length} ${dupes.length===1?'grupa lead-ova':'grupe lead-ova'} sa istim telefonom/emailom · klikni za spajanje</div>
       </div>
       <div class="dupe-banner-count">${dupes.length}</div>
     </div>`:'';})()}
@@ -6092,6 +6256,21 @@ async function assignLead(id,member){
   if(!error){lead.assigned_to=newVal;renderLeads(cachedLeads);logActivity(id,'assign',oldVal,newVal);}
 }
 
+/* Fail-soft Slack notify via /api/slack-notify (no-op until SLACK_WEBHOOK_URL is set). */
+function notifySlack(event, lead, meta){
+  try {
+    fetch('/api/slack-notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event,
+        lead: { name: lead?.name, email: lead?.email, phone: lead?.phone },
+        meta: meta || {},
+      }),
+    }).catch(()=>{});
+  } catch(e) {}
+}
+
 async function updateLeadStatus(id,status){
   const lead=cachedLeads.find(l=>l.id===id);
   const oldStatus=lead?(lead.status||'Novi'):null;
@@ -6099,6 +6278,9 @@ async function updateLeadStatus(id,status){
   const {error}=await sb.from('ghl_leads').update({status}).eq('id',id);
   if(!error){
     if(lead){
+      if (status === 'Closed') notifySlack('closed', lead, { deal_value: lead.deal_value, closer: (lead.assigned_to ? lead.assigned_to.charAt(0).toUpperCase()+lead.assigned_to.slice(1) : '') });
+      else if (oldStatus === 'Closed') notifySlack('reopened', lead, { note: `Status: Closed › ${status}` });
+      else if (status === 'DQ') notifySlack('dq', lead, {});
       lead.status=status;
       setLocalLastActivity(id, 'status', status, oldStatus);
       // Partial updates only — keep panel buttons in place
@@ -6187,7 +6369,10 @@ async function updateLeadDealValue(id,val){
   const oldVal = lead ? (lead.deal_value!=null ? lead.deal_value : null) : null;
   const {error}=await sb.from('ghl_leads').update({deal_value:num}).eq('id',id);
   if(!error){
-    if(lead){lead.deal_value=num;renderLeads(cachedLeads);}
+    if(lead){
+      lead.deal_value=num;renderLeads(cachedLeads);
+      if(lead.status==='Closed'&&num>0&&num!==oldVal) notifySlack('closed', lead, { deal_value: num, closer: (lead.assigned_to ? lead.assigned_to.charAt(0).toUpperCase()+lead.assigned_to.slice(1) : ''), note: 'Vrednost ažurirana' });
+    }
     logActivity(id,'deal_value',oldVal!=null?'€'+oldVal:null,num!=null?'€'+num:null);
   }
 }
@@ -6270,9 +6455,9 @@ async function syncClosedFromSheet(opts = {}){
       if (!match) continue;
       matchCount++;
       /* CJURE-CRM FIX PORTED: GHL auto-creates an OPEN opportunity per lead —
-         only WON ('polozeno') opportunities may close a lead. Open pipeline
+         only 'depozit' rows (Closed + value) may close a lead. Open pipeline
          rows must never flip status. */
-      if (row.status !== 'polozeno') continue;
+      if (row.status !== 'depozit') continue;
       const patch = {};
       if (match.status !== 'Closed') patch.status = 'Closed';
       const dealKey = _challengeToDeal(row.challenge);
@@ -6396,18 +6581,18 @@ async function fetchSheetData(){
   // Revenue/clients come straight from the tracker DB (ghl_leads) — the CRM is
   // the source of truth (closers set status + "Zatvoreno za" here), NOT GHL.
   // Same row shape as the old feed: {name,challenge,email,date,closer,status}
-  // status: 'polozeno' = Closed · 'rezervacija' = booked, not yet closed · 'u toku' = open deal.
+  // status: 'depozit' = Closed + uneta vrednost (cash) · 'rezervacija' = zakazan poziv · 'pipeline' = otvoren deal.
   const data=await sbFetchAllLeads();
   return (data||[]).map(l=>{
     const val=(l.deal_value!=null&&Number(l.deal_value)>0)?Number(l.deal_value):((l.deal&&DEAL_PRICES[l.deal])?DEAL_PRICES[l.deal]:0);
     let st=null;
-    if(l.status==='Closed') st='polozeno';
+    if(l.status==='Closed') st=val>0?'depozit':null; // Closed bez unete vrednosti = higijena statusa, ne klijent
     else if(l.status==='DQ') st=null;
     else if(l.lead_type==='booked') st='rezervacija';
-    else if(val>0) st='u toku';
+    else if(val>0) st='pipeline';
     if(!st) return null;
     return {name:l.name||'',challenge:val,email:l.email||'',date:l.date_added,closer:(l.assigned_to?l.assigned_to.charAt(0).toUpperCase()+l.assigned_to.slice(1):'—'),status:st};
-  }).filter(r=>r&&r.name&&(r.challenge>0||r.status!=='u toku'));
+  }).filter(r=>r&&r.name);
 }
 
 function parseGvizDate(d){
@@ -6420,16 +6605,16 @@ function parseGvizDate(d){
 }
 
 function renderRevenue(rows,sec){
-  const polozeno=rows.filter(r=>r.status==='polozeno');
-  const uToku=rows.filter(r=>r.status==='u toku');
+  const depozit=rows.filter(r=>r.status==='depozit');
+  const uToku=rows.filter(r=>r.status==='pipeline');
   const rezervacija=rows.filter(r=>r.status==='rezervacija');
-  const cash=polozeno.reduce((s,r)=>s+r.challenge,0);
+  const cash=depozit.reduce((s,r)=>s+r.challenge,0);
   const pipeline=uToku.reduce((s,r)=>s+r.challenge,0);
   const total=rows.reduce((s,r)=>s+r.challenge,0);
 
   const stMap={
-    polozeno:  {label:'Položeno',   cls:'pill-g'},
-    'u toku':  {label:'U Toku',     cls:'pill-y'},
+    depozit:   {label:'Depozit',    cls:'pill-g'},
+    pipeline:  {label:'Pipeline',   cls:'pill-y'},
     rezervacija:{label:'Rezervacija',cls:'pill-b'},
     '':        {label:'—',          cls:''}
   };
@@ -6456,12 +6641,12 @@ function renderRevenue(rows,sec){
           <div class="rev-kpi" style="border-bottom:2px solid var(--green)">
             <div class="rev-kpi-lbl">Cash Collected</div>
             <div class="rev-kpi-val" style="color:var(--green)">€${cash.toLocaleString()}</div>
-            <div class="rev-kpi-sub">${polozeno.length} položenih</div>
+            <div class="rev-kpi-sub">${depozit.length} depozita</div>
           </div>
           <div class="rev-kpi" style="border-bottom:2px solid var(--yellow)">
             <div class="rev-kpi-lbl">Pipeline</div>
             <div class="rev-kpi-val" style="color:var(--yellow)">€${pipeline.toLocaleString()}</div>
-            <div class="rev-kpi-sub">${uToku.length} u toku</div>
+            <div class="rev-kpi-sub">${uToku.length} u pipeline-u</div>
           </div>
           <div class="rev-kpi" style="border-bottom:2px solid var(--accent)">
             <div class="rev-kpi-lbl">Rezervacije</div>
