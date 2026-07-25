@@ -6366,7 +6366,7 @@ async function fetchSheetData(){
   // Same row shape as the old feed: {name,challenge,email,date,closer,status}
   // status: 'polozeno' = Closed · 'rezervacija' = booked, not yet closed · 'u toku' = open deal.
   const {data,error}=await sb.from('ghl_leads')
-    .select('name,email,status,lead_type,assigned_to,deal,deal_value,date_added')
+    .select('*')
     .order('date_added',{ascending:false})
     .limit(5000);
   if(error) throw new Error(error.message);
