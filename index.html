@@ -1095,7 +1095,7 @@ tr.row-flash > td { animation: row-flash 1.6s ease-out; }
 @media (max-width:640px){ .mstat-row { grid-template-columns:1fr; gap:10px; margin-bottom:24px; } .mstat-val { font-size:26px; } .kanban { grid-template-columns:1fr 1fr; gap:8px; } }
 
 /* ── Kalendar tab (agenda) ── */
-.cal-wrap { width:100%; max-width:760px; margin:0 auto; }
+.cal-wrap { width:100%; }
 .cal-sec { margin-bottom:32px; }
 .cal-sec-lbl { font-size:10px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted2); margin-bottom:14px; }
 .cal-day { margin-bottom:18px; }
@@ -2066,7 +2066,7 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 .cal-nav button:hover{color:#fff;border-color:var(--accent);}
 .cal-month{font-size:13px;font-weight:800;color:#fff;text-transform:capitalize;min-width:120px;text-align:center;}
 .cal-grid-hd{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:14px 0 6px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);text-align:center;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:0;}
 .cal-cell{min-height:92px;background:var(--s1);border:1px solid var(--b);border-radius:12px;padding:7px;display:flex;flex-direction:column;gap:4px;overflow:hidden;}
 .cal-cell-pad{background:transparent;border-color:transparent;}
 .cal-cell.cal-has{background:var(--s2);}
@@ -2081,6 +2081,67 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 .cal-chip-red{background:rgba(239,68,68,.12);border-left-color:#ef4444;text-decoration:line-through;opacity:.7;}
 .cal-empty{color:var(--muted);font-size:12px;padding:14px 0;}
 @media (max-width:760px){.cal-cell{min-height:64px;padding:4px}.cal-chip{font-size:9px;padding:2px 4px}.cal-chip-t{display:none}}
+
+
+/* ═══ Kalendar v2 — Mochi-style time grid ═══ */
+.tg-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:4px 0 14px;}
+.tg-btn{height:34px;padding:0 14px;border-radius:10px;border:1px solid var(--b2);background:var(--s1);color:var(--text);font-family:var(--font);font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s;}
+.tg-btn:hover{border-color:var(--accent);}
+.tg-nav{display:flex;gap:4px;}
+.tg-nav .tg-btn{width:34px;padding:0;color:var(--muted);}
+.tg-range{font-size:14px;font-weight:800;color:#fff;}
+.tg-stats{display:flex;gap:8px;flex-wrap:wrap;}
+.tg-stat{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);background:var(--s1);border:1px solid var(--b);border-radius:99px;padding:5px 11px;}
+.tg-stat i{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.tg-stat b{color:#fff;}
+.tg-views{margin-left:auto;display:flex;background:var(--s1);border:1px solid var(--b);border-radius:11px;padding:3px;gap:2px;}
+.tg-views button{height:28px;padding:0 12px;border-radius:8px;border:none;background:none;color:var(--muted);font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;}
+.tg-views button:hover{color:#fff;}
+.tg-views button.on{background:var(--s3);color:#fff;box-shadow:0 1px 6px rgba(0,0,0,.4);}
+.tg-day-hds{display:grid;grid-template-columns:64px repeat(var(--n),1fr);border:1px solid var(--b);border-bottom:none;border-radius:16px 16px 0 0;background:var(--s2);overflow:hidden;}
+.tg-day-hd{padding:10px 6px 12px;text-align:center;border-left:1px solid var(--b);}
+.tg-day-hd:first-child{border-left:none;}
+.tg-day-hd .w{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);}
+.tg-day-hd .d{font-size:22px;font-weight:900;color:#fff;line-height:1.25;}
+.tg-day-hd.today .d{color:var(--accent);}
+.tg-day-hd .c{font-size:10.5px;color:var(--muted);}
+.tg-day-hd .cq{font-size:9.5px;margin-top:1px;color:var(--muted);}
+.tg-scroll{height:620px;overflow-y:auto;border:1px solid var(--b);border-radius:0 0 16px 16px;background:var(--s1);}
+.tg-body{display:grid;grid-template-columns:64px repeat(var(--n),1fr);position:relative;}
+.tg-gutter{position:relative;}
+.tg-hour{height:56px;font-size:10px;color:var(--muted);text-align:right;padding-right:10px;transform:translateY(-5px);}
+.tg-col{position:relative;border-left:1px solid var(--b);height:1344px;background:repeating-linear-gradient(to bottom,transparent 0 55px,var(--b) 55px 56px);}
+.tg-ev{position:absolute;border-radius:8px;background:rgba(59,130,246,.16);border-left:3px solid #3B82F6;padding:4px 7px;overflow:hidden;cursor:pointer;transition:filter .15s;z-index:2;}
+.tg-ev:hover{filter:brightness(1.3);z-index:6;}
+.tg-ev-top{display:flex;align-items:center;justify-content:space-between;gap:6px;}
+.tg-ev-name{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tg-bdg{flex-shrink:0;font-size:8.5px;font-weight:800;letter-spacing:.5px;border-radius:6px;padding:2px 6px;background:rgba(59,130,246,.28);color:#93c5fd;}
+.tg-ev-time{font-size:9.5px;color:var(--muted);margin-top:1px;}
+.tg-ev-green{background:rgba(74,222,128,.14);border-left-color:#4ADE80;}
+.tg-ev-green .tg-bdg{background:rgba(74,222,128,.24);color:#86efac;}
+.tg-ev-amber{background:rgba(245,158,11,.14);border-left-color:#f59e0b;}
+.tg-ev-amber .tg-bdg{background:rgba(245,158,11,.24);color:#fcd34d;}
+.tg-ev-red{background:rgba(239,68,68,.12);border-left-color:#ef4444;opacity:.75;}
+.tg-ev-red .tg-bdg{background:rgba(239,68,68,.24);color:#fca5a5;}
+.tg-ev-red .tg-ev-name{text-decoration:line-through;}
+.tg-now{position:absolute;left:0;right:0;height:2px;background:#f43f5e;z-index:5;pointer-events:none;}
+.tg-now i{position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:#f43f5e;}
+.tg-foot{margin-top:10px;font-size:12px;color:var(--muted);}
+/* month overview: uniform cells (max 2 chips + count), click -> day view */
+.cal-cell{min-height:96px;cursor:pointer;transition:border-color .15s,background .15s;aspect-ratio:auto;align-items:stretch;justify-content:flex-start;}
+.cal-cell:hover{border-color:var(--b2);}
+.cal-cell-pad{cursor:default;}
+.cal-cell-pad:hover{border-color:transparent;}
+.cal-cell-hd{display:flex;justify-content:space-between;align-items:center;}
+.cal-cnt{font-size:9px;font-weight:800;background:var(--accent);color:#fff;border-radius:99px;padding:1px 6px;line-height:1.5;}
+.cal-more{font-size:9.5px;color:var(--accent);font-weight:700;padding-left:2px;}
+.cal-chip{pointer-events:none;cursor:default;}
+@media (max-width:760px){
+  .tg-scroll{height:480px;}
+  .tg-day-hd .d{font-size:16px;}
+  .tg-day-hd .cq{display:none;}
+  .cal-cell{min-height:58px}.cal-cell .cal-chip,.cal-cell .cal-more{display:none}
+}
 
 </style>
 </head>
@@ -2414,29 +2475,42 @@ async function handleDeepLink(){
   if (!id) return;
   try { localStorage.removeItem('stl_deeplink'); } catch(e) {}
 
-  let lead = (cachedLeads||[]).find(l => l.id === id);
-  // not in the loaded view → try the tracker DB
-  if (!lead) {
-    const { data } = await sb.from('ghl_leads').select('*').eq('id', id).single();
-    if (data) { cachedLeads.push(data); lead = data; }
-  }
-  // still missing (e.g. brand-new lead not synced yet) → fetch live from GHL
-  if (!lead) {
-    try {
-      const r = await fetch(`/api/ghl-contact?id=${encodeURIComponent(id)}`);
-      if (r.ok) {
-        const j = await r.json();
-        if (j && j.contact) {
-          lead = mapContact(j.contact, leadTypeFromTags(j.contact.tags));
-          lead.status = 'Novi';
-          cachedLeads.push(lead);
-        }
-      }
-    } catch(e) {}
-  }
+  const lead = await ensureLead(id);
   if (!lead) return;
   if (currentTab !== 'leads') setTab('leads');
   setTimeout(() => openLeadDetail(id), currentTab !== 'leads' ? 350 : 60);
+}
+
+/* Resolve a lead by GHL contactId from any view: cache → tracker DB → live GHL.
+   Whatever it finds lands in cachedLeads, so openLeadDetail can render it. */
+async function ensureLead(id){
+  if (!id) return null;
+  let lead = (cachedLeads||[]).find(l => l.id === id);
+  if (lead) return lead;
+
+  const { data } = await sb.from('ghl_leads').select('*').eq('id', id).maybeSingle();
+  if (data) { cachedLeads.push(data); return data; }
+
+  // not synced to the tracker yet → fetch live from GHL
+  try {
+    const r = await fetch(`/api/ghl-contact?id=${encodeURIComponent(id)}`);
+    if (r.ok) {
+      const j = await r.json();
+      if (j && j.contact) {
+        lead = mapContact(j.contact, leadTypeFromTags(j.contact.tags));
+        lead.status = 'Novi';
+        cachedLeads.push(lead);
+        return lead;
+      }
+    }
+  } catch(e) {}
+  return null;
+}
+
+/* Open the lead panel from anywhere (e.g. a calendar card) even when that lead
+   isn't part of the currently loaded leads view. */
+async function openLeadById(id){
+  if (await ensureLead(id)) openLeadDetail(id);
 }
 
 function updateMonthLabel() {
@@ -2569,82 +2643,235 @@ async function renderMetricsTab(){
 const _apptSt = a => String(a.appointmentStatus || a.appoinmentStatus || '').toLowerCase();
 
 /* ── Kalendar tab: agenda of GHL calendar appointments, grouped by day ── */
-let _calOffset = 0;
-function calNav(d){ _calOffset += d; renderKalendarTab(); }
+let _calView = '3day'; try { _calView = localStorage.getItem('calView') || '3day'; } catch(e) {}
+let _calAnchor = null;   // ms at 00:00 of the first visible day (null = today)
+let _calCache = null;
 
-/* Real month-grid Kalendar: lead-name chips per day, click -> lead profile */
+const _CAL_ST = { confirmed:['blue','ZAKAZANO'], new:['blue','ZAKAZANO'], booked:['blue','ZAKAZANO'], showed:['green','DOŠAO'], noshow:['amber','NIJE DOŠAO'], cancelled:['red','OTKAZANO'], invalid:['red','OTKAZANO'] };
+const _calDay0 = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x.getTime(); };
+const _calSpan = () => _calView === 'day' ? 1 : _calView === '3day' ? 3 : 7;
+/* Lead qualification from tags — DQ patterns first ('disqualified' contains 'qualified'). */
+const calQual = tags => {
+  const a = tags || [];
+  if (a.some(t => /(dis|un)qualif|(^|[^a-z])low-|(^|[^a-z])under|^dq$/i.test(t))) return 'dq';
+  if (a.some(t => /qualified|high|priority|budget-(100-300|300|1000)/i.test(t))) return 'qual';
+  return 'none';
+};
+
+function calSetView(v){ _calView = v; try { localStorage.setItem('calView', v); } catch(e) {} renderCalUI(); }
+function calToday(){ _calAnchor = null; renderCalUI(); }
+function calNav(dir){
+  const base = _calAnchor ?? _calDay0(new Date());
+  if (_calView === 'month'){
+    const d = new Date(base); d.setDate(1); d.setMonth(d.getMonth() + dir);
+    _calAnchor = d.getTime();
+  } else {
+    const d = new Date(base); d.setDate(d.getDate() + dir * _calSpan());
+    _calAnchor = d.getTime();
+  }
+  renderCalUI();
+}
+function calOpenDay(ts){ _calAnchor = ts; _calView = 'day'; try { localStorage.setItem('calView', 'day'); } catch(e) {} renderCalUI(); }
+
+/* Mochi-style Kalendar: time-grid Day/3-day/7-day + Month overview. */
 async function renderKalendarTab(){
   const el = document.getElementById('mainContent');
   const _seq = ++_renderSeq;
-  el.innerHTML = '<div class="fdrill-loading" style="padding:80px 0">' + iosSpin(26) + '</div>';
+  // Serve cached data instantly, but refetch when older than 60s so new
+  // bookings appear without a page reload.
+  if (_calCache && Date.now() - _calCache.at < 60e3){ renderCalUI(); return; }
+  if (_calCache) renderCalUI();
+  else el.innerHTML = '<div class="fdrill-loading" style="padding:80px 0">' + iosSpin(26) + '</div>';
   const now = Date.now();
   const [data, leadRows] = await Promise.all([
     fetch(`/api/ghl-appointments?start=${now - 180 * 864e5}&end=${now + 180 * 864e5}`).then(r => r.json()).catch(() => ({ error: 'fetch' })),
-    sb.from('ghl_leads').select('id,name,phone').limit(5000).then(r => r.data || []).catch(() => []),
+    sb.from('ghl_leads').select('id,name,phone,tags').limit(5000).then(r => r.data || []).catch(() => []),
   ]);
-  if (staleRender(_seq, 'kalendar')) return;
   if (data.error){
-    el.innerHTML = `<div class="empty" style="padding:40px"><div class="empty-icon" style="font-size:22px">📅</div><div class="empty-text">Kalendar trenutno nedostupan.<br><span style="color:var(--muted);font-size:12px">${esc(data.hint || data.error)}</span></div></div>`;
+    if (staleRender(_seq, 'kalendar')) return;
+    if (!_calCache) el.innerHTML = `<div class="empty" style="padding:40px"><div class="empty-icon" style="font-size:22px">📅</div><div class="empty-text">Kalendar trenutno nedostupan.<br><span style="color:var(--muted);font-size:12px">${esc(data.hint || data.error)}</span></div></div>`;
     return;
   }
-  const leadById = new Map(leadRows.map(l => [l.id, l]));
-  const evs = (data.events || []).filter(e => !e.deleted).sort((a, b) => String(a.startTime).localeCompare(String(b.startTime)));
-
-  const base = new Date(); base.setDate(1); base.setHours(0, 0, 0, 0); base.setMonth(base.getMonth() + _calOffset);
-  const y = base.getFullYear(), m = base.getMonth();
-  const monthName = base.toLocaleDateString(_LOC, { month: 'long', year: 'numeric' });
-  const firstDow = (base.getDay() + 6) % 7; // Monday-first
-  const dim = new Date(y, m + 1, 0).getDate();
-  const todayKey = new Date().toDateString();
-  const byDay = {};
-  evs.forEach(e => { const d = new Date(e.startTime); if (d.getFullYear() === y && d.getMonth() === m) (byDay[d.getDate()] = byDay[d.getDate()] || []).push(e); });
-  const stCls = s => ({ confirmed:'blue', new:'blue', booked:'blue', showed:'green', noshow:'amber', cancelled:'red', invalid:'red' })[s] || 'blue';
-  const nameOf = e => { const lead = leadById.get(e.contactId); return (lead && lead.name) || String(e.title || 'Poziv').split('·')[0].trim(); };
-  const chip = e => {
-    const t = new Date(e.startTime).toLocaleTimeString(_LOC, { hour: '2-digit', minute: '2-digit' });
-    return `<div class="cal-chip cal-chip-${stCls(_apptSt(e))}" ${e.contactId ? `onclick="fdrillOpenLead('${esc(e.contactId)}')"` : ''} title="${esc(nameOf(e))} · ${t}"><span class="cal-chip-t">${t}</span>${esc(nameOf(e))}</div>`;
+  _calCache = {
+    at: Date.now(),
+    evs: (data.events || []).filter(e => !e.deleted).sort((a, b) => String(a.startTime).localeCompare(String(b.startTime))),
+    leadById: new Map(leadRows.map(l => [l.id, l])),
   };
-  let cells = '';
-  for (let i = 0; i < firstDow; i++) cells += '<div class="cal-cell cal-cell-pad"></div>';
-  for (let dnum = 1; dnum <= dim; dnum++){
-    const isToday = new Date(y, m, dnum).toDateString() === todayKey;
-    const list = byDay[dnum] || [];
-    cells += `<div class="cal-cell${isToday ? ' cal-today' : ''}${list.length ? ' cal-has' : ''}"><div class="cal-daynum">${dnum}</div>${list.map(chip).join('')}</div>`;
-  }
-  const upcoming = evs.filter(e => new Date(e.startTime) >= new Date(new Date().setHours(0, 0, 0, 0)) && _apptSt(e) !== 'cancelled').slice(0, 8);
+  if (staleRender(_seq, 'kalendar')) return;
+  renderCalUI();
+}
 
-  el.innerHTML = `<div class="cal-wrap">
-    <div class="metrics-logo-row">
+function renderCalUI(){
+  const el = document.getElementById('mainContent');
+  if (!el || currentTab !== 'kalendar' || !_calCache) return;
+  const { evs, leadById } = _calCache;
+  const nameOf = e => { const lead = leadById.get(e.contactId); return (lead && lead.name) || String(e.title || 'Poziv').split('·')[0].trim(); };
+  const phoneOf = e => { const lead = leadById.get(e.contactId); return (lead && lead.phone) || e.phone || ''; };
+  const stOf = e => _CAL_ST[_apptSt(e)] || ['blue', 'ZAKAZANO'];
+  const qualOf = e => { const lead = leadById.get(e.contactId); return lead ? calQual(lead.tags) : 'none'; };
+  const t = x => x.toLocaleTimeString(_LOC, { hour: '2-digit', minute: '2-digit' });
+  const HOUR = 56;
+
+  const anchor = _calAnchor ?? _calDay0(new Date());
+  const todayTs = _calDay0(new Date());
+  const upcoming = evs.filter(e => new Date(e.startTime).getTime() >= todayTs && _apptSt(e) !== 'cancelled');
+
+  const qdCounts = list => {
+    const live = list.filter(e => _apptSt(e) !== 'cancelled');
+    let q = 0, dq = 0;
+    live.forEach(e => { const k = qualOf(e); if (k === 'qual') q++; else if (k === 'dq') dq++; });
+    return { q, dq, none: live.length - q - dq, total: live.length };
+  };
+  const statsHtml = c => `<div class="tg-stats">
+      <span class="tg-stat"><i style="background:#4ADE80"></i>Kvalifikovani <b>${c.q}</b></span>
+      <span class="tg-stat"><i style="background:#ef4444"></i>Diskvalifikovani <b>${c.dq}</b></span>
+      ${c.none ? `<span class="tg-stat"><i style="background:#8B93A1"></i>Bez taga <b>${c.none}</b></span>` : ''}
+    </div>`;
+
+  const VIEWS = [['day','Dan'], ['3day','3 dana'], ['week','7 dana'], ['month','Mesec']];
+  const viewsHtml = `<div class="tg-views">${VIEWS.map(([k, lbl]) => `<button class="${_calView === k ? 'on' : ''}" onclick="calSetView('${k}')">${lbl}</button>`).join('')}</div>`;
+
+  const header = (rangeLbl, counts) => `<div class="metrics-logo-row">
       <img src="strale-mark-t.png" alt="" />
       <div class="metrics-logo-row-text">
         <div class="metrics-logo-row-name">Kalendar</div>
         <div class="metrics-logo-row-sub">${upcoming.length} predstojećih · ${evs.length} ukupno</div>
       </div>
-      <div class="cal-nav">
-        <button onclick="calNav(-1)" aria-label="Prethodni mesec">‹</button>
-        <span class="cal-month">${monthName}</span>
-        <button onclick="calNav(1)" aria-label="Sledeći mesec">›</button>
+    </div>
+    <div class="tg-toolbar">
+      <button class="tg-btn" onclick="calToday()">Danas</button>
+      <div class="tg-nav"><button class="tg-btn" onclick="calNav(-1)" aria-label="Nazad">‹</button><button class="tg-btn" onclick="calNav(1)" aria-label="Napred">›</button></div>
+      <span class="tg-range">${rangeLbl}</span>
+      ${statsHtml(counts)}
+      ${viewsHtml}
+    </div>`;
+
+  /* ── Month overview ── */
+  if (_calView === 'month'){
+    const base = new Date(anchor); base.setDate(1); base.setHours(0, 0, 0, 0);
+    const y = base.getFullYear(), m = base.getMonth();
+    const monthName = base.toLocaleDateString(_LOC, { month: 'long', year: 'numeric' });
+    const firstDow = (base.getDay() + 6) % 7;
+    const dim = new Date(y, m + 1, 0).getDate();
+    const byDay = {}, monthEvs = [];
+    evs.forEach(e => { const d = new Date(e.startTime); if (d.getFullYear() === y && d.getMonth() === m){ (byDay[d.getDate()] = byDay[d.getDate()] || []).push(e); monthEvs.push(e); } });
+    let cells = '';
+    for (let i = 0; i < firstDow; i++) cells += '<div class="cal-cell cal-cell-pad"></div>';
+    for (let dnum = 1; dnum <= dim; dnum++){
+      const ts = new Date(y, m, dnum).getTime();
+      const isToday = ts === todayTs;
+      const list = byDay[dnum] || [];
+      cells += `<div class="cal-cell${isToday ? ' cal-today' : ''}${list.length ? ' cal-has' : ''}" onclick="calOpenDay(${ts})">
+        <div class="cal-cell-hd"><span class="cal-daynum">${dnum}</span>${list.length ? `<span class="cal-cnt">${list.length}</span>` : ''}</div>
+        ${list.slice(0, 2).map(e => `<div class="cal-chip cal-chip-${stOf(e)[0]}">${esc(nameOf(e))}</div>`).join('')}
+        ${list.length > 2 ? `<div class="cal-more">+${list.length - 2} još</div>` : ''}
+      </div>`;
+    }
+    const mc = qdCounts(monthEvs);
+    el.innerHTML = `<div class="cal-wrap">${header(monthName, mc)}
+      <div class="cal-grid-hd" style="margin-top:0">${['Pon','Uto','Sre','Čet','Pet','Sub','Ned'].map(x => `<div>${x}</div>`).join('')}</div>
+      <div class="cal-grid">${cells}</div>
+      <div class="tg-foot">${mc.total} poziva ovog meseca · ${mc.q} kvalifikovanih · ${mc.dq} diskvalifikovanih</div>
+    </div>`;
+    return;
+  }
+
+  /* ── Time grid (day / 3day / week) ── */
+  let start = anchor;
+  if (_calView === 'week'){ const d = new Date(anchor); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); start = d.getTime(); }
+  const nDays = _calSpan();
+  const days = Array.from({ length: nDays }, (_, i) => { const d = new Date(start); d.setDate(d.getDate() + i); return d.getTime(); });
+
+  const fmtD = ts => new Date(ts).toLocaleDateString(_LOC, { day: 'numeric', month: 'short' });
+  const rangeLbl = nDays === 1
+    ? new Date(start).toLocaleDateString(_LOC, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+    : `${fmtD(start)} – ${fmtD(days[nDays - 1])}, ${new Date(days[nDays - 1]).getFullYear()}`;
+
+  // events per visible day, with greedy lane assignment for overlaps
+  const perDay = days.map(ts => {
+    const list = evs.filter(e => _calDay0(new Date(e.startTime)) === ts)
+      .map(e => {
+        const s = new Date(e.startTime).getTime();
+        const en = Math.max(new Date(e.endTime || 0).getTime() || 0, s + 30 * 6e4);
+        return { e, s, en };
+      }).sort((a, b) => a.s - b.s);
+    const lanes = [];
+    list.forEach(x => {
+      let li = lanes.findIndex(endT => endT <= x.s);
+      if (li < 0){ li = lanes.length; lanes.push(0); }
+      lanes[li] = x.en; x.lane = li;
+    });
+    // lane count per overlap cluster, not day-wide
+    for (let ci = 0; ci < list.length;){
+      let cj = ci, end = list[ci].en;
+      while (cj + 1 < list.length && list[cj + 1].s < end){ cj++; end = Math.max(end, list[cj].en); }
+      let n = 1;
+      for (let k = ci; k <= cj; k++) n = Math.max(n, list[k].lane + 1);
+      for (let k = ci; k <= cj; k++) list[k].lanes = n;
+      ci = cj + 1;
+    }
+    return { ts, list };
+  });
+  const visEvs = perDay.flatMap(d => d.list.map(x => x.e));
+  const vc = qdCounts(visEvs);
+
+  const hdCells = perDay.map(({ ts, list }) => {
+    const d = new Date(ts);
+    const dc = qdCounts(list.map(x => x.e));
+    return `<div class="tg-day-hd${ts === todayTs ? ' today' : ''}">
+      <div class="w">${d.toLocaleDateString(_LOC, { weekday: 'short' })}</div>
+      <div class="d">${d.getDate()}</div>
+      <div class="c">${dc.total} ${dc.total === 1 ? 'poziv' : 'poziva'}</div>
+      ${dc.total ? `<div class="cq"><b style="color:#4ADE80">${dc.q} K</b> · <b style="color:#f87171">${dc.dq} D</b></div>` : ''}
+    </div>`;
+  }).join('');
+
+  const gutter = Array.from({ length: 24 }, (_, h) => `<div class="tg-hour">${h ? String(h).padStart(2, '0') + ':00' : ''}</div>`).join('');
+
+  const nowMs = Date.now();
+  const cols = perDay.map(({ ts, list }) => {
+    const evsHtml = list.map(({ e, s, en, lane, lanes }) => {
+      const d0 = new Date(s), d1 = new Date(en);
+      const top = (d0.getHours() * 60 + d0.getMinutes()) / 60 * HOUR;
+      const h = Math.max((en - s) / 36e5 * HOUR, 26);
+      const wPct = 100 / lanes, lPct = lane * wPct;
+      const [variant, label] = stOf(e);
+      const qk = qualOf(e);
+      const qTag = qk === 'qual' ? ' · KVALIFIKOVAN' : qk === 'dq' ? ' · DISKVALIFIKOVAN' : '';
+      const tip = `${nameOf(e)} · ${t(d0)}–${t(d1)}${phoneOf(e) ? ' · ' + phoneOf(e) : ''}${qTag}`;
+      return `<div class="tg-ev tg-ev-${variant}" style="top:${top.toFixed(1)}px;height:${h.toFixed(1)}px;left:calc(${lPct}% + 4px);width:calc(${wPct}% - 8px)" title="${esc(tip)}" ${/^[A-Za-z0-9_-]+$/.test(e.contactId || '') ? `onclick="fdrillOpenLead('${e.contactId}')"` : ''}>
+        <div class="tg-ev-top"><span class="tg-ev-name">${esc(nameOf(e))}</span>${lanes === 1 ? `<span class="tg-bdg">${label}</span>` : ''}</div>
+        ${h >= 46 ? `<div class="tg-ev-time">${t(d0)} – ${t(d1)}</div>` : ''}
+      </div>`;
+    }).join('');
+    const nowLine = ts === todayTs
+      ? `<div class="tg-now" style="top:${((new Date(nowMs).getHours() * 60 + new Date(nowMs).getMinutes()) / 60 * HOUR).toFixed(1)}px"><i></i></div>`
+      : '';
+    return `<div class="tg-col">${evsHtml}${nowLine}</div>`;
+  }).join('');
+
+  el.innerHTML = `<div class="cal-wrap">${header(rangeLbl, vc)}
+    <div class="tg-day-hds" style="--n:${nDays}"><div></div>${hdCells}</div>
+    <div class="tg-scroll" id="tg-scroll">
+      <div class="tg-body" style="--n:${nDays}">
+        <div class="tg-gutter">${gutter}</div>
+        ${cols}
       </div>
     </div>
-    <div class="cal-grid-hd">${['Pon','Uto','Sre','Čet','Pet','Sub','Ned'].map(x => `<div>${x}</div>`).join('')}</div>
-    <div class="cal-grid">${cells}</div>
-    <div class="metrics-sec" style="margin-top:22px">
-      <div class="metrics-sec-lbl">PREDSTOJEĆI POZIVI</div>
-      <div class="srow-list">${upcoming.length ? upcoming.map((e, i) => {
-        const dd = new Date(e.startTime);
-        const lead = leadById.get(e.contactId);
-        const phone = (lead && lead.phone) || e.phone || '';
-        return `<div class="srow ${e.contactId ? 'click' : ''}" style="--i:${i};--sg-c:rgba(59,130,246,.09)" ${e.contactId ? `onclick="fdrillOpenLead('${esc(e.contactId)}')"` : ''}>
-          <div class="srow-grad"></div>
-          <div class="srow-no">${String(i + 1).padStart(2, '0')}</div>
-          <div><div class="srow-name">${esc(nameOf(e))}</div><div class="srow-contact">${esc(dd.toLocaleDateString(_LOC, { weekday: 'short', day: 'numeric', month: 'short' }))} · ${dd.toLocaleTimeString(_LOC, { hour: '2-digit', minute: '2-digit' })}${phone ? ' · ' + esc(phone) : ''}</div></div>
-          <div></div><div></div>
-          <div style="justify-self:end"><span class="bdg bdg-${stCls(_apptSt(e))}">${esc(_apptSt(e) || 'zakazano')}</span></div>
-        </div>`;
-      }).join('') : '<div class="cal-empty">Nema zakazanih poziva.</div>'}</div>
-    </div>
+    <div class="tg-foot">${vc.total} ${vc.total === 1 ? 'poziv zakazan' : 'poziva zakazano'} · ${vc.q} kvalifikovanih · ${vc.dq} diskvalifikovanih</div>
   </div>`;
+
+  // auto-scroll: first visible event / now-line on today, else 09:00
+  const sc = document.getElementById('tg-scroll');
+  if (sc){
+    let target = 9 * HOUR;
+    const firstTops = perDay.flatMap(d => d.list.map(x => { const dd = new Date(x.s); return (dd.getHours() * 60 + dd.getMinutes()) / 60 * HOUR; }));
+    if (firstTops.length) target = Math.min(...firstTops);
+    if (days.includes(todayTs)){ const dn = new Date(); target = Math.min(target, (dn.getHours() * 60 + dn.getMinutes()) / 60 * HOUR); }
+    sc.scrollTop = Math.max(target - 80, 0);
+  }
 }
+
 
 
 /* Polished hero metric cards: Booked meetings / Won deals / Cash collected */
@@ -3009,7 +3236,7 @@ const iosSpin = (px=20) => `<span class="ios-spin" style="width:${px}px;height:$
 
 /* Badge kit (badge-1 port): tag/status -> tinted pill */
 const _BDG_RULES = [
-  [/disqualif|low-|under|^dq$/i, 'red'],
+  [/(dis|un)qualif|(^|[^a-z])low-|(^|[^a-z])under|^dq$/i, 'red'],
   [/qualified|high|priority|budget-(300|1000)/i, 'green'],
   [/mid-priority|budget-100/i, 'amber'],
   [/booked/i, 'blue'],
@@ -3129,7 +3356,7 @@ function renderFunnelDrill(keepFocus){
     <div class="srow-list">
       ${slice.length ? slice.map((l, ri) => {
         const grad = l.status === 'Closed' ? 'rgba(74,222,128,.12)' : l.status === 'DQ' ? 'rgba(239,68,68,.12)' : 'rgba(59,130,246,.09)';
-        return `<div class="srow ${l.id ? 'click' : ''}" style="--i:${ri};--sg-c:${grad}" ${l.id ? `onclick="fdrillOpenLead('${esc(l.id)}')"` : ''}>
+        return `<div class="srow ${l.id ? 'click' : ''}" style="--i:${ri};--sg-c:${grad}" ${/^[A-Za-z0-9_-]+$/.test(l.id || '') ? `onclick="fdrillOpenLead('${l.id}')"` : ''}>
         <div class="srow-grad"></div>
         <div class="srow-no">${String((d.page - 1) * PS + ri + 1).padStart(2, '0')}</div>
         <div><div class="srow-name">${esc(l.name || '—')}</div><div class="srow-contact">${esc(l.email || '')}${l.email && l.phone ? ' · ' : ''}${esc(l.phone || '')}</div></div>
