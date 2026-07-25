@@ -2195,6 +2195,14 @@ input[type="date"]{background:var(--s1);border:1px solid var(--b2);border-radius
 input[type="date"]:focus{outline:none;border-color:var(--accent);}
 input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.6);cursor:pointer;}
 
+
+/* de-slop icon sizing */
+.ui-ic{width:1em;height:1em;display:inline-block;vertical-align:-0.125em;}
+.stl-toast-icon .ui-ic{width:16px;height:16px;}
+.empty-icon .ui-ic{width:22px;height:22px;}
+.mstat-ic .ui-ic{width:16px;height:16px;}
+.ldp-fu-icon .ui-ic{width:15px;height:15px;}
+
 </style>
 </head>
 <body>
@@ -2383,9 +2391,9 @@ function saveTargets(t) { localStorage.setItem('toc_targets', JSON.stringify(t))
 const DEAL_PRICES = {};
 
 const DEALS = {
-  cpa:         { label: 'CPA (min. depozit $300)', price: 'var.', icon: '📈' },
-  funded_100k: { label: 'Funded 100K',             price: '—',    icon: '💎' },
-  funded_200k: { label: 'Funded 200K',             price: '—',    icon: '💎' },
+  cpa:         { label: 'CPA (min. depozit $300)', price: 'var.', icon: '' },
+  funded_100k: { label: 'Funded 100K',             price: '—',    icon: '' },
+  funded_200k: { label: 'Funded 200K',             price: '—',    icon: '' },
 };
 
 let currentTab = 'leads';
@@ -2394,6 +2402,35 @@ let currentTab = 'leads';
    bails if a newer render started or the user moved to another tab. */
 let _renderSeq = 0;
 const staleRender = (seq, tab) => seq !== _renderSeq || currentTab !== tab;
+
+/* Line-icon set — replaces emoji used as UI chrome */
+const UI = (() => {
+  const s = p => `<svg class="ui-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  return {
+    phone:    s('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>'),
+    clock:    s('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
+    mic:      s('<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/>'),
+    x:        s('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'),
+    check:    s('<polyline points="20 6 9 17 4 12"/>'),
+    refresh:  s('<path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>'),
+    user:     s('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'),
+    calendar: s('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'),
+    note:     s('<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>'),
+    euro:     s('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'),
+    moon:     s('<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'),
+    plus:     s('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'),
+    alert:    s('<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'),
+    info:     s('<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>'),
+    zap:      s('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'),
+    target:   s('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'),
+    bell:     s('<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>'),
+    link:     s('<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'),
+    pin:      s('<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'),
+    mail:     s('<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/>'),
+    trophy:   s('<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>'),
+  };
+})();
+
 let metricsRefreshInterval = null;
 let currentYear, currentMonth;
 
@@ -2742,7 +2779,7 @@ async function renderKalendarTab(){
   ]);
   if (data.error){
     if (staleRender(_seq, 'kalendar')) return;
-    if (!_calCache) el.innerHTML = `<div class="empty" style="padding:40px"><div class="empty-icon" style="font-size:22px">📅</div><div class="empty-text">Kalendar trenutno nedostupan.<br><span style="color:var(--muted);font-size:12px">${esc(data.hint || data.error)}</span></div></div>`;
+    if (!_calCache) el.innerHTML = `<div class="empty" style="padding:40px"><div class="empty-icon" style="font-size:22px">${UI.calendar}</div><div class="empty-text">Kalendar trenutno nedostupan.<br><span style="color:var(--muted);font-size:12px">${esc(data.hint || data.error)}</span></div></div>`;
     return;
   }
   _calCache = {
@@ -2952,18 +2989,18 @@ function renderHeroStats(appts, closedLeads, host, acts = []){
   host.innerHTML = `<div class="mstat-row">
     <div class="mstat spot mstat-rich">
       <div class="mstat-chart" data-spark="booked" data-color="#38bdf8"></div>
-      <div class="mstat-hd"><div class="mstat-lbl">Zakazani pozivi</div><div class="mstat-ic" style="background:rgba(56,189,248,.12);color:#38bdf8">📅</div></div>
+      <div class="mstat-hd"><div class="mstat-lbl">Zakazani pozivi</div><div class="mstat-ic" style="background:rgba(56,189,248,.12);color:#38bdf8">${UI.calendar}</div></div>
       <div class="mstat-val mstat-count" data-target="${booked}" style="color:#38bdf8">${booked}</div>
       <div class="mstat-sub">${appts.length} ukupno u kalendaru</div>
     </div>
     <div class="mstat spot mstat-rich">
       <div class="mstat-chart" data-spark="closed" data-color="#4ADE80"></div>
-      <div class="mstat-hd"><div class="mstat-lbl">Zatvoreni klijenti</div><div class="mstat-ic" style="background:rgba(74,222,128,.12);color:var(--green)">🏆</div></div>
+      <div class="mstat-hd"><div class="mstat-lbl">Zatvoreni klijenti</div><div class="mstat-ic" style="background:rgba(74,222,128,.12);color:var(--green)">${UI.trophy}</div></div>
       <div class="mstat-val mstat-count" data-target="${wonCount}" style="color:var(--green)">${wonCount}</div>
       <div class="mstat-sub">Status: Closed</div>
     </div>
     <div class="mstat spot">
-      <div class="mstat-hd"><div class="mstat-lbl">Cash Collected</div><div class="mstat-ic" style="background:rgba(59,130,246,.12);color:var(--accent)">💰</div></div>
+      <div class="mstat-hd"><div class="mstat-lbl">Cash Collected</div><div class="mstat-ic" style="background:rgba(59,130,246,.12);color:var(--accent)">${UI.euro}</div></div>
       <div class="mstat-val mstat-count" data-target="${cash}" data-cash="1" style="color:var(--accent)">€${cash.toLocaleString('sr-RS')}</div>
       <div class="mstat-sub">${withVal}/${wonCount} sa upisanom vrednošću</div>
     </div>
@@ -3123,7 +3160,7 @@ async function renderAIInsightsSection(){
   }
 
   host.innerHTML = `<div class="metrics-sec">
-    <div class="metrics-sec-lbl">ZAKLJUČCI — ŠTA RADI, ŠTA NE RADI</div>
+    <div class="metrics-sec-lbl">ZAKLJUČCI · ŠTA RADI, ŠTA NE RADI</div>
     <div style="padding:20px;text-align:center">
       <button class="ai-gen-btn" onclick="generateAIInsights()">Analiziraj obrasce</button>
       <div style="font-size:10px;color:var(--muted2);margin-top:8px">Poredi zatvorene i DQ leadove i izdvaja obrasce. Rezultat se čuva 24h.</div>
@@ -3135,7 +3172,7 @@ async function generateAIInsights(){
   const host = document.getElementById('ai-insights-section');
   if (!host) return;
   host.innerHTML = `<div class="metrics-sec">
-    <div class="metrics-sec-lbl">ZAKLJUČCI — ŠTA RADI, ŠTA NE RADI</div>
+    <div class="metrics-sec-lbl">ZAKLJUČCI · ŠTA RADI, ŠTA NE RADI</div>
     <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px"><span class="ai-spinner" style="margin-right:8px"></span> Analiziram obrasce...</div>
   </div>`;
 
@@ -3172,7 +3209,7 @@ function renderInsightsContent(host, text, ts){
     .replace(/^- (.+)$/gm, '<div class="insight-bullet">• $1</div>')
     .replace(/\n\n+/g, '<div class="insight-spacer"></div>');
   host.innerHTML = `<div class="metrics-sec">
-    <div class="metrics-sec-lbl">ZAKLJUČCI — ŠTA RADI, ŠTA NE RADI</div>
+    <div class="metrics-sec-lbl">ZAKLJUČCI · ŠTA RADI, ŠTA NE RADI</div>
     <div class="insights-body">${html}</div>
     <div class="insights-foot">
       <span style="font-size:10px;color:var(--muted2)">Generisano ${esc(when)}</span>
@@ -3195,7 +3232,7 @@ async function renderFunnelSection(appts = []){
   if (!host) return;
   _fnlAppts = appts;
   host.innerHTML = `<div class="metrics-sec">
-    <div class="metrics-sec-lbl">PRODAJNI LIJEVAK — VSL</div>
+    <div class="metrics-sec-lbl">PRODAJNI LIJEVAK · VSL</div>
     <div style="display:grid;gap:10px"><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div></div>
   </div>`;
 
@@ -3250,7 +3287,7 @@ async function renderFunnelSection(appts = []){
   }
 
   host.innerHTML = `<div class="metrics-sec">
-    <div class="metrics-sec-lbl">PRODAJNI LIJEVAK — VSL</div>
+    <div class="metrics-sec-lbl">PRODAJNI LIJEVAK · VSL</div>
     <div class="fnl-cards">
       ${stages.map(s => `<div class="fnl-card fnl-click" onclick="openFunnelDrill(\'${s.key}\')" title="Prikaži leadove">
         <div class="fnl-card-hd" style="color:${s.color}">${ICON[s.key]}<span style="color:var(--muted)">${s.label}</span></div>
@@ -3475,7 +3512,7 @@ function renderActivitySection(acts, host){
   const counts = CATS.map(c => ({ ...c, n: recent.filter(a => !used.has(a) && c.f(a) && used.add(a)).length }));
   const total = recent.length;
   host.innerHTML = `<div class="metrics-sec">
-    <div class="metrics-sec-lbl">AKTIVNOST TIMA — 30 DANA</div>
+    <div class="metrics-sec-lbl">AKTIVNOST TIMA · 30 DANA</div>
     <div class="actbar-card spot">
       <div class="actbar-top">
         <div><span class="actbar-total mstat-count" data-target="${total}">${total}</span><span class="actbar-unit">akcija u CRM-u</span></div>
@@ -3509,7 +3546,7 @@ function renderTargetsSection(tot){
   const closePct=Math.min(100,Math.round((tot.close/t.close)*100));
 
   return `<div class="metrics-sec">
-    <div class="metrics-sec-lbl">CILJEVI — ${metricsPeriod==='month'?`${MONTHS[currentMonth]} ${currentYear}`:PERIOD_LABELS[metricsPeriod]||'Izabrani Period'}</div>
+    <div class="metrics-sec-lbl">CILJEVI · ${metricsPeriod==='month'?`${MONTHS[currentMonth]} ${currentYear}`:PERIOD_LABELS[metricsPeriod]||'Izabrani Period'}</div>
     <div class="targets-row">
       <div class="target-cell">
         <div class="target-lbl">Pozivi</div>
@@ -3904,13 +3941,13 @@ function updatePanelAssignButtons(assignedTo){
 function showToast(opts){
   opts = opts || {};
   const variant = opts.variant || 'success';
-  const fallbackIcon = { success:'✅', error:'⚠️', warning:'⚠️', info:'ℹ️' };
+  const fallbackIcon = { success:UI.check, error:UI.alert, warning:UI.alert, info:UI.info };
   let wrap = document.getElementById('stl-toast-wrap');
   if(!wrap){ wrap=document.createElement('div'); wrap.id='stl-toast-wrap'; wrap.className='stl-toast-wrap'; document.body.appendChild(wrap); }
   const toast=document.createElement('div');
   toast.className='stl-toast t-'+variant;
   toast.innerHTML=`
-    <div class="stl-toast-icon">${opts.icon||fallbackIcon[variant]||'ℹ️'}</div>
+    <div class="stl-toast-icon">${opts.icon||fallbackIcon[variant]||UI.info}</div>
     <div class="stl-toast-body">
       ${opts.title?`<div class="stl-toast-title">${esc(opts.title)}</div>`:''}
       ${opts.name?`<div class="stl-toast-name">${esc(opts.name)}</div>`:''}
@@ -3934,9 +3971,9 @@ function showCallOutcomeToast(name, outcome){
   }
   const toast = document.createElement('div');
   toast.className = 'stl-toast';
-  const ICONS = { 'Javio se':'📞', 'Nije javio':'⏱', 'Govorna pošta':'🎙', 'Pogrešan broj':'❌' };
+  const ICONS = { 'Javio se':UI.phone, 'Nije javio':UI.clock, 'Govorna pošta':UI.mic, 'Pogrešan broj':UI.x };
   toast.innerHTML = `
-    <div class="stl-toast-icon">${ICONS[outcome] || '📞'}</div>
+    <div class="stl-toast-icon">${ICONS[outcome] || UI.phone}</div>
     <div class="stl-toast-body">
       <div class="stl-toast-title">Poziv zabeležen</div>
       <div class="stl-toast-name">${esc(name||'')}</div>
@@ -4014,7 +4051,7 @@ function showRecycleToast(r){
   const toast = document.createElement('div');
   toast.className = 'stl-toast';
   toast.innerHTML = `
-    <div class="stl-toast-icon">🔁</div>
+    <div class="stl-toast-icon">${UI.refresh}</div>
     <div class="stl-toast-body">
       <div class="stl-toast-title">Reciklirano</div>
       <div class="stl-toast-name">${r.recycled} leadova vraćeno u Novi</div>
@@ -4059,9 +4096,9 @@ function leadScore(l){
   return Math.max(0, Math.min(100, s));
 }
 function leadHeat(score){
-  if (score >= 70) return { label: 'Hot',  cls: 'heat-hot',  icon: '🔥' };
-  if (score >= 45) return { label: 'Warm', cls: 'heat-warm', icon: '🌤' };
-  return                  { label: 'Cold', cls: 'heat-cold', icon: '❄️' };
+  if (score >= 70) return { label: 'Hot',  cls: 'heat-hot',  icon: '' };
+  if (score >= 45) return { label: 'Warm', cls: 'heat-warm', icon: '' };
+  return                  { label: 'Cold', cls: 'heat-cold', icon: '' };
 }
 
 /* ─────────────────── ACTIVITY LOG ─────────────────────────────────
@@ -4127,7 +4164,7 @@ function showActivityLogSetupWarning(kind, rawError){
   toast.style.background = 'linear-gradient(135deg, rgba(234,179,8,.16), rgba(234,179,8,.06))';
   toast.style.maxWidth = '420px';
   toast.innerHTML = `
-    <div class="stl-toast-icon" style="background:rgba(234,179,8,.2)">⚠️</div>
+    <div class="stl-toast-icon" style="background:rgba(234,179,8,.2)">${UI.alert}</div>
     <div class="stl-toast-body">
       <div class="stl-toast-title" style="color:var(--yellow)">${esc(title)}</div>
       <div class="stl-toast-name">Aktivnosti se ne čuvaju u bazi</div>
@@ -4152,12 +4189,12 @@ async function loadLeadActivities(leadId, limit = 25){
 
 function formatActivity(a){
   const map = {
-    status:    { label: 'Status',    icon: '🔄' },
-    assign:    { label: 'Dodeljen',  icon: '👤' },
-    followup:  { label: 'Follow Up', icon: '📅' },
-    deal:      { label: 'Paket',     icon: '💰' },
-    note:      { label: 'Beleška',   icon: '📝' },
-    created:   { label: 'Kreiran',   icon: '✨' },
+    status:    { label: 'Status',    icon: UI.refresh },
+    assign:    { label: 'Dodeljen',  icon: UI.user },
+    followup:  { label: 'Follow Up', icon: UI.calendar },
+    deal:      { label: 'Paket',     icon: UI.euro },
+    note:      { label: 'Beleška',   icon: UI.note },
+    created:   { label: 'Kreiran',   icon: UI.plus },
   };
   const m = map[a.action_type] || { label: a.action_type, icon: '•' };
   const fmt = v => v==null||v==='' ? '∅' : v.length>40 ? v.slice(0,40)+'…' : v;
@@ -4311,7 +4348,7 @@ function stlShowToast(contact){
   toast.className = 'stl-toast';
   const meta = [contact.phone, contact.email].filter(Boolean).join(' · ');
   toast.innerHTML = `
-    <div class="stl-toast-icon">⚡</div>
+    <div class="stl-toast-icon">${UI.zap}</div>
     <div class="stl-toast-body">
       <div class="stl-toast-title">Novi lead</div>
       <div class="stl-toast-name">${esc(contact.name||'Nepoznat')}</div>
@@ -4342,7 +4379,7 @@ function stlShowDesktopNotification(contact){
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   try {
     const meta = [contact.phone, contact.email].filter(Boolean).join(' · ');
-    const n = new Notification('⚡ Novi lead', {
+    const n = new Notification('Novi lead', {
       body: `${contact.name||'Nepoznat'}${meta?'\n'+meta:''}`,
       icon: '/thenewioslogov2.png',
       tag: 'toc-new-lead-'+contact.id,
@@ -4692,7 +4729,7 @@ if ('serviceWorker' in navigator) {
 
 /* ── Onboarding: first-login walkthrough (runs once per device) ── */
 const TOUR_STEPS = [
-  { find:['.tabs','.bottom-nav'], title:'Dobrodošli! 👋', body:'Ovo je navigacija: <b>Leads</b> za obradu leadova, <b>Kalendar</b> za zakazane pozive i <b>Metrics</b> za rezultate.' },
+  { find:['.tabs','.bottom-nav'], title:'Dobrodošli', body:'Ovo je navigacija: <b>Leads</b> za obradu leadova, <b>Kalendar</b> za zakazane pozive i <b>Metrics</b> za rezultate.' },
   { find:['.sync-btn'], title:'Auto-sync', body:'Podaci se automatski povlače iz GHL-a svakih 5 minuta — ne moraš ništa da klikćeš. Dugme služi samo za ručno osvežavanje.' },
   { find:['#leadsBody','.fu-today-banner','.leads-wrap'], title:'Leadovi', body:'Klikni bilo kog leada da otvoriš profil: ishod poziva, status, beleške, follow-up datum i vrednost deala.' },
   { tab:'kalendar', find:['.tg-views'], title:'Kalendar', body:'Pregled po danu, 3 dana, 7 dana ili mesecu. Klik na poziv otvara lead, a gore odmah vidiš broj kvalifikovanih i diskvalifikovanih poziva.' },
@@ -4745,7 +4782,7 @@ function renderTourStep(el, step){
       <div class="tour-body">${step.body}</div>
       <div class="tour-actions">
         <button class="tour-skip" onclick="endTour()">Preskoči</button>
-        <button class="tour-next" onclick="tourNext()">${last ? 'Završi ✓' : 'Dalje →'}</button>
+        <button class="tour-next" onclick="tourNext()">${last ? 'Završi' : 'Dalje →'}</button>
       </div>
     </div>`;
   document.body.appendChild(root);
@@ -4840,35 +4877,35 @@ function setLocalLastActivity(leadId, actionType, newValue, oldValue = null){
 function lastActionBadge(act){
   if (!act) return null;
   const ICON = {
-    'call':     { 'Javio se':'📞','Nije javio':'⏱','Govorna pošta':'🎙','Pogrešan broj':'❌' },
-    'status':   { 'Novi':'🆕','Follow Up':'🔁','Closed':'✅','DQ':'❌' },
-    'assign':   '👤',
-    'followup': '📅',
-    'note':     '📝',
-    'deal':     '💰',
-    'snooze':   '😴',
+    'call':     { 'Javio se':UI.phone,'Nije javio':UI.clock,'Govorna pošta':UI.mic,'Pogrešan broj':UI.x },
+    'status':   { 'Novi':UI.plus,'Follow Up':UI.refresh,'Closed':UI.check,'DQ':UI.x },
+    'assign':   UI.user,
+    'followup': UI.calendar,
+    'note':     UI.note,
+    'deal':     UI.euro,
+    'snooze':   UI.moon,
   };
-  let icon = '•', label = act.new_value || act.action_type;
+  let icon = '', label = act.new_value || act.action_type;
   if (act.action_type === 'call') {
-    icon = ICON.call[act.new_value] || '📞';
+    icon = ICON.call[act.new_value] || UI.phone;
     label = act.new_value || 'Poziv';
   } else if (act.action_type === 'status') {
-    icon = ICON.status[act.new_value] || '🔄';
+    icon = ICON.status[act.new_value] || UI.refresh;
     label = `${act.new_value || ''}`;
   } else if (act.action_type === 'assign') {
-    icon = '👤';
+    icon = UI.user;
     label = act.new_value ? `→ ${act.new_value.charAt(0).toUpperCase()+act.new_value.slice(1)}` : 'Unassign';
   } else if (act.action_type === 'followup') {
-    icon = '📅';
+    icon = UI.calendar;
     label = act.new_value ? `FU ${act.new_value}` : 'FU obrisan';
   } else if (act.action_type === 'note') {
-    icon = '📝';
+    icon = UI.note;
     label = 'Beleška';
   } else if (act.action_type === 'deal') {
-    icon = '💰';
+    icon = UI.euro;
     label = 'Paket';
   } else if (act.action_type === 'snooze') {
-    icon = '😴';
+    icon = UI.moon;
     label = act.new_value ? `Snooze ${act.new_value}` : 'Otkazan';
   }
   // Color hint
@@ -5214,7 +5251,7 @@ function buildLeadRows(leads){
       </td>
       <td><span class="ltr-arrow">›</span></td>
     </tr>`;
-  }).join('')||`<tr><td colspan="7" style="padding:48px 20px;text-align:center;color:var(--muted)"><div style="font-size:24px;margin-bottom:8px">🎯</div><div style="font-size:13px;font-weight:700">Nema leadova</div></td></tr>`;
+  }).join('')||`<tr><td colspan="7" style="padding:48px 20px;text-align:center;color:var(--muted)"><div style="font-size:24px;margin-bottom:8px">${UI.target}</div><div style="font-size:13px;font-weight:700">Nema leadova</div></td></tr>`;
 }
 
 /* ── BULK ACTIONS ─────────────────────────────────────────────── */
@@ -5377,7 +5414,7 @@ function renderLeads(all){
   el.innerHTML=`<div style="width:100%">
 
     ${fuToday.length?`<div class="fu-today-banner ${leadsShowFollowUp?'active':''}" style="margin-bottom:10px;cursor:pointer" onclick="toggleFollowUpView()" title="${leadsShowFollowUp?'Klikni da prikažeš sve leadove':'Klikni da prikažeš samo follow-up'}">
-      <div class="fu-today-banner-icon">${leadsShowFollowUp?'✓':'🔔'}</div>
+      <div class="fu-today-banner-icon">${leadsShowFollowUp?UI.check:UI.bell}</div>
       <div class="fu-today-banner-text">
         <div class="fu-today-banner-title">${leadsShowFollowUp?'Prikazujem samo follow-up danas':'Follow-up danas'}</div>
         <div class="fu-today-banner-sub">${leadsShowFollowUp?'Klikni ponovo za sve leadove':`${fuToday.slice(0,3).map(l=>esc(l.name)).join(', ')}${fuToday.length>3?` +${fuToday.length-3}`:''}`}</div>
@@ -5386,7 +5423,7 @@ function renderLeads(all){
     </div>`:''}
 
     ${staleLeads.length?`<div class="stale-banner ${leadsShowStale?'active':''}" style="margin-bottom:16px;cursor:pointer" onclick="toggleStaleView()" title="${leadsShowStale?'Klikni da prikažeš sve leadove':'Klikni da prikažeš samo stale leadove'}">
-      <div class="stale-banner-icon">${leadsShowStale?'✓':'🥶'}</div>
+      <div class="stale-banner-icon">${leadsShowStale?UI.check:UI.alert}</div>
       <div class="stale-banner-text">
         <div class="stale-banner-title">${leadsShowStale?'Prikazujem samo stale leadove':'Stale leadovi · netaknuti 14+ dana'}</div>
         <div class="stale-banner-sub">${leadsShowStale?'Klikni ponovo za sve leadove':'Reaktiviraj ih ili obeleži DQ'}</div>
@@ -5395,7 +5432,7 @@ function renderLeads(all){
     </div>`:''}
 
     ${(()=>{const waiting=findWaitingLeads();return waiting.length?`<div class="wait-banner" style="margin-bottom:14px" onclick="alert('Leadovi koji čekaju > 15 min:\\n\\n'+${JSON.stringify(waiting.slice(0,8).map(l=>{const min=Math.round((Date.now()-new Date(l.date_added).getTime())/60000);return `• ${l.name||'?'} — čeka ${min}min`;}).join('\\n'))})">
-      <div class="wait-banner-icon">⚠️</div>
+      <div class="wait-banner-icon">${UI.alert}</div>
       <div class="wait-banner-text">
         <div class="wait-banner-title">${waiting.length} lead${waiting.length===1?'':'a'} čeka odgovor</div>
         <div class="wait-banner-sub">Prvi je stigao pre ${fmtMinutes(Math.round((Date.now()-new Date(waiting[0].date_added).getTime())/60000))} — javi se odmah da ne ohladi</div>
@@ -5403,8 +5440,8 @@ function renderLeads(all){
       <div class="wait-banner-count">${waiting.length}</div>
     </div>`:'';})()}
 
-    ${(()=>{const dupes=findLeadDuplicates();return dupes.length?`<div class="dupe-banner" style="margin-bottom:16px" onclick="alert('Pronađeno ${dupes.length} grupa duplikata.\\n\\n'+${JSON.stringify(dupes.slice(0,8).map(g=>`${g.type==='phone'?'📱':'📧'} ${g.key} → ${g.leads.map(l=>l.name||'?').join(', ')}`).join('\\n'))})">
-      <div class="dupe-banner-icon">⚠️</div>
+    ${(()=>{const dupes=findLeadDuplicates();return dupes.length?`<div class="dupe-banner" style="margin-bottom:16px" onclick="alert('Pronađeno ${dupes.length} grupa duplikata.\\n\\n'+${JSON.stringify(dupes.slice(0,8).map(g=>`${g.type==='phone'?'${UI.phone}':'${UI.mail}'} ${g.key} → ${g.leads.map(l=>l.name||'?').join(', ')}`).join('\\n'))})">
+      <div class="dupe-banner-icon">${UI.alert}</div>
       <div class="dupe-banner-text">
         <div class="dupe-banner-title">Mogući duplikati</div>
         <div class="dupe-banner-sub">${dupes.length} ${dupes.length===1?'grupa lead-ova':'grupe lead-ova'} sa istim telefonom/emailom · klikni za detalje</div>
@@ -5441,7 +5478,7 @@ function renderLeads(all){
         <button class="filter-btn ${leadsFilter==='unassigned'?'active':''}" data-filter="unassigned" onclick="filterLeads('unassigned')">Nedodeljeni</button>
       </div>
       <button class="smart-btn ${leadsSmartView?'active':''}" onclick="toggleSmartView()" title="Prikaži samo hot/warm leadove, sortirano po skoru">
-        ${leadsSmartView?'✓ Smart':'🎯 Smart'}
+        ${leadsSmartView?'✓ Smart':'Smart'}
       </button>
       <select class="tag-filter" onchange="setTagFilter(this.value)" title="Filtriraj po tagu">
         <option value="">Svi tagovi</option>
@@ -5464,7 +5501,7 @@ function renderLeads(all){
       <div class="pipeline-cell"><span class="pipeline-lbl">Pipeline (open)</span><span class="pipeline-val">€${pv.open.toLocaleString('sr-RS')}</span></div>
       <div class="pipeline-cell"><span class="pipeline-lbl">Zatvoreno</span><span class="pipeline-val" style="color:var(--green)">€${pv.closed.toLocaleString('sr-RS')}</span></div>
     </div>`:'';})()}
-    ${(()=>{const sm=loadSnoozeMap();const today=new Date().toISOString().slice(0,10);const n=Object.values(sm).filter(d=>d>today).length;return n?`<div class="snooze-toggle" onclick="toggleShowSnoozed()" style="margin-bottom:12px">${leadsShowSnoozed?'👁':'😴'} ${leadsShowSnoozed?`Prikazujem ${n} snoozed lead-ova · klikni da sakriješ`:`${n} snoozed lead-ova sakriveno · klikni da prikažeš`}</div>`:'';})()}
+    ${(()=>{const sm=loadSnoozeMap();const today=new Date().toISOString().slice(0,10);const n=Object.values(sm).filter(d=>d>today).length;return n?`<div class="snooze-toggle" onclick="toggleShowSnoozed()" style="margin-bottom:12px">${leadsShowSnoozed?`Prikazujem ${n} snoozed lead-ova · klikni da sakriješ`:`${n} snoozed lead-ova sakriveno · klikni da prikažeš`}</div>`:'';})()}
 
     <div class="leads-tbl-wrap">
       <table class="leads-tbl">
@@ -5572,10 +5609,10 @@ function openLeadDetail(id){
     <div class="ldp-card">
       <div class="ldp-sec-lbl">Poziv & Zakazivanje</div>
       ${c.phone?`<div class="ldp-call-outcomes">
-        <button class="ldp-co-btn ldp-co-ans"  onclick="logCallOutcome('${esc(c.id)}','Javio se')">📞 Javio se</button>
-        <button class="ldp-co-btn ldp-co-noans" onclick="logCallOutcome('${esc(c.id)}','Nije javio')">⏱ Nije javio</button>
-        <button class="ldp-co-btn ldp-co-vm"   onclick="logCallOutcome('${esc(c.id)}','Govorna pošta')">🎙 Pošta</button>
-        <button class="ldp-co-btn ldp-co-bad"  onclick="logCallOutcome('${esc(c.id)}','Pogrešan broj')">❌ Pogrešan</button>
+        <button class="ldp-co-btn ldp-co-ans"  onclick="logCallOutcome('${esc(c.id)}','Javio se')">${UI.phone} Javio se</button>
+        <button class="ldp-co-btn ldp-co-noans" onclick="logCallOutcome('${esc(c.id)}','Nije javio')">${UI.clock} Nije javio</button>
+        <button class="ldp-co-btn ldp-co-vm"   onclick="logCallOutcome('${esc(c.id)}','Govorna pošta')">${UI.mic} Pošta</button>
+        <button class="ldp-co-btn ldp-co-bad"  onclick="logCallOutcome('${esc(c.id)}','Pogrešan broj')">${UI.x} Pogrešan</button>
       </div>
       <div class="ldp-contact-actions">
         ${telLink(c.phone)?`<a class="ldp-ca-btn ldp-ca-call" href="${telLink(c.phone)}">
@@ -5687,7 +5724,7 @@ function renderApptRow(e){
     <div class="ldp-appt-main">
       <div class="ldp-appt-title">${esc(e.calendarName||e.title||'Poziv')}</div>
       <div class="ldp-appt-time">${esc(t1)}${t2?'–'+esc(t2):''}</div>
-      ${addr?`<div class="ldp-appt-loc">${isUrl?`<a href="${esc(addr)}" target="_blank" rel="noopener">🔗 Join Meet</a>`:`📍 ${esc(addr)}`}</div>`:''}
+      ${addr?`<div class="ldp-appt-loc">${isUrl?`<a href="${esc(addr)}" target="_blank" rel="noopener">${UI.link} Join Meet</a>`:`${UI.pin} ${esc(addr)}`}</div>`:''}
     </div>
     <span class="ldp-appt-status ${s.c}">${esc(s.l)}</span>
   </div>`;
@@ -5815,10 +5852,10 @@ function renderLeadCard(lead, subTab){
         </button>
       </div>
       <select class="lc-stsel" onchange="updateLeadStatus('${esc(lead.id)}',this.value)">
-        <option value="Novi"      ${st==='Novi'      ?'selected':''}>🔵 Novi</option>
-        <option value="Follow Up" ${st==='Follow Up' ?'selected':''}>🟡 Follow Up</option>
-        <option value="Closed"    ${st==='Closed'    ?'selected':''}>🟢 Closed</option>
-        <option value="DQ"        ${st==='DQ'        ?'selected':''}>🔴 DQ</option>
+        <option value="Novi"      ${st==='Novi'      ?'selected':''}>Novi</option>
+        <option value="Follow Up" ${st==='Follow Up' ?'selected':''}>Follow Up</option>
+        <option value="Closed"    ${st==='Closed'    ?'selected':''}>Closed</option>
+        <option value="DQ"        ${st==='DQ'        ?'selected':''}>DQ</option>
       </select>
     </div>
 
@@ -5826,14 +5863,14 @@ function renderLeadCard(lead, subTab){
       <span class="lc-deal-lbl">PAKET</span>
       <select class="lc-deal-sel" onchange="updateLeadDeal('${esc(lead.id)}',this.value)">
         <option value="">— Nije odabran —</option>
-        <option value="cpa"         ${lead.deal==='cpa'        ?'selected':''}>📈 CPA (min. depozit $300)</option>
-        <option value="funded_100k" ${lead.deal==='funded_100k'?'selected':''}>💎 Funded 100K</option>
-        <option value="funded_200k" ${lead.deal==='funded_200k'?'selected':''}>💎 Funded 200K</option>
+        <option value="cpa"         ${lead.deal==='cpa'        ?'selected':''}>CPA (min. depozit $300)</option>
+        <option value="funded_100k" ${lead.deal==='funded_100k'?'selected':''}>Funded 100K</option>
+        <option value="funded_200k" ${lead.deal==='funded_200k'?'selected':''}>Funded 200K</option>
       </select>
     </div>
 
     <div class="lc-fu-row">
-      <span class="lc-fu-lbl">📅 Follow-up</span>
+      <span class="lc-fu-lbl">${UI.calendar} Follow-up</span>
       <input type="date" class="lc-fu-input ${lead.follow_up_date?(lead.follow_up_date===todayStr?'fu-today':lead.follow_up_date<todayStr?'fu-overdue':''):''}"
         value="${lead.follow_up_date||''}"
         onchange="updateLeadFollowUp('${esc(lead.id)}',this.value)"
@@ -6172,7 +6209,7 @@ function showRoundRobinToast(r){
   const toast = document.createElement('div');
   toast.className = 'stl-toast';
   toast.innerHTML = `
-    <div class="stl-toast-icon">🎯</div>
+    <div class="stl-toast-icon">${UI.target}</div>
     <div class="stl-toast-body">
       <div class="stl-toast-title">Auto-dodela</div>
       <div class="stl-toast-name">${r.assigned} leadova dodeljeno Mateji</div>
@@ -6197,7 +6234,7 @@ function showSheetSyncToast(result){
   const toast = document.createElement('div');
   toast.className = 'stl-toast';
   toast.innerHTML = `
-    <div class="stl-toast-icon">✅</div>
+    <div class="stl-toast-icon">${UI.check}</div>
     <div class="stl-toast-body">
       <div class="stl-toast-title">Sheet sinhronizovan</div>
       <div class="stl-toast-name">${result.updated} leadova označeno kao Closed</div>
@@ -6260,7 +6297,7 @@ function renderRevenue(rows,sec){
   sec.innerHTML=`
     <div class="card">
       <div class="card-head">
-        <div class="card-title">💰 Prihodi & Klijenti</div>
+        <div class="card-title">Prihodi i klijenti</div>
         <div class="card-hint">${rows.length} klijenata · Live</div>
       </div>
       <div class="card-body">
