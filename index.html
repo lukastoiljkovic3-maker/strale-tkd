@@ -915,6 +915,22 @@ tr.row-flash > td { animation: row-flash 1.6s ease-out; }
 .ldp-close:hover { color: var(--text); background: var(--b2); }
 .ldp-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
 .ldp-sec-lbl { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted2); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--b); }
+.ldp-inforow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.ldp-il { font-size: 12.5px; color: #A1A1AA; font-weight: 500; }
+.ldp-mst { padding: 6px 12px; font-size: 11px; border-radius: 8px; cursor: pointer; }
+.ldp-crows { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; margin-bottom: 4px; }
+.ldp-crow {
+  display: flex; align-items: center; gap: 9px; padding: 7px 2px;
+  color: var(--text); text-decoration: none; font-size: 13px; font-weight: 500;
+  border-radius: 8px; transition: color .12s; min-width: 0;
+}
+.ldp-crow svg { width: 15px; height: 15px; flex-shrink: 0; color: #71717A; }
+.ldp-crow span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ldp-crow:hover { color: #fff; }
+.ldp-crow-full { grid-column: 1 / -1; }
+.ldp-notes-lbl { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; color: #71717A; margin: 16px 0 8px; }
+.ldp-notes { width: 100%; min-height: 92px; }
+@media (max-width: 640px) { .ldp-crows { grid-template-columns: 1fr; } }
 .ldp-field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .ldp-field { display: flex; flex-direction: column; gap: 4px; }
 .ldp-field label { font-size: 9px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--muted); }
@@ -1396,14 +1412,19 @@ tr.ltr-selected:hover { background: rgba(74,222,128,.10); }
 /* ── LEAD ACTIVITY TIMELINE ────────────── */
 .lat-host { display:flex; flex-direction:column; gap:0; max-height:340px; overflow-y:auto; }
 .lat-row {
-  display: flex; gap: 10px; align-items: flex-start;
-  padding: 10px 0; border-top: 1px solid var(--b);
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 9px 0; position: relative;
 }
-.lat-row:first-child { border-top: none; padding-top: 4px; }
+.lat-row::before {
+  content: ''; position: absolute; left: 15px; top: 41px; bottom: -9px;
+  width: 2px; background: #27272A;
+}
+.lat-row:last-child::before { display: none; }
 .lat-icon {
   font-size: 14px; flex-shrink: 0;
-  width: 26px; height: 26px; border-radius: 8px;
-  background: var(--s2); display: grid; place-items: center;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #27272A; display: grid; place-items: center;
+  position: relative; z-index: 1;
 }
 .lat-body { flex:1; min-width:0; }
 .lat-line { font-size: 12px; line-height: 1.45; color: var(--muted); }
@@ -5656,6 +5677,7 @@ function openLeadDetail(id){
   const typePillMap={qualified:'<span class="ltr-type type-q">Qualified</span>',disqualified:'<span class="ltr-type type-dq">Disqualified</span>',booked:'<span class="ltr-type type-wb">Zakazan poziv</span>',customer:'<span class="ltr-type type-wa">Klijent</span>'};
   const stOpts=['Novi','Follow Up','Closed','DQ'].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('');
   let fuCls=''; if(c.follow_up_date){fuCls=c.follow_up_date===todayStr?'fu-today':c.follow_up_date<todayStr?'fu-overdue':'';}
+  const stCls2=c.status==='Follow Up'?'mst-fu':c.status==='Closed'?'mst-closed':c.status==='DQ'?'mst-dq':'mst-novi';
   const dealOpts=Object.entries(DEALS).map(([k,v])=>`<option value="${k}" ${c.deal===k?'selected':''}>${v.icon} ${v.label} — ${v.price}</option>`).join('');
   const fields=[
     c.pain_point?{l:'Problem',v:c.pain_point,full:true}:null,
@@ -5676,23 +5698,17 @@ function openLeadDetail(id){
   document.getElementById('ldpMeta').innerHTML=meta.map(p=>`<span>${esc(p)}</span>`).join('<span style="margin:0 5px;opacity:.3">·</span>');
   document.getElementById('ldpBody').innerHTML=`
     <div class="ldp-card">
-      <div class="ldp-sec-lbl">Sažetak</div>
-      <div id="ai-summary-body" class="ai-summary-host"></div>
-    </div>
-
-    <div class="ldp-card">
       <div class="ldp-sec-lbl">Lead Info & Status</div>
-      ${lb?`<div class="ldp-badges"><span class="ldp-badge ${lb.c}">${lb.l}</span></div>`:''}
-      <div class="ldp-chips">
-        ${c.phone?`<a class="ldp-chip" href="${telLink(c.phone)||'#'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>${esc(c.phone)}</span></a>`:''}
-        ${c.email?`<a class="ldp-chip" href="mailto:${esc(c.email)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg><span>${esc(c.email)}</span></a>`:''}
-        ${igClean?`<a class="ldp-chip" href="https://instagram.com/${esc(igClean)}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg><span>@${esc(igClean)}</span></a>`:''}
+      <div class="ldp-inforow">
+        <span class="ldp-il">Status:</span>
+        <select class="mst ldp-mst ${stCls2}" onchange="updateLeadStatus('${esc(c.id)}',this.value)">${stOpts}</select>
+        <span class="ldp-il" style="margin-left:10px">Tip:</span>
+        ${lb?`<span class="ldp-badge ${lb.c}">${lb.l}</span>`:'<span class="ldp-il">—</span>'}
       </div>
-      <div class="ldp-status-grid ldp-subgap">
-        <button class="ldp-st-btn ${c.status==='Novi'?'ldp-st-novi':''}" onclick="updateLeadStatus('${esc(c.id)}','Novi')">Novi</button>
-        <button class="ldp-st-btn ${c.status==='Follow Up'?'ldp-st-fu':''}" onclick="updateLeadStatus('${esc(c.id)}','Follow Up')">Follow Up</button>
-        <button class="ldp-st-btn ${c.status==='Closed'?'ldp-st-closed':''}" onclick="updateLeadStatus('${esc(c.id)}','Closed')">Closed</button>
-        <button class="ldp-st-btn ${c.status==='DQ'?'ldp-st-dq':''}" onclick="updateLeadStatus('${esc(c.id)}','DQ')">DQ</button>
+      <div class="ldp-crows ldp-subgap">
+        ${c.phone?`<a class="ldp-crow" href="${telLink(c.phone)||'#'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>${esc(c.phone)}</span></a>`:''}
+        ${igClean?`<a class="ldp-crow" href="https://instagram.com/${esc(igClean)}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg><span>@${esc(igClean)}</span></a>`:''}
+        ${c.email?`<a class="ldp-crow ldp-crow-full" href="mailto:${esc(c.email)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg><span>${esc(c.email)}</span></a>`:''}
       </div>
       <div class="ldp-assign-row">
         <button class="ldp-assign-btn ${c.assigned_to==='nikola'?'ldp-ab-m':''}" onclick="assignLeadPanel('${esc(c.id)}','nikola')">
@@ -5713,6 +5729,15 @@ function openLeadDetail(id){
                  value="${c.deal_value!=null?c.deal_value:''}" onchange="updateLeadDealValue('${esc(c.id)}',this.value)">
         </div>
       </div>
+      <div class="ldp-notes-lbl">TEAM NOTES</div>
+      <textarea class="lc-note-input ldp-notes" placeholder="Dodaj belešku o leadu…" onblur="saveLeadNote('${esc(c.id)}',this.value)">${esc(c.notes||'')}</textarea>
+      <div class="ldp-notes-lbl">ZAKAZANI POZIVI</div>
+      <div id="ldpBookingList"><div class="ldp-appt-empty">Učitavanje…</div></div>
+    </div>
+
+    <div class="ldp-card">
+      <div class="ldp-sec-lbl">Sažetak</div>
+      <div id="ai-summary-body" class="ai-summary-host"></div>
     </div>
 
     <div class="ldp-card">
@@ -5756,13 +5781,6 @@ function openLeadDetail(id){
           WhatsApp
         </a>`:''}
       </div>`:''}
-      <div class="ldp-sec-lbl ldp-subgap" style="border:none;padding:0;margin-bottom:8px">Zakazani pozivi</div>
-      <div id="ldpBookingList"><div class="ldp-appt-empty">Učitavanje…</div></div>
-    </div>
-
-    <div class="ldp-card">
-      <div class="ldp-sec-lbl">Beleške tima</div>
-      <textarea class="lc-note-input" style="width:100%;min-height:90px" placeholder="Dodaj belešku…" onblur="saveLeadNote('${esc(c.id)}',this.value)">${esc(c.notes||'')}</textarea>
     </div>
 
     <div class="ldp-card">
