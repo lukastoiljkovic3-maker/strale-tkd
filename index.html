@@ -1931,6 +1931,99 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 .spot:hover::before { opacity:1; }
 @media (prefers-reduced-motion: reduce){ .sk::after { animation:none; } }
 
+
+/* ═══ 21st.dev vanilla ports: spinner, badges, funnel drill, sparklines, activity ═══ */
+.ios-spin{position:relative;display:inline-block;width:20px;height:20px;color:var(--muted);}
+.ios-spin i{position:absolute;top:37%;left:44%;width:8%;height:22%;border-radius:2px;background:currentColor;animation:ios-blade 1s linear infinite;will-change:opacity;}
+.ios-spin i:nth-child(1){transform:rotate(0deg) translateY(-130%);animation-delay:-1.667s}
+.ios-spin i:nth-child(2){transform:rotate(30deg) translateY(-130%);animation-delay:-1.584s}
+.ios-spin i:nth-child(3){transform:rotate(60deg) translateY(-130%);animation-delay:-1.500s}
+.ios-spin i:nth-child(4){transform:rotate(90deg) translateY(-130%);animation-delay:-1.417s}
+.ios-spin i:nth-child(5){transform:rotate(120deg) translateY(-130%);animation-delay:-1.334s}
+.ios-spin i:nth-child(6){transform:rotate(150deg) translateY(-130%);animation-delay:-1.251s}
+.ios-spin i:nth-child(7){transform:rotate(180deg) translateY(-130%);animation-delay:-1.167s}
+.ios-spin i:nth-child(8){transform:rotate(210deg) translateY(-130%);animation-delay:-1.084s}
+.ios-spin i:nth-child(9){transform:rotate(240deg) translateY(-130%);animation-delay:-1.001s}
+.ios-spin i:nth-child(10){transform:rotate(270deg) translateY(-130%);animation-delay:-0.917s}
+.ios-spin i:nth-child(11){transform:rotate(300deg) translateY(-130%);animation-delay:-0.834s}
+.ios-spin i:nth-child(12){transform:rotate(330deg) translateY(-130%);animation-delay:-0.751s}
+@keyframes ios-blade{0%{opacity:.85}50%{opacity:.25}100%{opacity:.25}}
+
+.bdg{display:inline-flex;align-items:center;height:19px;padding:0 8px;border-radius:999px;font-size:10.5px;font-weight:600;letter-spacing:.2px;white-space:nowrap;}
+.bdg-gray{background:rgba(148,163,184,.14);color:#b6c2d1}
+.bdg-blue{background:rgba(56,189,248,.14);color:#7dd3fc}
+.bdg-green{background:rgba(34,197,94,.14);color:#86efac}
+.bdg-amber{background:rgba(245,158,11,.16);color:#fcd34d}
+.bdg-red{background:rgba(239,68,68,.15);color:#fca5a5}
+.bdg-teal{background:rgba(45,212,191,.14);color:#5eead4}
+.bdg-purple{background:rgba(167,139,250,.16);color:#c4b5fd}
+
+.fnl-click{cursor:pointer;transition:background .2s;}
+.fnl-click:hover{background:rgba(255,255,255,.03);}
+
+.fdrill-overlay{position:fixed;inset:0;z-index:300;background:rgba(4,10,20,.66);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;animation:fdrill-fade .2s ease both;}
+@keyframes fdrill-fade{from{opacity:0}}
+.fdrill{width:min(880px,100%);max-height:min(86vh,760px);display:flex;flex-direction:column;background:linear-gradient(160deg,var(--s2),var(--s1));border:1px solid var(--b2);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);animation:fdrill-pop .25s cubic-bezier(.16,1,.3,1) both;}
+@keyframes fdrill-pop{from{opacity:0;transform:translateY(14px) scale(.98)}}
+.fdrill-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--b);flex-shrink:0;}
+.fdrill-ttl{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:800;color:#fff;letter-spacing:.2px;}
+.fdrill-count{color:var(--muted);font-weight:600;}
+.fdrill-x{background:none;border:none;color:var(--muted);font-size:22px;line-height:1;cursor:pointer;padding:2px 8px;border-radius:8px;font-family:var(--font);}
+.fdrill-x:hover{color:#fff;background:rgba(255,255,255,.06);}
+.fdrill-body{padding:14px 20px 18px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;}
+.fdrill-loading{display:flex;align-items:center;justify-content:center;padding:60px 0;}
+.fdrill-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.fdrill-search{flex:1;max-width:320px;background:var(--s1);border:1px solid var(--b2);border-radius:10px;padding:8px 12px;font-family:var(--font);font-size:12.5px;color:var(--text);outline:none;transition:border-color .15s;}
+.fdrill-search:focus{border-color:var(--accent);}
+.fdrill-showing{font-size:11px;color:var(--muted);}
+.fdrill-tblwrap{overflow-x:auto;border:1px solid var(--b);border-radius:12px;}
+.fdrill-tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+.fdrill-tbl th{position:sticky;top:0;background:var(--s2);text-align:left;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:10px 12px;cursor:pointer;user-select:none;white-space:nowrap;}
+.fdrill-tbl th span{opacity:.7;font-size:10px;}
+.fdrill-tbl td{padding:9px 12px;border-top:1px solid var(--b);vertical-align:middle;}
+.fdrill-tbl tr.click{cursor:pointer;transition:background .15s;}
+.fdrill-tbl tr.click:hover{background:rgba(255,255,255,.035);}
+.fdrill-name{font-weight:700;color:#fff;white-space:nowrap;}
+.fdrill-contact{color:var(--muted);font-size:11.5px;}
+.fdrill-tags{max-width:240px;}
+.fdrill-tags .bdg{margin:1px 3px 1px 0;}
+.fdrill-date{color:var(--muted);white-space:nowrap;font-size:11.5px;}
+.fdrill-empty{text-align:center;color:var(--muted);padding:26px 0 !important;}
+.fdrill-pgr{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;}
+.fdrill-pg{min-width:30px;height:30px;padding:0 8px;border-radius:9px;border:1px solid var(--b2);background:var(--s1);color:var(--muted);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.fdrill-pg:hover:not(:disabled){color:#fff;border-color:var(--accent);}
+.fdrill-pg.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+.fdrill-pg:disabled{opacity:.4;cursor:default;}
+@media (max-width:640px){.fdrill-overlay{padding:8px;}.fdrill{max-height:94vh;}.fdrill-tags{max-width:120px;}}
+
+.mstat{position:relative;overflow:hidden;transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s;}
+.mstat:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.35);}
+.mstat-rich > *:not(.mstat-chart){position:relative;z-index:1;}
+.mstat-chart{position:absolute;inset:0;left:38%;z-index:0;color:#fff;-webkit-mask-image:linear-gradient(to right,transparent,black 45%);mask-image:linear-gradient(to right,transparent,black 45%);}
+.mstat-chart svg{width:100%;height:100%;display:block;}
+
+.actbar-card{background:linear-gradient(160deg,var(--s2),var(--s1));border:1px solid var(--b);border-radius:16px;padding:20px;}
+.actbar-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;}
+.actbar-total{font-size:28px;font-weight:900;letter-spacing:-1px;color:#fff;}
+.actbar-unit{font-size:12px;color:var(--muted);margin-left:7px;}
+.actbar{height:8px;border-radius:99px;overflow:hidden;background:var(--s3);margin-bottom:12px;}
+.actbar-track{display:flex;height:100%;gap:2px;animation:actbar-in .9s cubic-bezier(.16,1,.3,1) both;}
+@keyframes actbar-in{from{transform:translateX(-101%)}}
+.actbar-seg{height:100%;border-radius:2px;}
+.actbar-legend{display:flex;flex-wrap:wrap;gap:14px;}
+.actbar-leg{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);}
+.actbar-leg b{color:var(--text);}
+
+.metrics-wrap > *{animation:msec-in .55s cubic-bezier(.16,1,.3,1) both;}
+.metrics-wrap > *:nth-child(2){animation-delay:.06s}
+.metrics-wrap > *:nth-child(3){animation-delay:.12s}
+.metrics-wrap > *:nth-child(4){animation-delay:.18s}
+.metrics-wrap > *:nth-child(5){animation-delay:.24s}
+.metrics-wrap > *:nth-child(6){animation-delay:.3s}
+.metrics-wrap > *:nth-child(7){animation-delay:.36s}
+@keyframes msec-in{from{opacity:0;transform:translateY(14px)}}
+@media (prefers-reduced-motion: reduce){.fdrill,.fdrill-overlay,.actbar-track,.metrics-wrap > *{animation:none;}.mstat:hover{transform:none;}}
+
 </style>
 </head>
 <body>
@@ -1953,6 +2046,7 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 <!-- LOADING SCREEN -->
 <div id="loader">
   <img id="loader-logo" src="strale-mark-t.png" alt="STRALETKD" />
+  <div class="ios-spin" style="width:26px;height:26px;margin:0 auto 14px;color:#fff"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <div id="loader-bar-wrap">
     <div id="loader-bar"></div>
   </div>
@@ -2370,6 +2464,8 @@ async function renderMetricsTab(){
   // Closed leads + their tracker-entered close value (deal_value) → Cash Collected / Won
   const { data: closedRaw } = await sb.from('ghl_leads').select('name, deal_value').eq('status', 'Closed');
   const closedLeads = closedRaw || [];
+  const { data: _actsRaw } = await sb.from('lead_activities').select('action_type,new_value,created_at').gte('created_at', new Date(Date.now() - 60 * 864e5).toISOString()).limit(8000);
+  const acts = _actsRaw || [];
   if (staleRender(_seq, 'metrics')) return;
   // Background: reconcile won deals from GHL → CRM Closed status
   syncClosedFromSheet().then(r => showSheetSyncToast(r));
@@ -2386,6 +2482,8 @@ async function renderMetricsTab(){
 
     <div id="hero-stats-section"></div>
 
+    <div id="activity-section"></div>
+
     <div id="revenue-section"></div>
 
     <div id="closers-board-section"></div>
@@ -2398,7 +2496,8 @@ async function renderMetricsTab(){
 
   </div>`;
 
-  renderHeroStats(appts, closedLeads, document.getElementById('hero-stats-section'));
+  renderHeroStats(appts, closedLeads, document.getElementById('hero-stats-section'), acts);
+  renderActivitySection(acts, document.getElementById('activity-section'));
   // Revenue/clients table (GHL opportunities via /api/ghl-metrics)
   const _revSec = document.getElementById('revenue-section');
   if (_revSec) renderRevenue(sheetRows, _revSec);
@@ -2491,20 +2590,22 @@ function countUpEls(root){
     })(start);
   });
 }
-function renderHeroStats(appts, closedLeads, host){
+function renderHeroStats(appts, closedLeads, host, acts = []){
   if(!host) return;
   const booked = appts.filter(a => ['confirmed','new','booked'].includes(_apptSt(a))).length;
   const wonCount = closedLeads.length;
   const cash = closedLeads.reduce((s,l) => s + (Number(l.deal_value)||0), 0);
   const withVal = closedLeads.filter(l => l.deal_value != null).length;
   host.innerHTML = `<div class="mstat-row">
-    <div class="mstat spot">
+    <div class="mstat spot mstat-rich">
+      <div class="mstat-chart" data-spark="booked" data-color="#38bdf8"></div>
       <div class="mstat-ic" style="background:rgba(56,189,248,.12);color:#38bdf8">📅</div>
       <div class="mstat-lbl">Zakazani pozivi</div>
       <div class="mstat-val mstat-count" data-target="${booked}" style="color:#38bdf8">${booked}</div>
       <div class="mstat-sub">${appts.length} ukupno u kalendaru</div>
     </div>
-    <div class="mstat spot">
+    <div class="mstat spot mstat-rich">
+      <div class="mstat-chart" data-spark="closed" data-color="#22c55e"></div>
       <div class="mstat-ic" style="background:rgba(34,197,94,.12);color:var(--green)">🏆</div>
       <div class="mstat-lbl">Zatvoreni klijenti</div>
       <div class="mstat-val mstat-count" data-target="${wonCount}" style="color:var(--green)">${wonCount}</div>
@@ -2518,6 +2619,7 @@ function renderHeroStats(appts, closedLeads, host){
     </div>
   </div>`;
   countUpEls(host);
+  renderMstatSparks(host, appts, acts);
 }
 
 /* Closer board (single closer = Nikola): Booked / Won / Lost / No-show.
@@ -2741,6 +2843,7 @@ function renderInsightsContent(host, text, ts){
 async function renderFunnelSection(appts = []){
   const host = document.getElementById('funnel-section');
   if (!host) return;
+  _fnlAppts = appts;
   host.innerHTML = `<div class="metrics-sec">
     <div class="metrics-sec-lbl">PRODAJNI LIJEVAK — VSL</div>
     <div style="display:grid;gap:10px"><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div></div>
@@ -2748,6 +2851,7 @@ async function renderFunnelSection(appts = []){
 
   const qualTags = ['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus'];
   const dqTags   = ['straletkd-disqualified','budget-under-100','dq'];
+  _fnlDrillCfg = { qual: qualTags, dq: dqTags };
 
   const [allR, qualR, bookedR, closedR, dqR] = await Promise.all([
     sb.from('ghl_leads').select('id',{count:'exact',head:true}),
@@ -2798,7 +2902,7 @@ async function renderFunnelSection(appts = []){
   host.innerHTML = `<div class="metrics-sec">
     <div class="metrics-sec-lbl">PRODAJNI LIJEVAK — VSL</div>
     <div class="fnl-cards">
-      ${stages.map(s => `<div class="fnl-card">
+      ${stages.map(s => `<div class="fnl-card fnl-click" onclick="openFunnelDrill(\'${s.key}\')" title="Prikaži leadove">
         <div class="fnl-card-hd" style="color:${s.color}">${ICON[s.key]}<span style="color:var(--muted)">${s.label}</span></div>
         <div class="fnl-card-val mstat-count" data-target="${s.count}">${s.count.toLocaleString('sr-RS')}</div>
       </div>`).join('')}
@@ -2813,9 +2917,216 @@ async function renderFunnelSection(appts = []){
       ${badges}
     </div>
     <div class="fnl-foot">
-      <div class="fnl-foot-item"><span class="fnl-foot-dot" style="background:var(--red)"></span>Diskvalifikovani: <b>${(dqR.count||0).toLocaleString('sr-RS')}</b></div>
+      <div class="fnl-foot-item fnl-click" onclick="openFunnelDrill('dq')" style="cursor:pointer;border-radius:8px;padding:2px 6px" title="Prikaži leadove"><span class="fnl-foot-dot" style="background:var(--red)"></span>Diskvalifikovani: <b>${(dqR.count||0).toLocaleString('sr-RS')}</b></div>
       <div class="fnl-foot-item"><span class="fnl-foot-dot" style="background:var(--green)"></span>Lead → zatvoren: <b>${conv(stages[0].count, stages[3].count)}%</b></div>
       <div class="fnl-foot-item"><span class="fnl-foot-dot" style="background:#38bdf8"></span>Close rate (zakazan → zatvoren): <b>${conv(stages[2].count, stages[3].count)}%</b></div>
+    </div>
+  </div>`;
+  countUpEls(host);
+}
+
+
+/* ═══ 21st.dev vanilla ports: iOS spinner, badge kit, funnel drill-down,
+   metric sparklines, activity split ═══ */
+const _LOC = 'sr-RS';
+const iosSpin = (px=20) => `<span class="ios-spin" style="width:${px}px;height:${px}px">${'<i></i>'.repeat(12)}</span>`;
+
+/* Badge kit (badge-1 port): tag/status -> tinted pill */
+const _BDG_RULES = [
+  [/disqualif|low-|under|^dq$/i, 'red'],
+  [/qualified|high|priority|budget-(300|1000)/i, 'green'],
+  [/mid-priority|budget-100/i, 'amber'],
+  [/booked/i, 'blue'],
+  [/customer|kupac|deposit/i, 'teal'],
+  [/webinar|vsl|optin/i, 'purple'],
+];
+function tagBadge(t){
+  const v = (_BDG_RULES.find(([re]) => re.test(t)) || [0,'gray'])[1];
+  return `<span class="bdg bdg-${v}">${esc(t)}</span>`;
+}
+function statusBadge(st){
+  const v = st==='Closed'?'green':st==='DQ'?'red':st==='Follow Up'?'amber':st==='Novi'?'blue':st==='Zakazan'?'blue':'gray';
+  return `<span class="bdg bdg-${v}">${esc(st||'—')}</span>`;
+}
+
+/* ── Funnel drill-down (ultra-quality-data-table port): click a stage, see its leads ── */
+let _fnlAppts = [];
+let _fnlDrillCfg = null;
+let _fdrill = null;
+
+async function openFunnelDrill(stage){
+  const META = {
+    lead:   { label:'Leadovi',           color:'var(--accent)' },
+    qual:   { label:'Kvalifikovani',     color:'#f59e0b' },
+    booked: { label:'Zakazan poziv',     color:'#38bdf8' },
+    closed: { label:'Zatvoreni',         color:'#22c55e' },
+    dq:     { label:'Diskvalifikovani',  color:'#ef4444' },
+  };
+  const m = META[stage]; if (!m) return;
+  document.getElementById('fdrill-overlay')?.remove();
+  const ov = document.createElement('div');
+  ov.id = 'fdrill-overlay'; ov.className = 'fdrill-overlay';
+  ov.innerHTML = `<div class="fdrill" role="dialog" aria-modal="true">
+    <div class="fdrill-hd">
+      <div class="fdrill-ttl"><span class="fnl-foot-dot" style="background:${m.color}"></span>${m.label}<span class="fdrill-count" id="fdrill-count"></span></div>
+      <button class="fdrill-x" onclick="closeFunnelDrill()" aria-label="Zatvori">&times;</button>
+    </div>
+    <div class="fdrill-body" id="fdrill-body"><div class="fdrill-loading">${iosSpin(26)}</div></div>
+  </div>`;
+  ov.addEventListener('click', e => { if (e.target === ov) closeFunnelDrill(); });
+  document.body.appendChild(ov);
+  document.addEventListener('keydown', _fdrillEsc);
+
+  const SEL = 'id,name,email,phone,tags,status,deal_value,date_added,created_at';
+  const cfg = _fnlDrillCfg || { qual: [], dq: [] };
+  let rows = [];
+  try {
+    if (stage === 'booked') {
+      // Source of truth = calendar feed; enrich with tracker rows, keep calendar-only bookings.
+      const live = _fnlAppts.filter(a => _apptSt(a) !== 'cancelled');
+      const ids = [...new Set(live.map(a => a.contactId).filter(Boolean))];
+      const [byId, byTag] = await Promise.all([
+        ids.length ? sb.from('ghl_leads').select(SEL).in('id', ids.slice(0, 500)) : Promise.resolve({ data: [] }),
+        sb.from('ghl_leads').select(SEL).overlaps('tags', ['booked-call']).limit(1000),
+      ]);
+      const seen = new Set();
+      rows = [...(byId.data || []), ...(byTag.data || [])].filter(l => !seen.has(l.id) && seen.add(l.id));
+      const idset = new Set(rows.map(r => r.id));
+      live.filter(a => !(a.contactId && idset.has(a.contactId))).forEach(a => {
+        rows.push({ id: a.contactId || null, name: String(a.title || 'Rezervacija').split('·')[0].trim(),
+          email: a.email || '', phone: a.phone || '', tags: ['booked-call'], status: 'Zakazan',
+          date_added: a.startTime });
+      });
+    } else {
+      let q = sb.from('ghl_leads').select(SEL).order('date_added', { ascending: false }).limit(2000);
+      if (stage === 'qual')   q = q.overlaps('tags', cfg.qual);
+      if (stage === 'dq')     q = q.overlaps('tags', cfg.dq);
+      if (stage === 'closed') q = q.eq('status', 'Closed');
+      rows = (await q).data || [];
+    }
+  } catch (e) { rows = []; }
+  if (!document.getElementById('fdrill-body')) return; // closed while loading
+  _fdrill = { stage, ...m, rows, search: '', sortKey: 'date', sortDir: 'desc', page: 1 };
+  renderFunnelDrill();
+}
+const _fdrillEsc = e => { if (e.key === 'Escape') closeFunnelDrill(); };
+function closeFunnelDrill(){ document.getElementById('fdrill-overlay')?.remove(); document.removeEventListener('keydown', _fdrillEsc); _fdrill = null; }
+function fdrillSearch(v){ if(!_fdrill) return; _fdrill.search = v; _fdrill.page = 1; renderFunnelDrill(true); }
+function fdrillSort(k){ if(!_fdrill) return; if (_fdrill.sortKey === k) _fdrill.sortDir = _fdrill.sortDir === 'asc' ? 'desc' : 'asc'; else { _fdrill.sortKey = k; _fdrill.sortDir = k === 'date' ? 'desc' : 'asc'; } renderFunnelDrill(); }
+function fdrillPage(p){ if(!_fdrill) return; _fdrill.page = p; renderFunnelDrill(); }
+function fdrillOpenLead(id){
+  if (!id) return;
+  closeFunnelDrill();
+  if (typeof openLeadById === 'function') openLeadById(id);
+  else if (typeof openLeadDetail === 'function') openLeadDetail(id);
+}
+
+function renderFunnelDrill(keepFocus){
+  const body = document.getElementById('fdrill-body'); if (!body || !_fdrill) return;
+  const d = _fdrill;
+  const term = d.search.trim().toLowerCase();
+  let list = !term ? d.rows : d.rows.filter(l => [l.name, l.email, l.phone].some(x => String(x || '').toLowerCase().includes(term)));
+  const dateOf = l => l.date_added || l.created_at || '';
+  const KEYS = { name: l => String(l.name || '').toLowerCase(), status: l => String(l.status || ''), date: dateOf };
+  const kf = KEYS[d.sortKey] || KEYS.date;
+  list = [...list].sort((a, b) => { const x = kf(a), y = kf(b); return (x < y ? -1 : x > y ? 1 : 0) * (d.sortDir === 'asc' ? 1 : -1); });
+  const PS = 10, pages = Math.max(1, Math.ceil(list.length / PS));
+  d.page = Math.min(d.page, pages);
+  const slice = list.slice((d.page - 1) * PS, d.page * PS);
+  const cnt = document.getElementById('fdrill-count'); if (cnt) cnt.textContent = ` · ${list.length}`;
+  const arrow = k => d.sortKey !== k ? '⇅' : d.sortDir === 'asc' ? '↑' : '↓';
+  const fmtD = v => { const dt = new Date(v); return isNaN(dt) ? '—' : dt.toLocaleDateString(_LOC, { day: 'numeric', month: 'short', year: 'numeric' }); };
+  let pb = ''; const win = 5; let s0 = Math.max(1, d.page - 2); const e0 = Math.min(pages, s0 + win - 1); s0 = Math.max(1, e0 - win + 1);
+  for (let i = s0; i <= e0; i++) pb += `<button class="fdrill-pg ${i === d.page ? 'on' : ''}" onclick="fdrillPage(${i})">${i}</button>`;
+  body.innerHTML = `
+    <div class="fdrill-tools">
+      <input id="fdrill-q" class="fdrill-search" placeholder="Pretraži ime, email, telefon…" value="${esc(d.search)}" oninput="fdrillSearch(this.value)" />
+      <span class="fdrill-showing">${slice.length} / ${list.length}</span>
+    </div>
+    <div class="fdrill-tblwrap">
+      <table class="fdrill-tbl">
+        <thead><tr>
+          <th onclick="fdrillSort('name')">Ime <span>${arrow('name')}</span></th>
+          <th style="cursor:default">Kontakt</th>
+          <th style="cursor:default">Tagovi</th>
+          <th onclick="fdrillSort('status')">Status <span>${arrow('status')}</span></th>
+          <th onclick="fdrillSort('date')">Datum <span>${arrow('date')}</span></th>
+        </tr></thead>
+        <tbody>
+          ${slice.length ? slice.map(l => `<tr ${l.id ? `onclick="fdrillOpenLead('${esc(l.id)}')"` : ''} class="${l.id ? 'click' : ''}">
+            <td class="fdrill-name">${esc(l.name || '—')}</td>
+            <td class="fdrill-contact">${esc(l.email || '')}${l.email && l.phone ? '<br>' : ''}${esc(l.phone || '')}</td>
+            <td class="fdrill-tags">${(l.tags || []).slice(0, 4).map(tagBadge).join('')}${(l.tags || []).length > 4 ? `<span class="bdg bdg-gray">+${l.tags.length - 4}</span>` : ''}</td>
+            <td>${statusBadge(l.status)}</td>
+            <td class="fdrill-date">${fmtD(dateOf(l))}</td>
+          </tr>`).join('') : `<tr><td colspan="5" class="fdrill-empty">Nema rezultata.</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+    <div class="fdrill-pgr">
+      <button class="fdrill-pg" onclick="fdrillPage(${Math.max(1, d.page - 1)})" ${d.page === 1 ? 'disabled' : ''}>‹</button>
+      ${pb}
+      <button class="fdrill-pg" onclick="fdrillPage(${Math.min(pages, d.page + 1)})" ${d.page === pages ? 'disabled' : ''}>›</button>
+    </div>`;
+  if (keepFocus) { const q = document.getElementById('fdrill-q'); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); } }
+}
+
+/* ── Hero card sparklines (progress-metric-card port): right-side area chart + dot grid ── */
+function renderMstatSparks(host, appts, acts){
+  const DAYS = 30;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const bucket = ts => { const d = new Date(ts); if (isNaN(d)) return null; d.setHours(0, 0, 0, 0); const diff = Math.round((today - d) / 864e5); return (diff >= 0 && diff < DAYS) ? DAYS - 1 - diff : null; };
+  const seriesOf = list => { const s = Array(DAYS).fill(0); list.forEach(ts => { const i = bucket(ts); if (i != null) s[i]++; }); return s; };
+  const src = {
+    booked: seriesOf(appts.filter(a => _apptSt(a) !== 'cancelled').map(a => a.startTime)),
+    closed: seriesOf((acts || []).filter(a => a.action_type === 'status' && a.new_value === 'Closed').map(a => a.created_at)),
+  };
+  host.querySelectorAll('.mstat-chart[data-spark]').forEach(el => {
+    const s = src[el.dataset.spark]; if (!s || !s.some(v => v)) { el.innerHTML = ''; return; }
+    const color = el.dataset.color || '#38bdf8';
+    const W = 200, H = 64, max = Math.max(...s, 1), n = s.length;
+    const pts = s.map((v, i) => ({ x: i / (n - 1) * W, y: H - 6 - (v / max) * (H - 14) }));
+    let dTop = `M ${pts[0].x} ${pts[0].y} `;
+    for (let i = 1; i < n; i++) { const p0 = pts[i - 1], p1 = pts[i], mx = (p0.x + p1.x) / 2; dTop += `C ${mx} ${p0.y}, ${mx} ${p1.y}, ${p1.x} ${p1.y} `; }
+    const gid = 'sg' + Math.random().toString(36).slice(2, 8);
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="${color}" stop-opacity=".28"/><stop offset="1" stop-color="${color}" stop-opacity="0"/>
+        </linearGradient>
+        <pattern id="${gid}d" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="currentColor" opacity=".14"/></pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#${gid}d)"/>
+      <path d="${dTop} L ${W} ${H} L 0 ${H} Z" fill="url(#${gid})"/>
+      <path d="${dTop}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+    </svg>`;
+  });
+}
+
+/* ── Activity split (dashboard-1 port): 30-day action mix, segmented bar + legend ── */
+function renderActivitySection(acts, host){
+  if (!host) return;
+  const cut = Date.now() - 30 * 864e5;
+  const recent = (acts || []).filter(a => new Date(a.created_at).getTime() >= cut);
+  if (!recent.length) { host.innerHTML = ''; return; }
+  const CATS = [
+    { label: 'Pozivi',    color: '#38bdf8', f: a => a.action_type === 'call' },
+    { label: 'Statusi',   color: '#22c55e', f: a => a.action_type === 'status' },
+    { label: 'Follow-up', color: '#f59e0b', f: a => a.action_type === 'followup' || a.action_type === 'snooze' },
+    { label: 'Beleške',   color: '#a78bfa', f: a => a.action_type === 'note' },
+    { label: 'Ostalo',    color: '#64748b', f: () => true },
+  ];
+  const used = new Set();
+  const counts = CATS.map(c => ({ ...c, n: recent.filter(a => !used.has(a) && c.f(a) && used.add(a)).length }));
+  const total = recent.length;
+  host.innerHTML = `<div class="metrics-sec">
+    <div class="metrics-sec-lbl">AKTIVNOST TIMA — 30 DANA</div>
+    <div class="actbar-card spot">
+      <div class="actbar-top">
+        <div><span class="actbar-total mstat-count" data-target="${total}">${total}</span><span class="actbar-unit">akcija u CRM-u</span></div>
+      </div>
+      <div class="actbar"><div class="actbar-track">${counts.filter(c => c.n).map(c => `<div class="actbar-seg" style="width:${(c.n / total * 100).toFixed(2)}%;background:${c.color}"></div>`).join('')}</div></div>
+      <div class="actbar-legend">${counts.filter(c => c.n).map(c => `<span class="actbar-leg"><span class="fnl-foot-dot" style="background:${c.color}"></span>${c.label} <b>${c.n}</b></span>`).join('')}</div>
     </div>
   </div>`;
   countUpEls(host);
