@@ -87,30 +87,25 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
 /* ── TABS ────────────────────────────────── */
 .toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
 .tabs {
-  display: flex; gap: 1px;
-  background: var(--s2);
-  border: 1px solid var(--b);
-  border-radius: 99px;
+  display: flex; gap: 2px;
+  background: #18181B;
+  border: 1px solid rgba(255,255,255,.05);
+  border-radius: 10px;
   padding: 4px;
-  box-shadow: 0 2px 20px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.04);
 }
 .tab {
   display: flex; align-items: center; gap: 7px;
-  padding: 8px 22px; border-radius: 99px; border: none; background: none;
-  color: var(--muted); font-family: var(--font); font-size: 12px; font-weight: 600;
-  cursor: pointer; transition: all .2s; white-space: nowrap; letter-spacing: .2px;
+  padding: 7px 16px; border-radius: 7px; border: none; background: none;
+  color: #71717A; font-family: var(--font); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: color .15s, background .15s; white-space: nowrap; letter-spacing: .1px;
 }
-.tab:hover { color: var(--text); }
+.tab:hover { color: #D4D4D8; }
 .tab.active {
-  background: var(--s3);
-  color: var(--text);
-  box-shadow: 0 1px 8px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.07);
+  background: #27272A;
+  color: #fff; font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
 }
-.tab.active[data-member="nikola"] { color: var(--nikola); }
-.tab.active[data-member="dusica"] { color: var(--dusica); }
-[data-member="dusica"] .tab-pip { background: var(--dusica); }
-.tab-pip { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-[data-member="nikola"] .tab-pip { background: var(--nikola); }
+.tab-pip { display: none; }
 
 .btn-add {
   display: flex; align-items: center; gap: 8px;
@@ -606,38 +601,81 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
   .ltr-av { width:34px; height:34px; }
 }
 
-/* ── LEADS TABLE VIEW ───────────────────── */
-.leads-stat-bar {
-  display: flex; gap: 1px; background: var(--b);
-  border: 1px solid var(--b); border-radius: var(--r);
-  overflow: hidden; margin-bottom: 20px;
+/* ── LEADS TABLE VIEW — MOCHI STYLE ─────── */
+.mochi-tabs { display: inline-flex; margin-bottom: 16px; flex-wrap: wrap; }
+.mtab {
+  display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px;
+  font-family: var(--font); font-size: 12px; font-weight: 500;
+  background: transparent; border: 1px solid #27272A; margin-left: -1px;
+  color: #A1A1AA; cursor: pointer; transition: color .15s, background .15s;
+  white-space: nowrap; touch-action: manipulation;
 }
-.lsb-btn {
-  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 16px 10px; background: var(--s1); border: none;
-  font-family: var(--font); cursor: pointer; transition: background .15s;
-  touch-action: manipulation; border-bottom: 2px solid transparent;
+.mtab:first-child { border-radius: 8px 0 0 8px; margin-left: 0; }
+.mtab:last-child { border-radius: 0 8px 8px 0; }
+.mtab:hover { color: #E4E4E7; background: rgba(255,255,255,.03); }
+.mtab.active { background: #fff; border-color: #fff; color: #18181B; font-weight: 600; position: relative; z-index: 1; }
+.mtab-n { padding: 1px 7px; border-radius: 99px; font-size: 10.5px; font-weight: 600; background: rgba(255,255,255,.08); color: #A1A1AA; }
+.mtab.active .mtab-n { background: rgba(24,24,27,.15); color: #18181B; }
+
+.mochi-filter-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.mdate {
+  padding: 6px 12px; border-radius: 6px; border: none; background: transparent;
+  color: #A1A1AA; font-family: var(--font); font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: color .15s, background .15s; touch-action: manipulation; white-space: nowrap;
 }
-.lsb-btn:hover { background: var(--s2); }
-.lsb-count { font-size: 26px; font-weight: 900; line-height: 1; letter-spacing: -1.5px; color: var(--text); transition: color .15s; }
-.lsb-label { font-size: 9px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--muted); }
-.lsb-btn.tab-all    { border-bottom-color: transparent; }
-.lsb-btn.tab-all.active    { background: var(--s2); }
-.lsb-btn.tab-all.active    .lsb-count { color: #fff; }
-.lsb-btn.tab-q.active      { border-bottom-color: #3B82F6; background: rgba(59,130,246,.04); }
-.lsb-btn.tab-q.active      .lsb-count { color: #3B82F6; }
-.lsb-btn.tab-dq.active     { border-bottom-color: var(--red); background: rgba(244,63,94,.04); }
-.lsb-btn.tab-dq.active     .lsb-count { color: var(--red); }
-.lsb-btn.tab-dq.active     { border-bottom-color: var(--red); background: rgba(244,63,94,.04); }
-.lsb-btn.tab-dq.active     .lsb-count { color: var(--red); }
-.lsb-btn.tab-wb.active     { border-bottom-color: #a855f7; background: rgba(168,85,247,.04); }
-.lsb-btn.tab-wb.active     .lsb-count { color: #a855f7; }
-.lsb-btn.tab-wa.active     { border-bottom-color: #10b981; background: rgba(16,185,129,.04); }
-.lsb-btn.tab-wa.active     .lsb-count { color: #10b981; }
-.lsb-btn.tab-wb2.active    { border-bottom-color: #14b8a6; background: rgba(20,184,166,.05); }
-.lsb-btn.tab-wb2.active    .lsb-count { color: #14b8a6; }
-.lsb-btn.tab-lm.active     { border-bottom-color: var(--yellow); background: rgba(234,179,8,.04); }
-.lsb-btn.tab-lm.active     .lsb-count { color: var(--yellow); }
+.mdate:hover { color: #E4E4E7; }
+.mdate.active { background: #fff; color: #18181B; font-weight: 600; }
+.mochi-vsep { width: 1px; height: 20px; background: #27272A; margin: 0 6px; flex-shrink: 0; }
+.msel {
+  padding: 6px 10px; border-radius: 6px; border: 1px solid #27272A;
+  background: #18181B; color: #E4E4E7; font-family: var(--font);
+  font-size: 12px; font-weight: 500; cursor: pointer; outline: none; max-width: 180px;
+}
+.msel:focus { border-color: #3F3F46; }
+.msel option { background: #1C1C22; }
+.mbtn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px;
+  border: 1px solid #27272A; background: transparent; color: #A1A1AA;
+  font-family: var(--font); font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: color .15s, background .15s, border-color .15s; touch-action: manipulation; white-space: nowrap;
+}
+.mbtn:hover { color: #E4E4E7; border-color: #3F3F46; }
+.mbtn.active { background: #fff; color: #18181B; border-color: #fff; font-weight: 600; }
+.mbtn.spinning svg { animation: spin .7s linear infinite; }
+
+.mochi-search-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.mochi-search-wrap { position: relative; width: 240px; max-width: 100%; }
+.mochi-search-wrap svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); opacity: .4; pointer-events: none; }
+.mochi-search {
+  width: 100%; padding: 7px 10px 7px 33px; border-radius: 6px;
+  border: 1px solid #27272A; background: #18181B; color: #fff;
+  font-family: var(--font); font-size: 12.5px; font-weight: 500; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.mochi-search::placeholder { color: #71717A; }
+.mochi-search:focus { border-color: transparent; box-shadow: 0 0 0 2px #3F3F46; }
+.mochi-count { margin-left: auto; font-size: 12px; color: #71717A; font-weight: 500; white-space: nowrap; }
+
+.mst {
+  appearance: none; -webkit-appearance: none; border: none; cursor: pointer; outline: none;
+  padding: 4px 10px; border-radius: 6px; font-size: 10.5px; font-weight: 600;
+  font-family: var(--font); text-transform: uppercase; letter-spacing: .4px; text-align: center;
+  transition: background .15s;
+}
+.mst option { background: #1C1C22; color: #fff; text-transform: none; letter-spacing: 0; }
+.mst-novi   { background: rgba(113,113,122,.18); color: #A1A1AA; }
+.mst-fu     { background: rgba(234,179,8,.18); color: #FACC15; }
+.mst-closed { background: rgba(34,197,94,.18); color: #4ADE80; }
+.mst-dq     { background: rgba(248,113,113,.12); color: #F87171; }
+.ltr-created { font-size: 11.5px; color: #A1A1AA; white-space: nowrap; }
+
+@media (max-width: 640px) {
+  .mochi-tabs { width: 100%; }
+  .mtab { flex: 1; justify-content: center; padding: 9px 6px; font-size: 11px; }
+  .mtab-n { display: none; }
+  .mochi-search { font-size: 16px; }
+  .mochi-search-wrap { flex: 1; width: auto; min-width: 0; }
+}
 
 /* ── ADS VIEW ── */
 .ads-view-btn { display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:99px;border:1px solid var(--b);background:var(--s2);color:var(--muted);font-family:var(--font);font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.3px; }
@@ -755,11 +793,11 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
 .leads-tbl-wrap { background: var(--s1); border: 1px solid var(--b); border-radius: var(--r); overflow: hidden; }
 .leads-tbl { width: 100%; border-collapse: collapse; }
 .leads-tbl thead th {
-  text-align: left; font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
-  color: var(--muted); padding: 12px 16px; border-bottom: 1px solid var(--b);
+  text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .1px; text-transform: none;
+  color: #D4D4D8; padding: 11px 16px; border-bottom: 1px solid #27272A;
   white-space: nowrap; background: var(--s1); position: sticky; top: 0; z-index: 1;
 }
-.leads-tbl tbody td { padding: 11px 14px; border-bottom: 1px solid var(--b); vertical-align: middle; }
+.leads-tbl tbody td { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,.04); vertical-align: middle; }
 .leads-tbl tbody tr:last-child td { border-bottom: none; }
 .leads-tbl tbody tr { cursor: pointer; transition: background .1s; }
 .leads-tbl tbody tr:hover td { background: var(--s2); }
@@ -771,15 +809,15 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
 }
 .ltr-av.av-m { background: rgba(168,85,247,.12); color: var(--nikola); border-color: rgba(168,85,247,.25); }
 .ltr-av.av-d { background: rgba(249,115,22,.12); color: var(--dusica); border-color: rgba(249,115,22,.25); }
-.ltr-name { font-size: 13px; font-weight: 700; line-height: 1.2; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
-.ltr-sub  { font-size: 10px; color: var(--muted); margin-top: 1px; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
-.ltr-type { display: inline-flex; padding: 2px 8px; border-radius: 99px; font-size: 9px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; white-space: nowrap; }
-.type-q  { background: rgba(59,130,246,.10);  color: #3B82F6; }
-.type-dq { background: rgba(244,63,94,.10);   color: var(--red); }
-.type-wb { background: rgba(168,85,247,.10);  color: #a855f7; }
-.type-wa { background: rgba(16,185,129,.10);  color: #10b981; }
-.type-wb2 { background: rgba(20,184,166,.12); color: #14b8a6; }
-.type-lm { background: rgba(234,179,8,.10);   color: var(--yellow); }
+.ltr-name { font-size: 13px; font-weight: 600; color: #fff; line-height: 1.2; white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+.ltr-sub  { font-size: 10.5px; color: #71717A; margin-top: 2px; white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+.ltr-type { display: inline-flex; padding: 2px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 600; letter-spacing: .3px; text-transform: uppercase; white-space: nowrap; }
+.type-q  { background: rgba(34,197,94,.18);   color: #4ADE80; }
+.type-dq { background: transparent;            color: #F87171; }
+.type-wb { background: rgba(34,197,94,.18);   color: #4ADE80; }
+.type-wa { background: rgba(192,132,252,.15); color: #C084FC; }
+.type-wb2 { background: rgba(20,184,166,.15); color: #14b8a6; }
+.type-lm { background: rgba(234,179,8,.18);   color: #FACC15; }
 .heat {
   display: inline-flex; align-items: center; gap: 4px;
   font-size: 9px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase;
@@ -2365,6 +2403,8 @@ function leadTypeFromTags(tags){
 let leadsShowFollowUp = false;  // when true, only show leads needing follow-up today
 let leadsShowStale    = false;  // when true, only show stale (untouched 14d+) leads
 let leadsTagFilter    = '';     // empty = no tag filter; otherwise exact tag string
+let leadsDateFilter   = 'all';  // 'all' | 'today' | 'week' | '7d' — filters by date_added
+let leadsStatusFilter = '';     // '' = all | 'Novi' | 'Follow Up' | 'Closed' | 'DQ'
 let leadsSmartView    = false;  // when true, sort by score desc + hide cold
 let cachedLeads  = [];
 let leadCounts   = { all: 0, qualified: 0, disqualified: 0, booked: 0, customer: 0 };
@@ -4730,7 +4770,7 @@ if ('serviceWorker' in navigator) {
 /* ── Onboarding: first-login walkthrough (runs once per device) ── */
 const TOUR_STEPS = [
   { find:['.tabs','.bottom-nav'], title:'Dobrodošli', body:'Ovo je navigacija: <b>Leads</b> za obradu leadova, <b>Kalendar</b> za zakazane pozive i <b>Metrics</b> za rezultate.' },
-  { find:['.sync-btn'], title:'Auto-sync', body:'Podaci se automatski povlače iz GHL-a svakih 5 minuta — ne moraš ništa da klikćeš. Dugme služi samo za ručno osvežavanje.' },
+  { find:['#syncBtn'], title:'Auto-sync', body:'Podaci se automatski povlače iz GHL-a svakih 5 minuta — ne moraš ništa da klikćeš. Dugme služi samo za ručno osvežavanje.' },
   { find:['#leadsBody','.fu-today-banner','.leads-wrap'], title:'Leadovi', body:'Klikni bilo kog leada da otvoriš profil: ishod poziva, status, beleške, follow-up datum i vrednost deala.' },
   { tab:'kalendar', find:['.tg-views'], title:'Kalendar', body:'Pregled po danu, 3 dana, 7 dana ili mesecu. Klik na poziv otvara lead, a gore odmah vidiš broj kvalifikovanih i diskvalifikovanih poziva.' },
   { tab:'metrics', find:['#funnel-section'], title:'Metrike', body:'Prodajni levak, closer board i prihod. Klikni bilo koju fazu da vidiš tačno koji leadovi su u njoj.' },
@@ -5077,7 +5117,6 @@ async function renderAdsView(){
 
 function filterLeads(f){
   leadsFilter=f;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f));
   refreshLeadRows();
 }
 
@@ -5101,6 +5140,22 @@ function toggleStaleView(){
 function setTagFilter(tag){
   leadsTagFilter=tag||'';
   refreshLeadRows();
+}
+
+function setLeadsDateFilter(f){
+  leadsDateFilter=f;
+  renderLeads(cachedLeads); // full re-render so the active pill updates
+}
+
+function setStatusFilter(s){
+  leadsStatusFilter=s||'';
+  refreshLeadRows();
+}
+
+function resetLeadFilters(){
+  leadsDateFilter='all'; leadsFilter='all'; leadsTagFilter='';
+  leadsStatusFilter=''; leadsSearch=''; leadsSmartView=false;
+  renderLeads(cachedLeads);
 }
 
 // Unique tags currently in the loaded lead set, sorted by frequency.
@@ -5166,6 +5221,17 @@ function computeLeads(){
   if(leadsTagFilter){
     searched=searched.filter(l=>keepAlways(l)||(Array.isArray(l.tags)&&l.tags.includes(leadsTagFilter)));
   }
+  if(leadsDateFilter!=='all'){
+    const now=new Date(); const start=new Date(now);
+    if(leadsDateFilter==='today'){ start.setHours(0,0,0,0); }
+    else if(leadsDateFilter==='week'){ const dow=(now.getDay()+6)%7; start.setDate(now.getDate()-dow); start.setHours(0,0,0,0); }
+    else if(leadsDateFilter==='7d'){ start.setDate(now.getDate()-7); }
+    const cutoff=start.toISOString();
+    searched=searched.filter(l=>keepAlways(l)||(l.date_added&&l.date_added>=cutoff));
+  }
+  if(leadsStatusFilter){
+    searched=searched.filter(l=>keepAlways(l)||l.status===leadsStatusFilter);
+  }
   if(!leadsShowSnoozed){
     searched=searched.filter(l=>keepAlways(l)||!isSnoozed(l.id));
   }
@@ -5213,6 +5279,14 @@ function computeLeads(){
   return {searched,leads,fc};
 }
 
+// "25. jul 19:23" — compact created-at stamp for the leads table.
+function fmtLeadDate(iso){
+  if(!iso) return '';
+  const d=new Date(iso);
+  if(isNaN(d)) return '';
+  return `${d.getDate()}. ${MONTHS3[d.getMonth()].toLowerCase()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
 // Builds just the <tr> rows HTML for the leads table.
 function buildLeadRows(leads){
   const todayStr=new Date().toISOString().slice(0,10);
@@ -5222,6 +5296,7 @@ function buildLeadRows(leads){
     const avCls=c.assigned_to==='nikola'?'av-m':c.assigned_to==='dusica'?'av-d':'';
     const meta=[c.phone,c.instagram?`@${c.instagram.replace('@','')}`:''].filter(Boolean).join(' · ');
     const stOpts=['Novi','Follow Up','Closed','DQ'].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('');
+    const stCls=c.status==='Follow Up'?'mst-fu':c.status==='Closed'?'mst-closed':c.status==='DQ'?'mst-dq':'mst-novi';
     let fuCls=''; if(c.follow_up_date){fuCls=c.follow_up_date===todayStr?'fu-today':c.follow_up_date<todayStr?'fu-overdue':'';}
     const checked=selectedLeadIds.has(c.id)?'checked':'';
     const lastAct = lastActionBadge(c.last_activity);
@@ -5229,18 +5304,18 @@ function buildLeadRows(leads){
       <td class="ltr-chk-cell" onclick="event.stopPropagation()">
         <input type="checkbox" class="ltr-chk" ${checked} onchange="toggleLeadSelection('${esc(c.id)}',this.checked)" />
       </td>
+      <td class="ltr-created col-desk">${fmtLeadDate(c.date_added)||'—'}</td>
       <td><div class="ltr-contact">
-        <div class="ltr-av ${avCls}">${initials}</div>
         <div>
           <div class="ltr-name">${esc(c.name)}${contactActions(c)}</div>
           ${meta?`<div class="ltr-sub">${esc(meta)}</div>`:(!c.phone?`<div class="ltr-sub" style="color:var(--muted2);font-style:italic">nema broja · samo email</div>`:'')}
           ${lastAct?`<div class="last-action ${lastAct.cls}" title="${esc(lastAct.actor||'')} · ${esc(lastAct.when)}">${lastAct.icon} ${esc(lastAct.label)} · ${esc(lastAct.when)}</div>`:''}
         </div>
       </div></td>
-      <td>${typePill(c.lead_type)}${(()=>{const h=leadHeat(leadScore(c));return `<span class="heat ${h.cls}" title="Score: ${leadScore(c)}">${h.icon} ${h.label}</span>`;})()}</td>
       <td class="col-mob" onclick="event.stopPropagation()">
-        <select class="ltr-status-sel" onchange="updateLeadStatus('${esc(c.id)}',this.value)">${stOpts}</select>
+        <select class="mst ${stCls}" onchange="updateLeadStatus('${esc(c.id)}',this.value)">${stOpts}</select>
       </td>
+      <td>${typePill(c.lead_type)||'<span style="color:var(--muted2)">—</span>'}${(()=>{const h=leadHeat(leadScore(c));return `<span class="heat ${h.cls}" title="Score: ${leadScore(c)}">${h.icon} ${h.label}</span>`;})()}</td>
       <td class="col-desk" onclick="event.stopPropagation()">
         <div class="ltr-assign">
           <button class="ltr-ab ${c.assigned_to==='nikola'?'on-m':''}" onclick="assignLead('${esc(c.id)}','nikola')">M</button>
@@ -5251,7 +5326,7 @@ function buildLeadRows(leads){
       </td>
       <td><span class="ltr-arrow">›</span></td>
     </tr>`;
-  }).join('')||`<tr><td colspan="7" style="padding:48px 20px;text-align:center;color:var(--muted)"><div style="font-size:24px;margin-bottom:8px">${UI.target}</div><div style="font-size:13px;font-weight:700">Nema leadova</div></td></tr>`;
+  }).join('')||`<tr><td colspan="8" style="padding:48px 20px;text-align:center;color:var(--muted)"><div style="font-size:24px;margin-bottom:8px">${UI.target}</div><div style="font-size:13px;font-weight:700">Nema leadova</div></td></tr>`;
 }
 
 /* ── BULK ACTIONS ─────────────────────────────────────────────── */
@@ -5376,17 +5451,11 @@ async function bulkFollowUp(date){
 
 // Updates ONLY the table body + filter-bar counts (preserves search focus).
 function refreshLeadRows(){
-  const {leads,fc}=computeLeads();
+  const {leads}=computeLeads();
   const body=document.getElementById('leadsBody');
   if(body) body.innerHTML=buildLeadRows(leads);
-  const bar=document.getElementById('leadsFilterBar');
-  if(bar){
-    bar.querySelectorAll('.filter-btn').forEach(b=>{
-      const f=b.dataset.filter;
-      b.classList.toggle('active',f===leadsFilter);
-      if(f==='all') b.textContent=`Svi (${fc.all})`;
-    });
-  }
+  const lbl=document.getElementById('leadsCountLbl');
+  if(lbl) lbl.textContent=`${leads.length} lead${leads.length===1?'':'ova'}`;
 }
 
 function renderLeads(all){
@@ -5398,6 +5467,7 @@ function renderLeads(all){
   const syncSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>`;
 
   const rows=buildLeadRows(leads);
+  const rowsCount=leads.length;
 
   // Compute stale-lead count for the banner
   const fourteenDaysAgo=new Date(); fourteenDaysAgo.setDate(fourteenDaysAgo.getDate()-14);
@@ -5449,52 +5519,56 @@ function renderLeads(all){
       <div class="dupe-banner-count">${dupes.length}</div>
     </div>`:'';})()}
 
-    <div class="leads-stat-bar">
-      <button class="lsb-btn tab-all ${leadsSubTab==='all'?'active':''}" onclick="setLeadsSubTab('all')">
-        <span class="lsb-count">${total}</span><span class="lsb-label">Svi</span>
-      </button>
-      <button class="lsb-btn tab-q ${leadsSubTab==='qualified'?'active':''}" onclick="setLeadsSubTab('qualified')">
-        <span class="lsb-count">${leadCounts.qualified}</span><span class="lsb-label">Qualified</span>
-      </button>
-      <button class="lsb-btn tab-dq ${leadsSubTab==='disqualified'?'active':''}" onclick="setLeadsSubTab('disqualified')">
-        <span class="lsb-count">${leadCounts.disqualified}</span><span class="lsb-label">Disqualified</span>
-      </button>
-      <button class="lsb-btn tab-wb ${leadsSubTab==='booked'?'active':''}" onclick="setLeadsSubTab('booked')">
-        <span class="lsb-count">${leadCounts.booked}</span><span class="lsb-label">Zakazan poziv</span>
-      </button>
-      <button class="lsb-btn tab-wa ${leadsSubTab==='customer'?'active':''}" onclick="setLeadsSubTab('customer')">
-        <span class="lsb-count">${leadCounts.customer}</span><span class="lsb-label">Klijent</span>
-      </button>
+    <div class="mochi-tabs">
+      <button class="mtab ${leadsSubTab==='all'?'active':''}" onclick="setLeadsSubTab('all')">Svi <span class="mtab-n">${total}</span></button>
+      <button class="mtab ${leadsSubTab==='qualified'?'active':''}" onclick="setLeadsSubTab('qualified')">Qualified <span class="mtab-n">${leadCounts.qualified}</span></button>
+      <button class="mtab ${leadsSubTab==='disqualified'?'active':''}" onclick="setLeadsSubTab('disqualified')">Disqualified <span class="mtab-n">${leadCounts.disqualified}</span></button>
+      <button class="mtab ${leadsSubTab==='booked'?'active':''}" onclick="setLeadsSubTab('booked')">Zakazan poziv <span class="mtab-n">${leadCounts.booked}</span></button>
+      <button class="mtab ${leadsSubTab==='customer'?'active':''}" onclick="setLeadsSubTab('customer')">Klijent <span class="mtab-n">${leadCounts.customer}</span></button>
     </div>
 
-    <div class="leads-toolbar">
-      <div class="leads-search-wrap">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input class="leads-search" placeholder="Pretraži ime, email, telefon…" value="${leadsSearch}" oninput="leadsSearch=this.value;scheduleLeadSearch()" />
-      </div>
-      <div class="leads-filter" id="leadsFilterBar">
-        <button class="filter-btn ${leadsFilter==='all'?'active':''}" data-filter="all" onclick="filterLeads('all')">Svi (${fc.all})</button>
-        <button class="filter-btn ${leadsFilter==='nikola'?'active':''}" data-filter="nikola" onclick="filterLeads('nikola')">Nikola</button>
-        <button class="filter-btn ${leadsFilter==='unassigned'?'active':''}" data-filter="unassigned" onclick="filterLeads('unassigned')">Nedodeljeni</button>
-      </div>
-      <button class="smart-btn ${leadsSmartView?'active':''}" onclick="toggleSmartView()" title="Prikaži samo hot/warm leadove, sortirano po skoru">
-        ${leadsSmartView?'✓ Smart':'Smart'}
-      </button>
-      <select class="tag-filter" onchange="setTagFilter(this.value)" title="Filtriraj po tagu">
+    <div class="mochi-filter-row">
+      <button class="mdate ${leadsDateFilter==='all'?'active':''}" onclick="setLeadsDateFilter('all')">Svi</button>
+      <button class="mdate ${leadsDateFilter==='today'?'active':''}" onclick="setLeadsDateFilter('today')">Danas</button>
+      <button class="mdate ${leadsDateFilter==='week'?'active':''}" onclick="setLeadsDateFilter('week')">Ova nedelja</button>
+      <button class="mdate ${leadsDateFilter==='7d'?'active':''}" onclick="setLeadsDateFilter('7d')">Zadnjih 7 dana</button>
+      <span class="mochi-vsep"></span>
+      <select class="msel" onchange="filterLeads(this.value)" title="Filtriraj po closeru">
+        <option value="all" ${leadsFilter==='all'?'selected':''}>Svi closeri (${fc.all})</option>
+        <option value="nikola" ${leadsFilter==='nikola'?'selected':''}>Nikola (${fc.nikola||0})</option>
+        <option value="unassigned" ${leadsFilter==='unassigned'?'selected':''}>Nedodeljeni (${fc.unassigned})</option>
+      </select>
+      <select class="msel" onchange="setTagFilter(this.value)" title="Filtriraj po tagu">
         <option value="">Svi tagovi</option>
         ${availableTags().slice(0,30).map(t=>`<option value="${esc(t.tag)}" ${leadsTagFilter===t.tag?'selected':''}>${esc(t.tag)} (${t.n})</option>`).join('')}
       </select>
-      <button class="ads-view-btn ${leadsView==='ads'?'active':''}" onclick="toggleAdsView()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 8h2m4 0h2M7 12h10"/></svg>
-        Ads
-      </button>
-      <button class="export-btn" onclick="exportLeadsCSV()" title="Eksport CSV">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        CSV
-      </button>
-      <button class="sync-btn" title="Sinhronizacija sa GHL radi automatski svakih 5 min — klikni za ručnu" id="syncBtn" onclick="syncLeadsFromGHL()">
+      <button class="mbtn" onclick="resetLeadFilters()">Reset</button>
+      <span style="margin-left:auto;display:inline-flex;gap:6px;align-items:center">
+        <button class="mbtn ${leadsSmartView?'active':''}" onclick="toggleSmartView()" title="Prikaži samo hot/warm leadove, sortirano po skoru">${leadsSmartView?'✓ Smart':'Smart'}</button>
+        <button class="mbtn ${leadsView==='ads'?'active':''}" onclick="toggleAdsView()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 8h2m4 0h2M7 12h10"/></svg>
+          Ads
+        </button>
+        <button class="mbtn" onclick="exportLeadsCSV()" title="Eksport CSV">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          CSV
+        </button>
+      </span>
+    </div>
+
+    <div class="mochi-search-row">
+      <div class="mochi-search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="mochi-search" placeholder="Pretraži ime, email, telefon…" value="${leadsSearch}" oninput="leadsSearch=this.value;scheduleLeadSearch()" />
+      </div>
+      <select class="msel" onchange="setStatusFilter(this.value)" title="Filtriraj po statusu">
+        <option value="">Svi statusi</option>
+        ${['Novi','Follow Up','Closed','DQ'].map(s=>`<option value="${s}" ${leadsStatusFilter===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+      <button class="mbtn" title="Sinhronizacija sa GHL radi automatski svakih 5 min — klikni za ručnu" id="syncBtn" onclick="syncLeadsFromGHL()">
         ${syncSvg}<span class="sync-label">Auto-sync</span>
       </button>
+      <div class="mochi-count" id="leadsCountLbl">${rowsCount} lead${rowsCount===1?'':'ova'}</div>
     </div>
 
     ${(()=>{const pv=pipelineValue(cachedLeads);return (pv.open||pv.closed)?`<div class="pipeline-strip">
@@ -5507,9 +5581,10 @@ function renderLeads(all){
       <table class="leads-tbl">
         <thead><tr>
           <th class="ltr-chk-cell"><input type="checkbox" class="ltr-chk" id="selectAllChk" onchange="toggleSelectAll(this.checked)" title="Selektuj sve" /></th>
-          <th>Kontakt</th>
-          <th>Tip</th>
+          <th class="col-desk">Kreirano</th>
+          <th>Ime</th>
           <th class="col-mob">Status</th>
+          <th>Tip</th>
           <th class="col-desk">Closer</th>
           <th class="col-desk">Follow Up</th>
           <th></th>
