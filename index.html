@@ -3038,7 +3038,7 @@ async function renderTimeToCloseSection(){
 
   host.innerHTML = `<div class="metrics-sec">
     <div class="metrics-sec-lbl">VREME DO ZATVARANJA — Median po izvoru</div>
-    <div class="ttc-wrap">${sourceRows || '<div style="padding:18px;color:var(--muted);font-size:12px;text-align:center">Nedovoljno aktivnosti — pokreni Sinhronizuj GHL.</div>'}</div>
+    <div class="ttc-wrap">${sourceRows || '<div style="padding:18px;color:var(--muted);font-size:12px;text-align:center">Nedovoljno aktivnosti — sinhronizacija radi automatski.</div>'}</div>
     ${repRows ? `<div class="metrics-sec-lbl" style="margin-top:18px">PO PRODAVCU</div><div class="ttc-wrap">${repRows}</div>` : ''}
   </div>`;
 }
@@ -4542,9 +4542,10 @@ function mapContact(c, lead_type){
   };
 }
 
-async function syncLeadsFromGHL(){
+async function syncLeadsFromGHL(opts = {}){
   if(syncLeadsFromGHL._busy) return;   // ignore overlapping syncs (no duplicate full GHL pulls)
   syncLeadsFromGHL._busy = true;
+  syncLeadsFromGHL._last = Date.now();
   const btn=document.querySelector('.sync-btn');
   if(btn)btn.classList.add('spinning');
   try{
@@ -4608,12 +4609,29 @@ async function syncLeadsFromGHL(){
   }catch(e){
     console.error('GHL sync error:',e);
     const msg='Ne mogu da sinhronizujem sa GHL: '+e.message;
-    document.getElementById('mainContent').insertAdjacentHTML('afterbegin',
+    if(!opts.auto) document.getElementById('mainContent').insertAdjacentHTML('afterbegin',
       `<div style="background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);border-radius:10px;padding:12px 16px;color:var(--red);font-size:12px;font-weight:600;margin-bottom:12px;">${msg}</div>`);
   }
   if(btn)btn.classList.remove('spinning');
   syncLeadsFromGHL._busy = false;
 }
+
+
+/* ── Auto-sync: GHL pull runs by itself — shortly after login, then every
+   5 minutes while the tab is visible. Manual click still forces a run. ── */
+const GHL_AUTO_SYNC_MS = 5 * 60e3;
+async function autoSyncGHL(){
+  if (document.hidden) return;
+  if (Date.now() - (syncLeadsFromGHL._last || 0) < GHL_AUTO_SYNC_MS - 30e3) return;
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;                       // not signed in yet
+  } catch(e) { return; }
+  syncLeadsFromGHL({ auto: true });
+}
+setInterval(autoSyncGHL, GHL_AUTO_SYNC_MS);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) autoSyncGHL(); });
+setTimeout(autoSyncGHL, 2500);
 
 async function setLeadsSubTab(tab){
   leadsSubTab=tab;
@@ -4876,7 +4894,7 @@ async function renderAdsView(){
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
         <button class="ads-view-btn active" onclick="toggleAdsView()">← Nazad na Leads</button>
-        <button class="sync-btn" onclick="syncLeadsFromGHL()">${syncSvg}<span class="sync-label">Sinhronizuj GHL</span></button>
+        <button class="sync-btn" title="Sinhronizacija sa GHL radi automatski svakih 5 min — klikni za ručnu" onclick="syncLeadsFromGHL()">${syncSvg}<span class="sync-label">Auto-sync</span></button>
       </div>
     </div>
     <div class="ads-tbl-wrap">
@@ -5316,8 +5334,8 @@ function renderLeads(all){
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         CSV
       </button>
-      <button class="sync-btn" id="syncBtn" onclick="syncLeadsFromGHL()">
-        ${syncSvg}<span class="sync-label">Sinhronizuj GHL</span>
+      <button class="sync-btn" title="Sinhronizacija sa GHL radi automatski svakih 5 min — klikni za ručnu" id="syncBtn" onclick="syncLeadsFromGHL()">
+        ${syncSvg}<span class="sync-label">Auto-sync</span>
       </button>
     </div>
 
