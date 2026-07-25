@@ -2026,7 +2026,7 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 
 
 /* ═══ Sales-dashboard restyle: segmented funnel, server rows, stat cards, calendar ═══ */
-.fnlc{display:flex;gap:6px;margin:10px 0 16px;}
+.fnlc{display:flex;gap:4px;margin:10px 0 16px;}
 .fnlc-seg{position:relative;flex:1;height:210px;cursor:pointer;animation:fnlc-in .5s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--i,0)*.1s);transform-origin:left center;transition:opacity .25s;}
 @keyframes fnlc-in{from{opacity:0;transform:scaleX(.2)}}
 .fnlc-seg svg{position:absolute;inset:0;width:100%;height:100%;transition:transform .3s cubic-bezier(.16,1,.3,1);}
@@ -3256,9 +3256,8 @@ async function renderFunnelSection(appts = []){
         const b = (i < n - 1 ? stages[i + 1].count : s.count) / (maxV || 1);
         const pct = maxV ? Math.round(s.count / maxV * 100) : 0;
         return `<div class="fnlc-seg" style="--i:${i}" onclick="openFunnelDrill('${s.key}')" title="Prikaži leadove">
-          ${fnlcSegSvg(a, b, s.color)}
+          ${fnlcSegSvg(a, b, '#3B82F6')}
           <div class="fnlc-lbls">
-            <div class="fnlc-val">${s.count.toLocaleString('sr-RS')}</div>
             <div class="fnlc-mid"><span class="fnlc-pill">${pct}%</span></div>
             <div class="fnlc-lbl">${s.label}</div>
           </div>
