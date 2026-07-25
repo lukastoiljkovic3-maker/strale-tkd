@@ -668,6 +668,9 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
 .mst-closed { background: rgba(34,197,94,.18); color: #4ADE80; }
 .mst-dq     { background: rgba(248,113,113,.12); color: #F87171; }
 .ltr-created { font-size: 11.5px; color: #A1A1AA; white-space: nowrap; }
+.tab-loading { display: flex; align-items: center; justify-content: center; width: 100%; padding: 90px 0; }
+.tab-loading-spin { width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,.12); border-top-color: #fff; animation: spin .7s linear infinite; }
+.kpi-grid:empty { display: none; }
 
 @media (max-width: 640px) {
   .mochi-tabs { width: 100%; }
@@ -2667,6 +2670,10 @@ function setTab(tab) {
     }, 60000);
   }
 
+  // Instant feedback: clear the stale view with a lightweight loader while
+  // the new tab's data loads (leads/kalendar fetches can take seconds).
+  const _mc = document.getElementById('mainContent');
+  if (_mc) _mc.innerHTML = '<div class="tab-loading"><div class="tab-loading-spin"></div></div>';
   render();
 }
 
@@ -5279,6 +5286,25 @@ function computeLeads(){
   return {searched,leads,fc};
 }
 
+/* Chunked row injection: the first LEAD_ROW_CHUNK rows render synchronously,
+   the rest stream in over animation frames so 1000+ leads never freeze the UI. */
+const LEAD_ROW_CHUNK=150;
+let _leadTailSeq=0;
+function scheduleLeadRowTail(leads){
+  const seq=++_leadTailSeq;
+  if(!leads||leads.length<=LEAD_ROW_CHUNK) return;
+  let i=LEAD_ROW_CHUNK;
+  const step=()=>{
+    if(seq!==_leadTailSeq) return; // superseded by a newer render
+    const body=document.getElementById('leadsBody');
+    if(!body) return;
+    body.insertAdjacentHTML('beforeend', buildLeadRows(leads.slice(i, i+LEAD_ROW_CHUNK*2)));
+    i+=LEAD_ROW_CHUNK*2;
+    if(i<leads.length) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
 // "25. jul 19:23" — compact created-at stamp for the leads table.
 function fmtLeadDate(iso){
   if(!iso) return '';
@@ -5315,7 +5341,7 @@ function buildLeadRows(leads){
       <td class="col-mob" onclick="event.stopPropagation()">
         <select class="mst ${stCls}" onchange="updateLeadStatus('${esc(c.id)}',this.value)">${stOpts}</select>
       </td>
-      <td>${typePill(c.lead_type)||'<span style="color:var(--muted2)">—</span>'}${(()=>{const h=leadHeat(leadScore(c));return `<span class="heat ${h.cls}" title="Score: ${leadScore(c)}">${h.icon} ${h.label}</span>`;})()}</td>
+      <td>${typePill(c.lead_type)||'<span style="color:var(--muted2)">—</span>'}${(()=>{const s=leadScore(c);const h=leadHeat(s);return `<span class="heat ${h.cls}" title="Score: ${s}">${h.icon} ${h.label}</span>`;})()}</td>
       <td class="col-desk" onclick="event.stopPropagation()">
         <div class="ltr-assign">
           <button class="ltr-ab ${c.assigned_to==='nikola'?'on-m':''}" onclick="assignLead('${esc(c.id)}','nikola')">M</button>
@@ -5453,7 +5479,10 @@ async function bulkFollowUp(date){
 function refreshLeadRows(){
   const {leads}=computeLeads();
   const body=document.getElementById('leadsBody');
-  if(body) body.innerHTML=buildLeadRows(leads);
+  if(body){
+    body.innerHTML=buildLeadRows(leads.slice(0,LEAD_ROW_CHUNK));
+    scheduleLeadRowTail(leads);
+  }
   const lbl=document.getElementById('leadsCountLbl');
   if(lbl) lbl.textContent=`${leads.length} lead${leads.length===1?'':'ova'}`;
 }
@@ -5466,7 +5495,7 @@ function renderLeads(all){
   const fuToday=(cachedLeads||[]).filter(l=>l.follow_up_date===todayStr&&l.status!=='Closed'&&l.status!=='DQ');
   const syncSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>`;
 
-  const rows=buildLeadRows(leads);
+  const rows=buildLeadRows(leads.slice(0,LEAD_ROW_CHUNK));
   const rowsCount=leads.length;
 
   // Compute stale-lead count for the banner
@@ -5593,6 +5622,7 @@ function renderLeads(all){
       </table>
     </div>
   </div>`;
+  scheduleLeadRowTail(leads);
 }
 
 function openLeadDetail(id){
