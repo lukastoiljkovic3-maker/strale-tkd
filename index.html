@@ -2162,6 +2162,32 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
   header { padding-top: calc(12px + env(safe-area-inset-top)); }
 }
 
+
+/* ═══ 21st.dev animated banner (red flow) — replaces the solid stale block ═══ */
+.stale-banner{position:relative;overflow:hidden;background:var(--s1);border:1px solid rgba(239,68,68,.35);}
+.stale-banner::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:repeating-linear-gradient(70deg,rgba(239,68,68,.55) 0%,rgba(239,68,68,.12) 14%,transparent 28%,rgba(255,80,80,.45) 42%,transparent 56%);
+  background-size:200% 100%;animation:crm-banner-flow 20s linear infinite;filter:saturate(1.6);
+  -webkit-mask-image:linear-gradient(to bottom,white,transparent);
+  mask-image:linear-gradient(to bottom,white,transparent);}
+.stale-banner > *{position:relative;z-index:1;}
+@keyframes crm-banner-flow{from{background-position:0% 0}to{background-position:100% 0}}
+.stale-banner-icon{display:none;}
+.stale-banner:hover{background:var(--s2);}
+@media (prefers-reduced-motion: reduce){.stale-banner::before{animation:none}}
+
+/* ═══ Onboarding tour ═══ */
+.tour-ring{position:fixed;z-index:400;border-radius:14px;border:2px solid var(--accent);box-shadow:0 0 0 9999px rgba(4,8,16,.72),0 0 24px rgba(59,130,246,.5);pointer-events:none;}
+.tour-card{position:fixed;z-index:401;width:320px;max-width:calc(100vw - 24px);background:linear-gradient(160deg,var(--s2),var(--s1));border:1px solid var(--b2);border-radius:16px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:fdrill-pop .25s cubic-bezier(.16,1,.3,1) both;}
+.tour-step{font-size:10px;font-weight:800;letter-spacing:1px;color:var(--accent);margin-bottom:6px;}
+.tour-title{font-size:15px;font-weight:800;color:#fff;margin-bottom:6px;}
+.tour-body{font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:14px;}
+.tour-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.tour-skip{background:none;border:none;color:var(--muted);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;padding:8px 4px;}
+.tour-skip:hover{color:#fff;}
+.tour-next{background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12.5px;font-weight:700;border-radius:10px;padding:9px 16px;cursor:pointer;transition:filter .15s;}
+.tour-next:hover{filter:brightness(1.15);}
+
 </style>
 </head>
 <body>
@@ -4657,6 +4683,64 @@ setTimeout(autoSyncGHL, 2500);
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
 }
+
+/* ── Onboarding: first-login walkthrough (runs once per device) ── */
+const TOUR_STEPS = [
+  { find:['.tabs','.bottom-nav'], title:'Dobrodošli! 👋', body:'Ovo je navigacija: <b>Leads</b> za obradu leadova, <b>Kalendar</b> za zakazane pozive i <b>Metrics</b> za rezultate.' },
+  { find:['.sync-btn'], title:'Auto-sync', body:'Podaci se automatski povlače iz GHL-a svakih 5 minuta — ne moraš ništa da klikćeš. Dugme služi samo za ručno osvežavanje.' },
+  { find:['#leadsBody','.fu-today-banner','.leads-wrap'], title:'Leadovi', body:'Klikni bilo kog leada da otvoriš profil: ishod poziva, status, beleške, follow-up datum i vrednost deala.' },
+  { tab:'kalendar', find:['.tg-views'], title:'Kalendar', body:'Pregled po danu, 3 dana, 7 dana ili mesecu. Klik na poziv otvara lead, a gore odmah vidiš broj kvalifikovanih i diskvalifikovanih poziva.' },
+  { tab:'metrics', find:['#funnel-section'], title:'Metrike', body:'Prodajni levak, closer board i prihod. Klikni bilo koju fazu da vidiš tačno koji leadovi su u njoj.' },
+];
+let _tourI = -1;
+function maybeStartOnboarding(){
+  try { if (localStorage.getItem('crmOnboarded') === '1') return; } catch(e) { return; }
+  sb.auth.getSession().then(({ data: { session } }) => { if (session && _tourI === -1) startTour(); }).catch(() => {});
+}
+function startTour(){ _tourI = -1; tourNext(); }
+function endTour(){
+  try { localStorage.setItem('crmOnboarded', '1'); } catch(e) {}
+  const n = document.getElementById('tour-root'); if (n) n.remove();
+  _tourI = TOUR_STEPS.length;
+  if (currentTab !== 'leads') setTab('leads');
+}
+async function tourNext(){
+  _tourI++;
+  const step = TOUR_STEPS[_tourI];
+  if (!step){ endTour(); return; }
+  const old = document.getElementById('tour-root'); if (old) old.remove();
+  if (step.tab && currentTab !== step.tab) setTab(step.tab);
+  let el = null;
+  for (let t = 0; t < 40 && !el; t++){
+    el = step.find.map(s => document.querySelector(s)).find(x => x && x.getBoundingClientRect().height > 0) || null;
+    if (!el) await new Promise(r => setTimeout(r, 100));
+  }
+  if (!el){ tourNext(); return; }   // target missing on this device — skip the step
+  el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  await new Promise(r => setTimeout(r, 380));
+  renderTourStep(el, step);
+}
+function renderTourStep(el, step){
+  const r = el.getBoundingClientRect(), pad = 8;
+  const root = document.createElement('div');
+  root.id = 'tour-root';
+  const last = _tourI === TOUR_STEPS.length - 1;
+  const below = r.bottom + 210 < innerHeight;
+  root.innerHTML = `
+    <div class="tour-ring" style="left:${(r.left - pad).toFixed(0)}px;top:${(r.top - pad).toFixed(0)}px;width:${(r.width + pad * 2).toFixed(0)}px;height:${(r.height + pad * 2).toFixed(0)}px"></div>
+    <div class="tour-card" style="${below ? `top:${(r.bottom + 16).toFixed(0)}px` : `bottom:${(innerHeight - r.top + 16).toFixed(0)}px`};left:${Math.max(12, Math.min(r.left, innerWidth - 332)).toFixed(0)}px">
+      <div class="tour-step">${_tourI + 1} / ${TOUR_STEPS.length}</div>
+      <div class="tour-title">${step.title}</div>
+      <div class="tour-body">${step.body}</div>
+      <div class="tour-actions">
+        <button class="tour-skip" onclick="endTour()">Preskoči</button>
+        <button class="tour-next" onclick="tourNext()">${last ? 'Završi ✓' : 'Dalje →'}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(root);
+}
+setTimeout(maybeStartOnboarding, 3800);
+
 
 
 async function setLeadsSubTab(tab){
