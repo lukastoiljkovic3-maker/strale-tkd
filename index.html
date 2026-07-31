@@ -2645,7 +2645,7 @@ async function signOut() {
       // burst of realtime events fired hundreds of concurrent reloads.
       if(currentTab!=='leads')return;
       clearTimeout(window._rtLeadsTimer);
-      window._rtLeadsTimer=setTimeout(()=>{if(currentTab==='leads')renderLeadsSection();},1500);
+      window._rtLeadsTimer=setTimeout(()=>{invalidateLeadsSnap();if(currentTab==='leads')renderLeadsSection();},1500);
     })
     .subscribe();
 })();
@@ -3798,32 +3798,73 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 /* Supabase caps responses at 1000 rows per request — page through so
    CRMs with more than 1000 leads load the full set (incl. old Closed clients). */
 async function sbFetchAllLeads(applyFilters){
-  const PAGE=1000, MAX_PAGES=8, out=[];
-  for(let p=0;p<MAX_PAGES;p++){
+  // Pages used to be awaited one after another. Now we ask for the row count
+  // first, then fire every page at once - two round-trips instead of N.
+  const PAGE=1000, MAX_PAGES=8;
+  const mkPage=p=>{
     let q=sb.from('ghl_leads').select('*').order('date_added',{ascending:false}).range(p*PAGE,(p+1)*PAGE-1);
     if(applyFilters) q=applyFilters(q);
-    const {data,error}=await q;
-    if(error){console.error(error);break;}
-    out.push(...(data||[]));
-    if(!data||data.length<PAGE) break;
+    return q;
+  };
+  let total=null;
+  try{
+    let cq=sb.from('ghl_leads').select('id',{count:'exact',head:true});
+    if(applyFilters) cq=applyFilters(cq);
+    const {count}=await cq;
+    if(typeof count==='number') total=count;
+  }catch(e){ /* count unavailable - fall back to sequential tail below */ }
+  if(total===0) return [];
+  const pages=(total==null)?1:Math.min(MAX_PAGES,Math.max(1,Math.ceil(total/PAGE)));
+  const res=await Promise.all(Array.from({length:pages},(_,p)=>mkPage(p)));
+  const out=[];
+  for(const r of res){
+    if(r.error){console.error(r.error);continue;}
+    out.push(...(r.data||[]));
+  }
+  if(total==null&&out.length===PAGE){
+    for(let p=1;p<MAX_PAGES;p++){
+      const {data,error}=await mkPage(p);
+      if(error){console.error(error);break;}
+      out.push(...(data||[]));
+      if(!data||data.length<PAGE) break;
+    }
   }
   return out;
 }
 
+/* Whole-table snapshot shared by the Leads, Metrics and Prihodi views.
+ * Each of those used to run its own full pass on every tab switch. Concurrent
+ * callers now share one in-flight request; writes invalidate via realtime. */
+let _allLeadsSnap=null,_allLeadsAt=0,_allLeadsInFlight=null;
+const ALL_LEADS_TTL=60000;
+
+async function sbAllLeads(force){
+  if(!force&&_allLeadsSnap&&Date.now()-_allLeadsAt<ALL_LEADS_TTL) return _allLeadsSnap;
+  if(_allLeadsInFlight) return _allLeadsInFlight;
+  _allLeadsInFlight=sbFetchAllLeads().then(rows=>{
+    _allLeadsSnap=rows; _allLeadsAt=Date.now(); _allLeadsInFlight=null;
+    return rows;
+  }).catch(e=>{ _allLeadsInFlight=null; throw e; });
+  return _allLeadsInFlight;
+}
+
+function invalidateLeadsSnap(){ _allLeadsSnap=null; _allLeadsAt=0; }
+
+/* Mirrors Postgres `tags && '{...}'` (array overlap) for client-side filtering. */
+const tagsOverlap=(row,tags)=>Array.isArray(row.tags)&&row.tags.some(t=>tags.includes(t));
+
 async function loadLeads(lead_type){
-  return sbFetchAllLeads(q=>{
-    if(lead_type && lead_type!=='all'){
-      const tagMap={
-      qualified:['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus'],
-      disqualified:['straletkd-disqualified','budget-under-100','dq'],
-      booked:['booked-call'],
-      customer:['customer'],
-      };
-      const tags=tagMap[lead_type]||[];
-      if(tags.length) q=q.overlaps('tags',tags);
-    }
-    return q;
-  });
+  // Sub-tabs now slice the shared snapshot instead of re-querying per tab.
+  const all=await sbAllLeads();
+  if(!lead_type||lead_type==='all') return all;
+  const tagMap={
+    qualified:['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus'],
+    disqualified:['straletkd-disqualified','budget-under-100','dq'],
+    booked:['booked-call'],
+    customer:['customer'],
+    };
+  const tags=tagMap[lead_type]||[];
+  return tags.length?all.filter(l=>tagsOverlap(l,tags)):all;
 }
 
 /* ─────────────────── AI LEAD SUMMARY ──────────────────────────────
@@ -5184,7 +5225,7 @@ async function toggleAdsView(){
 }
 
 async function loadCampaignData(){
-  const data=await sbFetchAllLeads(q=>q.overlaps('tags',['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus','straletkd-disqualified','budget-under-100','booked-call','customer']));
+  const data=(await sbAllLeads()).filter(l=>tagsOverlap(l,['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus','straletkd-disqualified','budget-under-100','booked-call','customer']));
   if(!data.length) return [];
   const isId=v=>v&&/^\d{10,}$/.test(v.trim());
   const fmt=v=>!v||isId(v)?null:v;
@@ -6582,7 +6623,7 @@ async function fetchSheetData(){
   // the source of truth (closers set status + "Zatvoreno za" here), NOT GHL.
   // Same row shape as the old feed: {name,challenge,email,date,closer,status}
   // status: 'depozit' = Closed + uneta vrednost (cash) · 'rezervacija' = zakazan poziv · 'pipeline' = otvoren deal.
-  const data=await sbFetchAllLeads();
+  const data=await sbAllLeads();
   return (data||[]).map(l=>{
     const val=(l.deal_value!=null&&Number(l.deal_value)>0)?Number(l.deal_value):((l.deal&&DEAL_PRICES[l.deal])?DEAL_PRICES[l.deal]:0);
     let st=null;
