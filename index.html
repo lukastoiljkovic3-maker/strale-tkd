@@ -3072,7 +3072,9 @@ async function renderKalendarTab(){
   const [data, leadRows] = await Promise.all([
     fetch(`/api/ghl-appointments?start=${now - 180 * 864e5}&end=${now + 180 * 864e5}`).then(r => r.json()).catch(() => ({ error: 'fetch' })),
     sb.from('ghl_leads').select('id,name,phone,tags').limit(5000).then(r => r.data || []).catch(() => []),
-    loadCalBlocks(),
+    // .catch so a blocks failure can never take the whole Kalendar tab down
+    // with it (the table may not exist yet on a fresh project).
+    loadCalBlocks().catch(() => { _calBlocks = []; }),
   ]);
   if (data.error){
     if (staleRender(_seq, 'kalendar')) return;
