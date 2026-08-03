@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>STRALETKD — Sales Tracker</title>
+<title>STRALETKD · Sales Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -17,7 +17,6 @@
 <link rel="apple-touch-icon" sizes="167x167" href="/thenewioslogov2.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="/thenewioslogov2.png" />
 <link rel="manifest" href="/manifest.json" />
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root {
@@ -691,7 +690,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
 /* ── DUPLICATE MERGE MODAL ── */
 .merge-overlay { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,.6); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; padding: 20px; }
 .merge-overlay.open { display: flex; }
-.merge-panel { background: var(--s1); border: 1px solid var(--b); border-radius: 16px; width: min(560px, 100%); max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; }
+.merge-panel { background: var(--s1); border: 1px solid var(--b); border-radius: 16px; width: min(560px, 100%); max-height: 80dvh; display: flex; flex-direction: column; overflow: hidden; }
 .merge-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--b); font-size: 13px; font-weight: 800; }
 .merge-body { overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
 .merge-group { border: 1px solid var(--b); border-radius: 12px; padding: 14px; }
@@ -1288,8 +1287,8 @@ tr.row-flash > td { animation: row-flash 1.6s ease-out; }
 /* ── AI INSIGHTS ───────────────────────── */
 .insights-body {
   padding: 16px 18px; font-size: 13px; line-height: 1.6;
-  background: linear-gradient(135deg, rgba(168,85,247,.06), rgba(168,85,247,.01));
-  border: 1px solid rgba(168,85,247,.2); border-radius: 12px;
+  background: var(--s2);
+  border: 1px solid var(--b); border-radius: 12px;
 }
 .insights-body strong { color: var(--nikola); font-size: 12px; letter-spacing: .8px; text-transform: uppercase; display: block; margin: 10px 0 6px; }
 .insights-body strong:first-child { margin-top: 0; }
@@ -1467,9 +1466,9 @@ tr.ltr-selected:hover { background: rgba(74,222,128,.10); }
 /* ── CLICK-TO-CONTACT BIG BUTTONS (detail panel) ── */
 .ldp-contact-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
 .ldp-ca-btn.ldp-ca-ai {
-  background: linear-gradient(135deg, rgba(168,85,247,.12), rgba(147,51,234,.08));
-  border-color: rgba(168,85,247,.4); color: var(--nikola);
-  font-weight: 800;
+  background: var(--s2);
+  border-color: var(--b); color: var(--text);
+  font-weight: 700;
 }
 .ldp-ca-btn.ldp-ca-ai:hover {
   background: linear-gradient(135deg, rgba(168,85,247,.2), rgba(147,51,234,.15));
@@ -1974,13 +1973,9 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 #loader-logo {
   width: 72px; height: 72px;
   object-fit: contain;
-  filter: drop-shadow(0 0 16px rgba(59,130,246,.4));
-  animation: pulse-logo 2s ease-in-out infinite;
+
 }
-@keyframes pulse-logo {
-  0%, 100% { filter: drop-shadow(0 0 10px rgba(59,130,246,.3)); }
-  50%       { filter: drop-shadow(0 0 28px rgba(59,130,246,.7)); }
-}
+
 #loader-bar-wrap {
   width: 200px; height: 3px;
   background: rgba(255,255,255,0.08);
@@ -1992,23 +1987,11 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
   height: 100%;
   width: 0%;
   border-radius: 99px;
-  background: linear-gradient(90deg, #3B82F6, #60a5fa);
-  box-shadow: 0 0 10px #3B82F6, 0 0 24px #3B82F6, 0 0 2px #fff;
+  background: var(--accent);
   transition: width .1s linear;
 }
-#loader-bar-wrap::after {
-  content: '';
-  position: absolute; top: 50%; left: 0; right: 0;
-  height: 12px; transform: translateY(-50%);
-  background: linear-gradient(90deg, transparent, rgba(96,165,250,.25), transparent);
-  border-radius: 99px;
-  animation: glow-sweep 1.8s ease-in-out infinite;
-}
-@keyframes glow-sweep {
-  0%   { opacity: 0; transform: translateY(-50%) scaleX(0); transform-origin: left; }
-  50%  { opacity: 1; }
-  100% { opacity: 0; transform: translateY(-50%) scaleX(1); transform-origin: left; }
-}
+
+
 
 /* 21st.dev ports (vanilla): skeleton shimmer + spotlight-card (id 2220), orange. */
 .sk { position:relative; overflow:hidden; background:rgba(255,255,255,.045); border-radius:10px; }
@@ -2057,7 +2040,7 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 
 .fdrill-overlay{position:fixed;inset:0;z-index:300;background:rgba(4,10,20,.66);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;animation:fdrill-fade .2s ease both;}
 @keyframes fdrill-fade{from{opacity:0}}
-.fdrill{width:min(880px,100%);max-height:min(86vh,760px);display:flex;flex-direction:column;background:linear-gradient(160deg,var(--s2),var(--s1));border:1px solid var(--b2);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);animation:fdrill-pop .25s cubic-bezier(.16,1,.3,1) both;}
+.fdrill{width:min(880px,100%);max-height:min(86dvh,760px);display:flex;flex-direction:column;background:linear-gradient(160deg,var(--s2),var(--s1));border:1px solid var(--b2);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);animation:fdrill-pop .25s cubic-bezier(.16,1,.3,1) both;}
 @keyframes fdrill-pop{from{opacity:0;transform:translateY(14px) scale(.98)}}
 .fdrill-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--b);flex-shrink:0;}
 .fdrill-ttl{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:800;color:#fff;letter-spacing:.2px;}
@@ -2088,7 +2071,7 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 .fdrill-pg:hover:not(:disabled){color:#fff;border-color:var(--accent);}
 .fdrill-pg.on{background:var(--accent);border-color:var(--accent);color:#fff;}
 .fdrill-pg:disabled{opacity:.4;cursor:default;}
-@media (max-width:640px){.fdrill-overlay{padding:8px;}.fdrill{max-height:94vh;}.fdrill-tags{max-width:120px;}}
+@media (max-width:640px){.fdrill-overlay{padding:8px;}.fdrill{max-height:94dvh;}.fdrill-tags{max-width:120px;}}
 
 .mstat{position:relative;overflow:hidden;transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s;}
 .mstat:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.35);}
@@ -2145,7 +2128,7 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 .srow-no{font-size:20px;font-weight:800;color:var(--muted);}
 .srow-name{font-weight:700;color:#fff;font-size:13px;}
 .srow-contact{color:var(--muted);font-size:11px;margin-top:2px;}
-.srow > *{position:relative;}
+.srow > *:not(.srow-grad){position:relative;}
 @media (max-width:640px){.srow,.srow-hd{grid-template-columns:36px 1fr auto}.srow .fdrill-tags,.srow .fdrill-date,.srow-hd span:nth-child(3),.srow-hd span:nth-child(4){display:none}}
 @media (prefers-reduced-motion: reduce){.fnlc-seg,.srow{animation:none}}
 
@@ -2230,6 +2213,62 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 .cal-cnt{font-size:9px;font-weight:800;background:var(--accent);color:#fff;border-radius:99px;padding:1px 6px;line-height:1.5;}
 .cal-more{font-size:9.5px;color:var(--accent);font-weight:700;padding-left:2px;}
 .cal-chip{pointer-events:none;cursor:default;}
+
+/* ═══ Blocked time — the closer marks himself unavailable ═══
+   Sits under appointments (z-index 1 vs 2) so an existing call stays readable
+   on top of a range that was blocked afterwards. */
+.tg-block{position:absolute;left:2px;right:2px;z-index:1;border-radius:8px;overflow:hidden;
+  background:repeating-linear-gradient(135deg,rgba(148,157,173,.17) 0 6px,rgba(148,157,173,.05) 6px 12px);
+  border:1px solid rgba(148,157,173,.26);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:4px;padding:4px 4px 4px 7px;}
+.tg-block-lbl{min-width:0;font-size:9.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#98a1b0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-top:2px;}
+.tg-block-sub{display:block;font-size:9px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--muted2);margin-top:1px;}
+.tg-block-x{flex-shrink:0;width:30px;height:30px;margin:-3px -2px 0 0;border:none;background:none;color:#98a1b0;
+  font-size:16px;line-height:1;cursor:pointer;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font);-webkit-tap-highlight-color:transparent;}
+.tg-block-x:active{background:rgba(255,255,255,.08);}
+.cal-blk{font-size:9.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#98a1b0;
+  background:rgba(148,157,173,.12);border-left:3px solid #6b7280;border-radius:6px;padding:3px 6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* compact form dialog — reuses .fdrill so it inherits the mobile bottom sheet */
+.fdrill-sm{width:min(420px,100%);}
+.cblk-form{display:flex;flex-direction:column;gap:14px;}
+.cblk-row{display:flex;flex-direction:column;gap:6px;}
+.cblk-lbl{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.cblk-in{width:100%;background:var(--s1);border:1px solid var(--b2);border-radius:11px;padding:11px 13px;
+  font-family:var(--font);font-size:13.5px;font-weight:600;color:var(--text);outline:none;transition:border-color .15s;
+  color-scheme:dark;-webkit-appearance:none;appearance:none;}
+.cblk-in:focus{border-color:var(--accent);}
+.cblk-times{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.cblk-quick{display:flex;gap:6px;flex-wrap:wrap;}
+.cblk-qbtn{height:32px;padding:0 11px;border-radius:9px;border:1px solid var(--b2);background:var(--s1);color:var(--muted);
+  font-family:var(--font);font-size:11.5px;font-weight:700;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.cblk-qbtn:active{border-color:var(--accent);color:#fff;}
+.cblk-err{font-size:12px;color:var(--red);background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.2);
+  border-radius:10px;padding:9px 12px;line-height:1.5;}
+.cblk-note{font-size:11.5px;color:var(--muted);line-height:1.55;}
+.cblk-actions{display:flex;gap:10px;}
+.cblk-save{flex:1;height:46px;border:none;border-radius:12px;background:var(--accent);color:#fff;
+  font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:filter .15s;-webkit-tap-highlight-color:transparent;}
+.cblk-save:disabled{opacity:.55;cursor:default;}
+.cblk-cancel{height:46px;padding:0 18px;border:1px solid var(--b2);border-radius:12px;background:none;color:var(--muted);
+  font-family:var(--font);font-size:13.5px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.cblk-list{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--b);padding-top:14px;}
+.cblk-item{display:flex;align-items:center;gap:10px;background:var(--s1);border:1px solid var(--b);border-radius:11px;padding:10px 12px;}
+.cblk-item-main{flex:1;min-width:0;}
+.cblk-item-when{font-size:12.5px;font-weight:700;color:#fff;}
+.cblk-item-why{font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cblk-item-x{flex-shrink:0;width:34px;height:34px;border:1px solid var(--b2);border-radius:10px;background:none;
+  color:var(--muted);font-size:15px;cursor:pointer;font-family:var(--font);-webkit-tap-highlight-color:transparent;}
+.cblk-item-x:active{color:var(--red);border-color:rgba(244,63,94,.4);}
+@media (hover:hover){
+  .tg-block-x:hover{color:#fff;background:rgba(255,255,255,.08);}
+  .cblk-qbtn:hover{border-color:var(--accent);color:#fff;}
+  .cblk-save:hover:not(:disabled){filter:brightness(1.12);}
+  .cblk-cancel:hover{color:#fff;}
+  .cblk-item-x:hover{color:var(--red);border-color:rgba(244,63,94,.4);}
+}
 @media (max-width:760px){
   .tg-scroll{height:480px;}
   .tg-day-hd .d{font-size:16px;}
@@ -2250,37 +2289,39 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
   .tg-day-hds, .tg-body { grid-template-columns:44px repeat(var(--n),1fr); }
   .tg-hour { font-size:8.5px; padding-right:6px; }
   .fdrill-overlay { align-items:flex-end; padding:0; }
-  .fdrill { max-height:92vh; border-radius:20px 20px 0 0; }
+  .fdrill { max-height:92dvh; border-radius:20px 20px 0 0; }
 }
 @media (display-mode: standalone){
   header { padding-top: calc(12px + env(safe-area-inset-top)); }
 }
 
 
-/* ═══ 21st.dev animated banner (red flow) — replaces the solid stale block ═══ */
-.stale-banner{position:relative;overflow:hidden;background:var(--s1);border:1px solid rgba(239,68,68,.35);}
-.stale-banner::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
-  background-image:repeating-linear-gradient(70deg,rgba(239,68,68,.55) 0%,rgba(239,68,68,.12) 14%,transparent 28%,rgba(255,80,80,.45) 42%,transparent 56%);
-  background-size:200% 100%;animation:crm-banner-flow 20s linear infinite;filter:saturate(1.6);
-  -webkit-mask-image:linear-gradient(to bottom,white,transparent);
-  mask-image:linear-gradient(to bottom,white,transparent);}
-.stale-banner > *{position:relative;z-index:1;}
-@keyframes crm-banner-flow{from{background-position:0% 0}to{background-position:100% 0}}
-.stale-banner-icon{display:none;}
-.stale-banner:hover{background:var(--s2);}
-@media (prefers-reduced-motion: reduce){.stale-banner::before{animation:none}}
 
-/* ═══ Onboarding tour ═══ */
-.tour-ring{position:fixed;z-index:400;border-radius:14px;border:2px solid var(--accent);box-shadow:0 0 0 9999px rgba(4,8,16,.72),0 0 24px rgba(59,130,246,.5);pointer-events:none;}
-.tour-card{position:fixed;z-index:401;width:320px;max-width:calc(100vw - 24px);background:linear-gradient(160deg,var(--s2),var(--s1));border:1px solid var(--b2);border-radius:16px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:fdrill-pop .25s cubic-bezier(.16,1,.3,1) both;}
-.tour-step{font-size:10px;font-weight:800;letter-spacing:1px;color:var(--accent);margin-bottom:6px;}
-.tour-title{font-size:15px;font-weight:800;color:#fff;margin-bottom:6px;}
-.tour-body{font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:14px;}
-.tour-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;}
-.tour-skip{background:none;border:none;color:var(--muted);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;padding:8px 4px;}
-.tour-skip:hover{color:#fff;}
-.tour-next{background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12.5px;font-weight:700;border-radius:10px;padding:9px 16px;cursor:pointer;transition:filter .15s;}
-.tour-next:hover{filter:brightness(1.15);}
+/* ═══ Onboarding page (replaces the spotlight tour) ═══ */
+.onb-wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:20px;}
+.onb-hero{display:flex;align-items:center;gap:14px;}
+.onb-mark{width:44px;height:44px;border-radius:12px;object-fit:contain;flex-shrink:0;}
+.onb-h1{font-size:22px;font-weight:800;letter-spacing:-.4px;color:#fff;margin:0;}
+.onb-sub{font-size:13px;line-height:1.6;color:var(--muted);margin:6px 0 0;}
+.onb-video{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--b2);}
+.onb-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.onb-video-empty{display:flex;align-items:center;justify-content:center;background:var(--s1);}
+.onb-empty-txt{text-align:center;font-size:13px;font-weight:700;color:var(--muted);padding:0 24px;line-height:1.6;}
+.onb-empty-txt span{display:block;font-size:12px;font-weight:500;color:var(--muted2);margin-top:6px;}
+.onb-steps{display:flex;flex-direction:column;gap:10px;}
+.onb-step{display:flex;gap:13px;background:var(--s1);border:1px solid var(--b);border-radius:14px;padding:14px 16px;}
+.onb-step-n{flex-shrink:0;width:26px;height:26px;border-radius:9px;background:var(--s3);color:var(--muted);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.onb-step-t{font-size:13.5px;font-weight:700;color:#fff;}
+.onb-step-d{font-size:12.5px;line-height:1.6;color:var(--muted);margin-top:4px;}
+.onb-cta{height:50px;border:none;border-radius:14px;background:var(--accent);color:#fff;font-family:var(--font);font-size:14.5px;font-weight:700;cursor:pointer;transition:filter .15s,transform .1s;-webkit-tap-highlight-color:transparent;}
+.onb-cta:active{transform:scale(.99);}
+@media (hover:hover){.onb-cta:hover{filter:brightness(1.12);}}
+@media (max-width:640px){
+  .onb-wrap{gap:16px;}
+  .onb-h1{font-size:19px;}
+  .onb-video{border-radius:14px;}
+  .onb-step{padding:13px 14px;}
+}
 
 
 /* Native date inputs follow the dark theme (incl. the browser picker) */
@@ -2295,6 +2336,124 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.6);cursor:p
 .empty-icon .ui-ic{width:22px;height:22px;}
 .mstat-ic .ui-ic{width:16px;height:16px;}
 .ldp-fu-icon .ui-ic{width:15px;height:15px;}
+
+
+/* ═══ iOS touch feedback ═══
+   The global tap-highlight reset above removes the native flash, so every
+   tappable surface needs its own pressed state or the app feels dead under
+   the thumb. Short press-in, slower release, matching UIKit. */
+@media (hover: none) {
+  .bnav-btn:active, .filter-btn:active, .lead-card:active, .ldp-st-btn:active,
+  .ldp-assign-btn:active, .ldp-ca-btn:active, .ldp-co-btn:active, .ldp-chip:active,
+  .ldp-crow:active, .mfu-row:active, .srow.click:active, .mp-btn:active,
+  .lsb-btn:active, .sync-btn:active, .lc-ab:active, .lc-note-btn:active,
+  .cal-appt:active, .fdrill-pg:active, .ldp-close:active, .mtab:active,
+  .mdate:active, .tg-btn:active, .tg-views button:active, .cblk-qbtn:active,
+  .month-nav button:active, .cal-nav button:active, .onb-step:active {
+    transform: scale(.97);
+    filter: brightness(1.22);
+    transition-duration: .06s;
+  }
+  .leads-tbl tbody tr:active td, .fdrill-tbl tr.click:active { background: rgba(255,255,255,.05); }
+  .tg-ev:active { filter: brightness(1.3); }
+  /* A tap must not leave a card permanently lifted. */
+  .lead-card:hover, .mstat:hover, .kpi:hover, .ms:hover, .cal-appt:hover,
+  .srow.click:hover, .mfu-row:hover, .stl-toast:hover, .fnlc-seg:hover {
+    transform: none !important;
+    box-shadow: none;
+  }
+  .leads-tbl tbody tr:hover td, .fdrill-tbl tr.click:hover { background: transparent; }
+}
+
+/* ═══ Touch targets ═══
+   Icon controls keep their visual size but get a 44px hit area, which is what
+   Apple actually asks for. Text controls just grow. */
+@media (hover: none) {
+  .ltr-ab, .ca-btn, .ltr-chk, .stl-toast-close, .fdrill-pg, .ldp-tag button { position: relative; }
+  .ltr-ab::after, .ca-btn::after, .ltr-chk::after,
+  .stl-toast-close::after, .fdrill-pg::after, .ldp-tag button::after {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); width: 44px; height: 44px;
+  }
+}
+@media (max-width: 640px) {
+  .filter-btn { min-height: 40px; padding: 10px 16px; }
+  .ldp-close  { width: 40px; height: 40px; }
+  .month-nav button, .cal-nav button { width: 40px; height: 40px; }
+  .tg-views button { height: 38px; }
+  .ca-btn { width: 30px; height: 30px; border-radius: 9px; }
+  .ltr-ab { width: 30px; height: 30px; }
+}
+
+
+/* ═══ Overlay scrolling ═══
+   Without overscroll-behavior the page behind a sheet scrolls the moment its
+   inner scroller hits an end - the classic "background moves under the modal"
+   iOS bug. */
+.ldp-body, .fdrill-body, .merge-body, .lat-host {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ═══ Leads table at 390px ═══
+   The wrapper is overflow:hidden with no scroller, so an auto-layout table
+   simply lost its right-hand columns. Fixed layout makes the four mobile
+   columns share the width instead of overflowing it. */
+@media (max-width: 640px) {
+  .leads-tbl { table-layout: fixed; width: 100%; }
+  .leads-tbl thead th:first-child { width: 34px; }
+  .leads-tbl thead th:last-child  { width: 26px; }
+  .leads-tbl tbody td { padding: 14px 8px; }
+  .ltr-name, .ltr-sub { max-width: none; }
+  .ltr-type { font-size: 10px; padding: 2px 6px; }
+  .heat { font-size: 8px; padding: 1px 4px; margin-left: 4px; }
+  /* Call / WhatsApp live beside the name, not inside the ellipsised text. */
+  .ltr-namerow { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .ltr-namerow .ltr-name { flex: 1; min-width: 0; }
+  .ca-row { flex-shrink: 0; margin-left: 0; }
+
+  /* Filter row becomes one horizontal rail instead of five stacked rows. */
+  .mochi-filter-row {
+    flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    gap: 8px; padding-bottom: 4px; scrollbar-width: none;
+  }
+  .mochi-filter-row::-webkit-scrollbar { display: none; }
+  .mochi-filter-row > * { flex-shrink: 0; }
+  .mochi-filter-row > span[style*="margin-left:auto"] { margin-left: 0 !important; }
+  .msel { max-width: none; padding: 10px 12px; border-radius: 10px; }
+
+  /* Calendar: keep the day headers and the day columns on identical tracks,
+     and drop the status word that is wider than a 7-day column. */
+  .tg-day-hds, .tg-body { grid-template-columns: 44px repeat(var(--n), minmax(52px, 1fr)); }
+  .tg-day-hd .c { display: none; }
+  .tg-ev .tg-bdg { display: none; }
+  .tg-ev { padding: 3px 5px; }
+  .tg-ev-name { font-size: 10px; }
+
+  /* Duplicate-merge dialog was the one overlay still a desktop centred card. */
+  .merge-overlay { align-items: flex-end; padding: 0; }
+  .merge-panel {
+    width: 100%; max-height: 88dvh;
+    border-radius: 22px 22px 0 0;
+    border-left: none; border-right: none; border-bottom: none;
+  }
+  .merge-body { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+
+  /* Home indicator: sheets must not put controls under it. */
+  .fdrill-body { padding-bottom: calc(18px + env(safe-area-inset-bottom)); }
+}
+
+/* ═══ Fixed-element stacking ═══
+   One source of truth for the bottom nav height so the FAB, the bulk bar and
+   the toast stack can never drift into each other again. */
+:root { --bnav-h: calc(58px + env(safe-area-inset-bottom)); }
+@media (max-width: 768px) {
+  .bulk-bar { bottom: calc(var(--bnav-h) + 12px) !important; }
+}
+@media (max-width: 640px) {
+  .stl-toast-wrap { bottom: calc(var(--bnav-h) + 66px); }
+  .close-celebrate { top: calc(24px + env(safe-area-inset-top)) !important; }
+}
 
 </style>
 </head>
@@ -2363,6 +2522,9 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.6);cursor:p
       <button class="tab" data-member="metrics" onclick="setTab('metrics')">
         <span class="tab-pip" style="background:var(--yellow)"></span> Metrics
       </button>
+      <button class="tab" data-member="uputstvo" onclick="setTab('uputstvo')">
+        <span class="tab-pip" style="background:#a78bfa"></span> Uputstvo
+      </button>
     </div>
   </div>
 
@@ -2415,6 +2577,13 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.6);cursor:p
       <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
     </svg>
     <span>Metrics</span>
+  </button>
+  <button class="bnav-btn" data-tab="uputstvo" onclick="setTab('uputstvo')" style="color:#a78bfa">
+    <div class="bnav-pip"></div>
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/><polygon points="10,8.5 16,12 10,15.5" fill="currentColor" stroke="none"/>
+    </svg>
+    <span>Uputstvo</span>
   </button>
 </nav>
 
@@ -2487,8 +2656,8 @@ const DEAL_PRICES = {};
 
 const DEALS = {
   cpa:         { label: 'CPA (min. depozit $300)', price: 'var.', icon: '' },
-  funded_100k: { label: 'Funded 100K',             price: '—',    icon: '' },
-  funded_200k: { label: 'Funded 200K',             price: '—',    icon: '' },
+  funded_100k: { label: 'Funded 100K',             price: '',    icon: '' },
+  funded_200k: { label: 'Funded 200K',             price: '',    icon: '' },
 };
 
 let currentTab = 'leads';
@@ -2535,7 +2704,13 @@ function setProgress(pct) {
   document.getElementById('loader-bar').style.width = pct + '%';
 }
 function hideLoader() {
-  document.getElementById('loader').classList.add('hidden');
+  const l = document.getElementById('loader');
+  if (!l) return;
+  l.classList.add('hidden');
+  // Remove it: .hidden only sets opacity/visibility, so a fixed full-screen
+  // layer would otherwise stay in the compositor for the whole session.
+  l.addEventListener('transitionend', () => l.remove(), { once: true });
+  setTimeout(() => l.remove(), 1200);
 }
 
 /* ── AUTH ── */
@@ -2628,7 +2803,13 @@ async function signOut() {
     setProgress(prog);
   }, 120);
 
-  render().then(() => {
+  render().catch(err => {
+    // Offline / Supabase 5xx / expired JWT used to reject here with no catch,
+    // so hideLoader() never ran and the closer stared at a frozen 85% bar.
+    console.error(err);
+    showToast({ variant:'error', title:'Podaci nisu učitani',
+                message:'Proveri internet konekciju pa povuci nadole da osvežiš.', duration:8000 });
+  }).then(() => {
     clearInterval(tick);
     setProgress(100);
     setTimeout(hideLoader, 400);
@@ -2724,7 +2905,11 @@ function setTab(tab) {
   // Auto-refresh Metrics tab every 60s (picks up new Sheet data)
   if (tab === 'metrics') {
     metricsRefreshInterval = setInterval(() => {
-      if (currentTab === 'metrics') renderMetricsTab();
+      // Skip while the app is backgrounded, and never repaint over someone
+      // who has scrolled into the page - the full rebuild resets scroll.
+      if (currentTab !== 'metrics' || document.hidden) return;
+      if (window.scrollY > 240) return;
+      renderMetricsTab();
     }, 60000);
   }
 
@@ -2767,12 +2952,17 @@ async function render() {
     await renderKalendarTab();
     return;
   }
+  if (currentTab === 'uputstvo') {
+    kpi.innerHTML = '';
+    mc.style.cssText = 'display:block;';
+    renderOnboardingTab();
+    return;
+  }
 }
 
 
 /* ── METRICS ── */
 let metricsPeriod = 'all';
-let _trendChart = null;
 
 function setMetricsPeriod(p){ metricsPeriod=p; renderMetricsTab(); }
 
@@ -2882,15 +3072,24 @@ async function renderKalendarTab(){
   const [data, leadRows] = await Promise.all([
     fetch(`/api/ghl-appointments?start=${now - 180 * 864e5}&end=${now + 180 * 864e5}`).then(r => r.json()).catch(() => ({ error: 'fetch' })),
     sb.from('ghl_leads').select('id,name,phone,tags').limit(5000).then(r => r.data || []).catch(() => []),
+    loadCalBlocks(),
   ]);
   if (data.error){
     if (staleRender(_seq, 'kalendar')) return;
     if (!_calCache) el.innerHTML = `<div class="empty" style="padding:40px"><div class="empty-icon" style="font-size:22px">${UI.calendar}</div><div class="empty-text">Kalendar trenutno nedostupan.<br><span style="color:var(--muted);font-size:12px">${esc(data.hint || data.error)}</span></div></div>`;
     return;
   }
+  /* Blocks we pushed into GHL come back through the events feed. They are not
+     appointments, so drop them - otherwise every block would also render as a
+     phantom booked call and inflate the funnel. Matched by the id we stored,
+     with the title as a fallback for blocks made straight in GHL. */
+  const mirrored = new Set(_calBlocks.map(b => b.ghl_event_id).filter(Boolean));
   _calCache = {
     at: Date.now(),
-    evs: (data.events || []).filter(e => !e.deleted).sort((a, b) => String(a.startTime).localeCompare(String(b.startTime))),
+    evs: (data.events || [])
+      .filter(e => !e.deleted)
+      .filter(e => !mirrored.has(e.id) && !(!e.contactId && String(e.title || '').trim() === CAL_BLOCK_TITLE))
+      .sort((a, b) => String(a.startTime).localeCompare(String(b.startTime))),
     leadById: new Map(leadRows.map(l => [l.id, l])),
   };
   if (staleRender(_seq, 'kalendar')) return;
@@ -2992,6 +3191,7 @@ function renderCalUI(){
     <div class="tg-toolbar">
       <button class="tg-btn" onclick="calToday()">Danas</button>
       <div class="tg-nav"><button class="tg-btn" onclick="calNav(-1)" aria-label="Nazad">‹</button><button class="tg-btn" onclick="calNav(1)" aria-label="Napred">›</button></div>
+      <button class="tg-btn" onclick="calBlockOpen()">Blokiraj vreme</button>
       <span class="tg-range">${rangeLbl}</span>
       ${statsHtml(counts)}
       ${viewsHtml}
@@ -3014,6 +3214,7 @@ function renderCalUI(){
       const list = byDay[dnum] || [];
       cells += `<div class="cal-cell${isToday ? ' cal-today' : ''}${list.length ? ' cal-has' : ''}" onclick="calOpenDay(${ts})">
         <div class="cal-cell-hd"><span class="cal-daynum">${dnum}</span>${list.length ? `<span class="cal-cnt">${list.length}</span>` : ''}</div>
+        ${calBlockMonthChip(ts)}
         ${list.slice(0, 2).map(e => `<div class="cal-chip cal-chip-${stOf(e)[0]}">${esc(nameOf(e))}</div>`).join('')}
         ${list.length > 2 ? `<div class="cal-more">+${list.length - 2} još</div>` : ''}
       </div>`;
@@ -3098,7 +3299,7 @@ function renderCalUI(){
     const nowLine = ts === todayTs
       ? `<div class="tg-now" style="top:${((new Date(nowMs).getHours() * 60 + new Date(nowMs).getMinutes()) / 60 * HOUR).toFixed(1)}px"><i></i></div>`
       : '';
-    return `<div class="tg-col">${evsHtml}${nowLine}</div>`;
+    return `<div class="tg-col">${calBlockHtml(ts)}${evsHtml}${nowLine}</div>`;
   }).join('');
 
   el.innerHTML = `<div class="cal-wrap">${header(rangeLbl, vc)}
@@ -3121,6 +3322,281 @@ function renderCalUI(){
     if (days.includes(todayTs)){ const dn = new Date(); target = Math.min(target, (dn.getHours() * 60 + dn.getMinutes()) / 60 * HOUR); }
     sc.scrollTop = Math.max(target - 80, 0);
   }
+}
+
+/* ══ BLOCKED TIME ═══════════════════════════════════════════════
+   The closer marks a range as unavailable ("16:00-17:00, doktor") and
+   nobody can book it. Two writes per block, in this order:
+     1. GHL blocked slot  (api/cal-block) — this is what actually stops the
+        public booking widget. A row in our own database cannot.
+     2. public.calendar_blocks — the CRM's own record, so the grid can draw it
+        and so the block survives a GHL hiccup.
+   If step 1 fails we still save step 2 and say so plainly, rather than
+   pretending the slot is protected when it is not.
+   (On maminjo there is no GHL calendar: bookings are native, and
+   maminjo-webinar /api/book reads calendar_blocks directly.)
+   ═══════════════════════════════════════════════════════════════ */
+let _calBlocks = [];
+const CAL_BLOCK_TITLE = 'Zauzeto (CRM)';
+
+/** ISO 8601 in the browser's own timezone, e.g. 2026-08-05T16:00:00+02:00.
+    GHL speaks offset-local time and the closer sits in the calendar's zone. */
+function localISO(d){
+  const p = n => String(Math.floor(Math.abs(n))).padStart(2, '0');
+  const off = -d.getTimezoneOffset();
+  const sign = off >= 0 ? '+' : '-';
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:00`
+       + `${sign}${p(off / 60)}:${p(off % 60)}`;
+}
+
+async function loadCalBlocks(){
+  const now = Date.now();
+  const { data, error } = await sb.from('calendar_blocks')
+    .select('id,starts_at,ends_at,reason,created_by,ghl_event_id')
+    .gte('ends_at', new Date(now - 180 * 864e5).toISOString())
+    .lte('starts_at', new Date(now + 180 * 864e5).toISOString())
+    .order('starts_at', { ascending: true });
+  if (error){
+    // Table not created yet -> behave as "nothing blocked" instead of breaking
+    // the whole Kalendar tab.
+    _calBlocks = [];
+    if (!/does not exist|schema cache|PGRST205/i.test(error.message || '')) console.error(error);
+    return;
+  }
+  _calBlocks = (data || []).map(b => ({
+    ...b,
+    s: new Date(b.starts_at).getTime(),
+    e: new Date(b.ends_at).getTime(),
+  })).filter(b => Number.isFinite(b.s) && Number.isFinite(b.e) && b.e > b.s);
+}
+
+/** Blocks intersecting one day, clipped to that day's 00:00-24:00 box. */
+function calBlocksForDay(dayTs){
+  const d0 = dayTs, d1 = dayTs + 864e5;
+  return _calBlocks.filter(b => b.s < d1 && b.e > d0).map(b => ({
+    ...b,
+    cs: Math.max(b.s, d0),
+    ce: Math.min(b.e, d1),
+  }));
+}
+
+function calBlockHtml(dayTs){
+  const HOUR = 56;
+  const t = ms => new Date(ms).toLocaleTimeString(_LOC, { hour: '2-digit', minute: '2-digit' });
+  return calBlocksForDay(dayTs).map(b => {
+    const top = (b.cs - dayTs) / 36e5 * HOUR;
+    const h = Math.max((b.ce - b.cs) / 36e5 * HOUR, 22);
+    const why = b.reason ? ` · ${b.reason}` : '';
+    return `<div class="tg-block" style="top:${top.toFixed(1)}px;height:${h.toFixed(1)}px" title="${esc(`Blokirano ${t(b.s)}–${t(b.e)}${why}`)}">
+      <span class="tg-block-lbl">Blokirano${h >= 40 ? `<span class="tg-block-sub">${esc(t(b.s))} – ${esc(t(b.e))}${esc(why)}</span>` : ''}</span>
+      <button class="tg-block-x" onclick="event.stopPropagation();calBlockDelete(${Number(b.id)})" aria-label="Ukloni blokadu">&times;</button>
+    </div>`;
+  }).join('');
+}
+
+function calBlockMonthChip(dayTs){
+  const n = calBlocksForDay(dayTs).length;
+  return n ? `<div class="cal-blk">${n === 1 ? 'Blokirano' : n + ' blokade'}</div>` : '';
+}
+
+/* ── Block dialog ── */
+function calBlockOpen(dayTs){
+  const day = new Date(dayTs ?? (_calAnchor ?? _calDay0(new Date())));
+  const p = n => String(n).padStart(2, '0');
+  const dateVal = `${day.getFullYear()}-${p(day.getMonth() + 1)}-${p(day.getDate())}`;
+  document.getElementById('cblk-overlay')?.remove();
+  const ov = document.createElement('div');
+  ov.id = 'cblk-overlay'; ov.className = 'fdrill-overlay';
+  ov.innerHTML = `<div class="fdrill fdrill-sm" role="dialog" aria-modal="true" aria-label="Blokiraj vreme">
+    <div class="fdrill-hd">
+      <div class="fdrill-ttl">Blokiraj vreme</div>
+      <button class="fdrill-x" onclick="calBlockClose()" aria-label="Zatvori">&times;</button>
+    </div>
+    <div class="fdrill-body">
+      <div class="cblk-form">
+        <div class="cblk-row">
+          <label class="cblk-lbl" for="cblk-date">Datum</label>
+          <input class="cblk-in" type="date" id="cblk-date" value="${dateVal}" />
+        </div>
+        <div class="cblk-times">
+          <div class="cblk-row">
+            <label class="cblk-lbl" for="cblk-from">Od</label>
+            <input class="cblk-in" type="time" id="cblk-from" value="16:00" step="900" />
+          </div>
+          <div class="cblk-row">
+            <label class="cblk-lbl" for="cblk-to">Do</label>
+            <input class="cblk-in" type="time" id="cblk-to" value="17:00" step="900" />
+          </div>
+        </div>
+        <div class="cblk-quick">
+          <button class="cblk-qbtn" onclick="calBlockQuick('09:00','12:00')">Prepodne</button>
+          <button class="cblk-qbtn" onclick="calBlockQuick('12:00','17:00')">Popodne</button>
+          <button class="cblk-qbtn" onclick="calBlockQuick('00:00','23:59')">Ceo dan</button>
+        </div>
+        <div class="cblk-row">
+          <label class="cblk-lbl" for="cblk-why">Razlog <span style="font-weight:600;letter-spacing:0;text-transform:none">(opciono)</span></label>
+          <input class="cblk-in" type="text" id="cblk-why" maxlength="80" placeholder="npr. doktor, trening, pauza" />
+        </div>
+        <div class="cblk-err" id="cblk-err" style="display:none"></div>
+        <div class="cblk-note">Termin nestaje iz kalendara za rezervacije, tako da niko ne može da zakaže poziv u tom periodu.</div>
+        <div class="cblk-actions">
+          <button class="cblk-cancel" onclick="calBlockClose()">Otkaži</button>
+          <button class="cblk-save" id="cblk-save" onclick="calBlockSave()">Blokiraj</button>
+        </div>
+        <div id="cblk-list"></div>
+      </div>
+    </div>
+  </div>`;
+  ov.addEventListener('click', e => { if (e.target === ov) calBlockClose(); });
+  document.body.appendChild(ov);
+  lockBody();
+  document.addEventListener('keydown', _cblkEsc);
+  calBlockRenderList();
+}
+const _cblkEsc = e => { if (e.key === 'Escape') calBlockClose(); };
+function calBlockClose(){
+  if (document.getElementById('cblk-overlay')) unlockBody();
+  document.getElementById('cblk-overlay')?.remove();
+  document.removeEventListener('keydown', _cblkEsc);
+}
+function calBlockQuick(from, to){
+  const f = document.getElementById('cblk-from'), t = document.getElementById('cblk-to');
+  if (f) f.value = from;
+  if (t) t.value = to;
+}
+function calBlockErr(msg){
+  const el = document.getElementById('cblk-err');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.display = msg ? '' : 'none';
+}
+
+/** Upcoming blocks, so the closer can undo one without hunting the grid. */
+function calBlockRenderList(){
+  const host = document.getElementById('cblk-list');
+  if (!host) return;
+  const now = Date.now();
+  const up = _calBlocks.filter(b => b.e > now).sort((a, b) => a.s - b.s).slice(0, 8);
+  if (!up.length){ host.innerHTML = ''; return; }
+  const fmt = b => {
+    const d = new Date(b.s);
+    const day = d.toLocaleDateString(_LOC, { day: 'numeric', month: 'short' });
+    const t = ms => new Date(ms).toLocaleTimeString(_LOC, { hour: '2-digit', minute: '2-digit' });
+    return `${day} · ${t(b.s)} – ${t(b.e)}`;
+  };
+  host.innerHTML = `<div class="cblk-list">
+    <div class="cblk-lbl">Blokirani termini</div>
+    ${up.map(b => `<div class="cblk-item">
+      <div class="cblk-item-main">
+        <div class="cblk-item-when">${esc(fmt(b))}</div>
+        ${b.reason ? `<div class="cblk-item-why">${esc(b.reason)}</div>` : ''}
+      </div>
+      <button class="cblk-item-x" onclick="calBlockDelete(${Number(b.id)})" aria-label="Ukloni blokadu">&times;</button>
+    </div>`).join('')}
+  </div>`;
+}
+
+async function calBlockSave(){
+  const btn = document.getElementById('cblk-save');
+  const dateV = (document.getElementById('cblk-date') || {}).value || '';
+  const fromV = (document.getElementById('cblk-from') || {}).value || '';
+  const toV   = (document.getElementById('cblk-to') || {}).value || '';
+  const why   = ((document.getElementById('cblk-why') || {}).value || '').trim().slice(0, 80);
+  calBlockErr('');
+
+  if (!dateV || !fromV || !toV) return calBlockErr('Popuni datum, od i do.');
+  const [y, m, d] = dateV.split('-').map(Number);
+  const [fh, fm] = fromV.split(':').map(Number);
+  const [th, tm] = toV.split(':').map(Number);
+  const start = new Date(y, m - 1, d, fh, fm, 0, 0);
+  const end   = new Date(y, m - 1, d, th, tm, 0, 0);
+  if (!(start.getTime() < end.getTime())) return calBlockErr('"Do" mora biti posle "Od".');
+
+  // Refuse to hide a call that is already on the books - the closer should see
+  // it and cancel it deliberately, not have it silently covered by a block.
+  const clash = (_calCache?.evs || []).filter(e => {
+    if (_apptSt(e) === 'cancelled') return false;
+    const s = new Date(e.startTime).getTime(), en = new Date(e.endTime || e.startTime).getTime();
+    return s < end.getTime() && en > start.getTime();
+  });
+  if (clash.length){
+    const t = ms => new Date(ms).toLocaleTimeString(_LOC, { hour: '2-digit', minute: '2-digit' });
+    return calBlockErr(`U tom periodu već postoji zakazan poziv (${t(new Date(clash[0].startTime).getTime())}). Otkaži ga prvo ili izaberi drugi termin.`);
+  }
+
+  if (btn){ btn.disabled = true; btn.textContent = 'Blokiram...'; }
+
+  // 1) GHL — the write that actually closes the slot on the booking widget.
+  let ghlEventId = null, ghlCalId = null, ghlWarn = '';
+  try {
+    const r = await fetch('/api/cal-block', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ startTime: localISO(start), endTime: localISO(end), title: CAL_BLOCK_TITLE }),
+    });
+    const j = await r.json().catch(() => ({}));
+    // j.native = this CRM books natively (no GHL calendar), so there is nothing
+    // to mirror and the Supabase row alone already closes the slot.
+    if (r.ok && (j.eventId || j.native)){ ghlEventId = j.eventId || null; ghlCalId = j.calendarId || null; }
+    else ghlWarn = j.hint || j.error || `Kalendar za rezervacije nije prihvatio blokadu (${r.status}).`;
+  } catch (e) {
+    ghlWarn = 'GHL nije dostupan.';
+  }
+
+  // 2) Our own record.
+  const email = (await sb.auth.getUser()).data?.user?.email || null;
+  const { data, error } = await sb.from('calendar_blocks').insert({
+    starts_at: start.toISOString(),
+    ends_at: end.toISOString(),
+    reason: why || null,
+    created_by: email,
+    ghl_event_id: ghlEventId,
+    ghl_calendar_id: ghlCalId,
+  }).select().single();
+
+  if (btn){ btn.disabled = false; btn.textContent = 'Blokiraj'; }
+
+  if (error){
+    // The GHL block would otherwise linger with nothing pointing at it.
+    if (ghlEventId) fetch(`/api/cal-block?eventId=${encodeURIComponent(ghlEventId)}`, { method: 'DELETE' }).catch(() => {});
+    return calBlockErr(/does not exist|schema cache|PGRST205/i.test(error.message || '')
+      ? 'Tabela calendar_blocks još ne postoji u bazi. Pokreni calendar-blocks.sql u Supabase SQL editoru.'
+      : `Čuvanje nije uspelo: ${error.message}`);
+  }
+
+  _calBlocks.push({ ...data, s: new Date(data.starts_at).getTime(), e: new Date(data.ends_at).getTime() });
+  calBlockClose();
+  if (currentTab === 'kalendar') renderCalUI();
+  const tt = x => x.toLocaleTimeString(_LOC, { hour: '2-digit', minute: '2-digit' });
+  showToast(ghlWarn
+    ? { variant: 'warning', title: 'Blokirano samo u CRM-u',
+        message: `${tt(start)}–${tt(end)} je označeno kod nas, ali kalendar za rezervacije nije ažuriran. ${ghlWarn}`, duration: 9000 }
+    : { variant: 'success', title: 'Termin blokiran',
+        message: `${tt(start)}–${tt(end)} više nije dostupno za rezervacije.` });
+}
+
+async function calBlockDelete(id){
+  const b = _calBlocks.find(x => Number(x.id) === Number(id));
+  if (!b) return;
+  const tt = ms => new Date(ms).toLocaleTimeString(_LOC, { hour: '2-digit', minute: '2-digit' });
+  if (!confirm(`Ukloniti blokadu ${tt(b.s)}–${tt(b.e)}?\n\nTermin ponovo postaje dostupan za rezervacije.`)) return;
+
+  if (b.ghl_event_id){
+    try {
+      const r = await fetch(`/api/cal-block?eventId=${encodeURIComponent(b.ghl_event_id)}`, { method: 'DELETE' });
+      if (!r.ok){
+        const j = await r.json().catch(() => ({}));
+        showToast({ variant: 'warning', title: 'GHL blokada nije uklonjena',
+          message: j.error || `GHL ${r.status}. Ukloni je ručno u GHL kalendaru.`, duration: 9000 });
+      }
+    } catch (e) { /* reported below by the row delete succeeding anyway */ }
+  }
+  const { error } = await sb.from('calendar_blocks').delete().eq('id', b.id);
+  if (error){ showToast({ variant: 'error', title: 'Brisanje nije uspelo', message: error.message }); return; }
+  _calBlocks = _calBlocks.filter(x => Number(x.id) !== Number(id));
+  calBlockRenderList();
+  if (currentTab === 'kalendar') renderCalUI();
+  showToast({ variant: 'success', title: 'Blokada uklonjena', message: 'Termin je ponovo dostupan.' });
 }
 
 
@@ -3185,10 +3661,10 @@ function renderClosersBoard(appts, closedLeads, host){
     const when = isNaN(d) ? '' : `${d.toLocaleDateString('sr-RS',{day:'numeric',month:'short'})} · ${d.toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'})}`;
     return `<div class="kan-card"><div class="kan-card-name">${esc(a.title||'Poziv')}</div><div class="kan-card-meta">${esc(when)}</div></div>`;
   };
-  const wonCard = l => `<div class="kan-card"><div class="kan-card-name">${esc(l.name||'Klijent')}</div><div class="kan-card-meta" style="color:var(--green)">${l.deal_value!=null?'€'+Number(l.deal_value).toLocaleString('sr-RS'):'—'}</div></div>`;
-  const col = (cls,title,items,render) => `<div class="kan-col ${cls}"><div class="kan-col-hd"><span class="kan-col-ttl">${title}</span><span class="kan-count">${items.length}</span></div>${items.length?items.slice(0,30).map(render).join(''):'<div class="kan-empty">—</div>'}</div>`;
+  const wonCard = l => `<div class="kan-card"><div class="kan-card-name">${esc(l.name||'Klijent')}</div><div class="kan-card-meta" style="color:var(--green)">${l.deal_value!=null?'€'+Number(l.deal_value).toLocaleString('sr-RS'):'·'}</div></div>`;
+  const col = (cls,title,items,render) => `<div class="kan-col ${cls}"><div class="kan-col-hd"><span class="kan-col-ttl">${title}</span><span class="kan-count">${items.length}</span></div>${items.length?items.slice(0,30).map(render).join(''):'<div class="kan-empty">·</div>'}</div>`;
   host.innerHTML = `<div class="metrics-sec">
-    <div class="metrics-sec-lbl">CLOSER BOARD — Nikola</div>
+    <div class="metrics-sec-lbl">CLOSER BOARD · Nikola</div>
     <div class="kanban">
       ${col('k-booked','Zakazano',booked,apptCard)}
       ${col('k-won','Zatvoreno',won,wonCard)}
@@ -3207,7 +3683,7 @@ async function renderTimeToCloseSection(){
   const host = document.getElementById('time-to-close-section');
   if (!host) return;
   host.innerHTML = `<div class="metrics-sec">
-    <div class="metrics-sec-lbl">VREME DO ZATVARANJA — Po izvoru</div>
+    <div class="metrics-sec-lbl">VREME DO ZATVARANJA · Po izvoru</div>
     <div style="display:grid;gap:10px"><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div></div>
   </div>`;
 
@@ -3288,8 +3764,8 @@ async function renderTimeToCloseSection(){
   }).join('');
 
   host.innerHTML = `<div class="metrics-sec">
-    <div class="metrics-sec-lbl">VREME DO ZATVARANJA — Median po izvoru</div>
-    <div class="ttc-wrap">${sourceRows || '<div style="padding:18px;color:var(--muted);font-size:12px;text-align:center">Nedovoljno aktivnosti — sinhronizacija radi automatski.</div>'}</div>
+    <div class="metrics-sec-lbl">VREME DO ZATVARANJA · Median po izvoru</div>
+    <div class="ttc-wrap">${sourceRows || '<div style="padding:18px;color:var(--muted);font-size:12px;text-align:center">Nedovoljno aktivnosti, sinhronizacija radi automatski.</div>'}</div>
     ${repRows ? `<div class="metrics-sec-lbl" style="margin-top:18px">PO PRODAVCU</div><div class="ttc-wrap">${repRows}</div>` : ''}
   </div>`;
 }
@@ -3499,7 +3975,7 @@ function tagBadge(t){
 }
 function statusBadge(st){
   const v = st==='Closed'?'green':st==='DQ'?'red':st==='Follow Up'?'amber':st==='Novi'?'blue':st==='Zakazan'?'blue':'gray';
-  return `<span class="bdg bdg-${v}">${esc(st||'—')}</span>`;
+  return `<span class="bdg bdg-${v}">${esc(st||'·')}</span>`;
 }
 
 /* ── Funnel drill-down (ultra-quality-data-table port): click a stage, see its leads ── */
@@ -3528,6 +4004,7 @@ async function openFunnelDrill(stage){
   </div>`;
   ov.addEventListener('click', e => { if (e.target === ov) closeFunnelDrill(); });
   document.body.appendChild(ov);
+  lockBody();
   document.addEventListener('keydown', _fdrillEsc);
 
   const SEL = 'id,name,email,phone,tags,status,deal_value,date_added,created_at';
@@ -3563,7 +4040,7 @@ async function openFunnelDrill(stage){
   renderFunnelDrill();
 }
 const _fdrillEsc = e => { if (e.key === 'Escape') closeFunnelDrill(); };
-function closeFunnelDrill(){ document.getElementById('fdrill-overlay')?.remove(); document.removeEventListener('keydown', _fdrillEsc); _fdrill = null; }
+function closeFunnelDrill(){ if(document.getElementById('fdrill-overlay')) unlockBody(); document.getElementById('fdrill-overlay')?.remove(); document.removeEventListener('keydown', _fdrillEsc); _fdrill = null; }
 function fdrillSearch(v){ if(!_fdrill) return; _fdrill.search = v; _fdrill.page = 1; renderFunnelDrill(true); }
 function fdrillSort(k){ if(!_fdrill) return; if (_fdrill.sortKey === k) _fdrill.sortDir = _fdrill.sortDir === 'asc' ? 'desc' : 'asc'; else { _fdrill.sortKey = k; _fdrill.sortDir = k === 'date' ? 'desc' : 'asc'; } renderFunnelDrill(); }
 function fdrillPage(p){ if(!_fdrill) return; _fdrill.page = p; renderFunnelDrill(); }
@@ -3588,7 +4065,7 @@ function renderFunnelDrill(keepFocus){
   const slice = list.slice((d.page - 1) * PS, d.page * PS);
   const cnt = document.getElementById('fdrill-count'); if (cnt) cnt.textContent = ` · ${list.length}`;
   const arrow = k => d.sortKey !== k ? '⇅' : d.sortDir === 'asc' ? '↑' : '↓';
-  const fmtD = v => { const dt = new Date(v); return isNaN(dt) ? '—' : dt.toLocaleDateString(_LOC, { day: 'numeric', month: 'short', year: 'numeric' }); };
+  const fmtD = v => { const dt = new Date(v); return isNaN(dt) ? '·' : dt.toLocaleDateString(_LOC, { day: 'numeric', month: 'short', year: 'numeric' }); };
   let pb = ''; const win = 5; let s0 = Math.max(1, d.page - 2); const e0 = Math.min(pages, s0 + win - 1); s0 = Math.max(1, e0 - win + 1);
   for (let i = s0; i <= e0; i++) pb += `<button class="fdrill-pg ${i === d.page ? 'on' : ''}" onclick="fdrillPage(${i})">${i}</button>`;
   body.innerHTML = `
@@ -3609,7 +4086,7 @@ function renderFunnelDrill(keepFocus){
         return `<div class="srow ${l.id ? 'click' : ''}" style="--i:${ri};--sg-c:${grad}" ${/^[A-Za-z0-9_-]+$/.test(l.id || '') ? `onclick="fdrillOpenLead('${l.id}')"` : ''}>
         <div class="srow-grad"></div>
         <div class="srow-no">${String((d.page - 1) * PS + ri + 1).padStart(2, '0')}</div>
-        <div><div class="srow-name">${esc(l.name || '—')}</div><div class="srow-contact">${esc(l.email || '')}${l.email && l.phone ? ' · ' : ''}${esc(l.phone || '')}</div></div>
+        <div><div class="srow-name">${esc(l.name || '·')}</div><div class="srow-contact">${esc(l.email || '')}${l.email && l.phone ? ' · ' : ''}${esc(l.phone || '')}</div></div>
         <div class="fdrill-tags">${(l.tags || []).slice(0, 3).map(tagBadge).join('')}${(l.tags || []).length > 3 ? `<span class="bdg bdg-gray">+${l.tags.length - 3}</span>` : ''}</div>
         <div class="fdrill-date">${fmtD(dateOf(l))}</div>
         <div style="justify-self:end">${statusBadge(l.status)}</div>
@@ -3784,7 +4261,7 @@ async function renderCommissionSection(){
     </div>`;
 
   return`<div class="metrics-sec">
-    <div class="metrics-sec-lbl">PROVIZIJA — Svi Zatvoreni Dealovi</div>
+    <div class="metrics-sec-lbl">PROVIZIJA · Svi Zatvoreni Dealovi</div>
     <div class="comm-grid">
       ${commCell('Nikola','nikola',cM,'var(--nikola)')}
       ${commCell('Dusica','dusica',cD,'var(--dusica)')}
@@ -3989,7 +4466,7 @@ async function loadFirstResponseStats(){
 
 // Format minutes → "3min" / "47min" / "2h 15min" / "1d 4h"
 function fmtMinutes(m){
-  if (m == null) return '—';
+  if (m == null) return '·';
   if (m < 60)   return `${m} min`;
   if (m < 1440) return `${Math.floor(m/60)}h ${m%60?(m%60)+'min':''}`.trim();
   const d = Math.floor(m/1440); const h = Math.floor((m%1440)/60);
@@ -4154,6 +4631,26 @@ function updatePanelAssignButtons(assignedTo){
 }
 
 /* Reusable typed toast: showToast({title, name, message, variant:'success|error|warning|info', icon, duration}) */
+
+/* Overlays must freeze the page under them. Without this the document keeps
+   scrolling behind a bottom sheet on iOS, and closing the sheet drops the
+   closer somewhere else in the list than where they tapped. Ref-counted so
+   a lead panel opened on top of a drill-down still unlocks exactly once. */
+let _lockY = 0, _lockDepth = 0;
+function lockBody(){
+  if (_lockDepth++) return;
+  _lockY = window.scrollY;
+  const b = document.body.style;
+  b.position = 'fixed'; b.top = `${-_lockY}px`; b.left = '0'; b.right = '0'; b.width = '100%';
+}
+function unlockBody(){
+  if (_lockDepth > 0 && --_lockDepth > 0) return;
+  _lockDepth = 0;
+  const b = document.body.style;
+  b.position = ''; b.top = ''; b.left = ''; b.right = ''; b.width = '';
+  window.scrollTo(0, _lockY);
+}
+
 function showToast(opts){
   opts = opts || {};
   const variant = opts.variant || 'success';
@@ -4680,7 +5177,7 @@ function showCloseCelebration(leadName, rep){
   const banner = document.createElement('div');
   banner.className = 'close-celebrate';
   banner.innerHTML = `
-    <div class="cc-emoji">🎉</div>
+    
     <div class="cc-text">
       <div class="cc-title">CLOSED!</div>
       <div class="cc-sub">${repCap?esc(repCap)+' zatvorio ':''}<strong>${esc(leadName)}</strong></div>
@@ -4784,7 +5281,7 @@ function openMergeModal(){
       return `<div class="merge-group" id="mg-${i}">
         <div class="merge-key">${g.type==='phone'?UI.phone:UI.mail} ${esc(g.key)}</div>
         ${leads.map((l,j)=>`<div class="merge-lead ${j===0?'primary':''}">
-          <span class="merge-nm">${esc(l.name||'—')}</span>
+          <span class="merge-nm">${esc(l.name||'·')}</span>
           <span class="merge-meta">${esc(fmtLeadDate(l.date_added)||'')} · ${esc(l.status||'')}${l.deal_value?` · €${l.deal_value}`:''}</span>
           ${j===0?'<span class="merge-tag-primary">zadržava se</span>':''}
         </div>`).join('')}
@@ -4793,8 +5290,9 @@ function openMergeModal(){
     }).join('')}</div>
   </div>`;
   host.classList.add('open');
+  lockBody();
 }
-function closeMergeModal(){ const h=document.getElementById('mergeModal'); if(h) h.classList.remove('open'); }
+function closeMergeModal(){ const h=document.getElementById('mergeModal'); if(h && h.classList.contains('open')){ h.classList.remove('open'); unlockBody(); } }
 
 async function mergeDupGroup(idx){
   const host=document.getElementById('mergeModal');
@@ -4802,7 +5300,7 @@ async function mergeDupGroup(idx){
   if(!g) return;
   const leads=g.leads.slice().sort((a,b)=>String(a.date_added||'').localeCompare(String(b.date_added||'')));
   const target=leads[0], dupes=leads.slice(1);
-  if(!confirm(`Spojiti ${leads.length} leada u "${target.name||'—'}"?\n\nOstali će biti obrisani (i iz GHL-a). Ovo se ne može poništiti.`)) return;
+  if(!confirm(`Spojiti ${leads.length} leada u "${target.name||'·'}"?\n\nOstali će biti obrisani (i iz GHL-a). Ovo se ne može poništiti.`)) return;
   const gEl=document.getElementById('mg-'+idx);
   if(gEl) gEl.style.opacity='.5';
   const RANK={'DQ':0,'Novi':1,'Follow Up':2,'Closed':3};
@@ -5024,67 +5522,86 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
 }
 
-/* ── Onboarding: first-login walkthrough (runs once per device) ── */
-const TOUR_STEPS = [
-  { find:['.tabs','.bottom-nav'], title:'Dobrodošli', body:'Ovo je navigacija: <b>Leads</b> za obradu leadova, <b>Kalendar</b> za zakazane pozive i <b>Metrics</b> za rezultate.' },
-  { find:['#syncBtn'], title:'Auto-sync', body:'Podaci se automatski povlače iz GHL-a svakih 5 minuta — ne moraš ništa da klikćeš. Dugme služi samo za ručno osvežavanje.' },
-  { find:['#leadsBody','.fu-today-banner','.leads-wrap'], title:'Leadovi', body:'Klikni bilo kog leada da otvoriš profil: ishod poziva, status, beleške, follow-up datum i vrednost deala.' },
-  { tab:'kalendar', find:['.tg-views'], title:'Kalendar', body:'Pregled po danu, 3 dana, 7 dana ili mesecu. Klik na poziv otvara lead, a gore odmah vidiš broj kvalifikovanih i diskvalifikovanih poziva.' },
-  { tab:'metrics', find:['#funnel-section'], title:'Metrike', body:'Prodajni levak, closer board i prihod. Klikni bilo koju fazu da vidiš tačno koji leadovi su u njoj.' },
+/* ── Onboarding ────────────────────────────────────────────────
+   This used to be a spotlight tour that pinned a card next to a highlighted
+   element. It broke on step 3: the step targets #leadsBody, a <tbody> that is
+   taller than the viewport once there are more than a handful of leads, so
+   scrollIntoView({block:'center'}) parked its midpoint on screen and left
+   getBoundingClientRect().top far above 0. The card is positioned from that
+   rect, so it landed hundreds of pixels off-screen with the Next and Skip
+   buttons on it - no way forward, on phone or desktop.
+   It is now a real page instead: a walkthrough video plus written steps,
+   reachable any time from the nav rather than a one-shot overlay.
+   ─────────────────────────────────────────────────────────────── */
+
+/* Paste the Loom share link here (or a YouTube / Vimeo link - all three work).
+   Until it is set the page shows everything except the player. */
+const ONBOARDING_VIDEO = '';
+
+/** Accepts a share link, an embed link or a bare id and returns an embed src. */
+function onbEmbedUrl(raw){
+  const u = String(raw || '').trim();
+  if (!u) return '';
+  let m;
+  if ((m = u.match(/loom\.com\/(?:share|embed)\/([A-Za-z0-9]+)/))) return `https://www.loom.com/embed/${m[1]}`;
+  if ((m = u.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/))) return `https://www.youtube.com/embed/${m[1]}?rel=0`;
+  if ((m = u.match(/vimeo\.com\/(?:video\/)?(\d+)/))) return `https://player.vimeo.com/video/${m[1]}`;
+  if (/^[A-Za-z0-9]{20,}$/.test(u)) return `https://www.loom.com/embed/${u}`;   // bare Loom id
+  if (/^https?:\/\//.test(u)) return u;                                          // already an embed url
+  return '';
+}
+
+const ONB_STEPS = [
+  { n:'1', t:'Leadovi',            d:'Svaki novi lead sleti ovde automatski. Klikni ga da otvoriš profil: ishod poziva, status, beleške, datum za follow-up i vrednost deala. Sve što upišeš ostaje zabeleženo u istoriji.' },
+  { n:'2', t:'Kalendar',           d:'Svi zakazani pozivi na jednom mestu, po danu, 3 dana, 7 dana ili mesecu. Klik na poziv otvara lead. Gore odmah vidiš koliko je kvalifikovanih, a koliko diskvalifikovanih.' },
+  { n:'3', t:'Blokiranje vremena', d:'Dugme "Blokiraj vreme" u Kalendaru zatvara termin koji ti ne odgovara. Niko ne može da zakaže poziv u tom periodu dok ne ukloniš blokadu.' },
+  { n:'4', t:'Metrike',            d:'Prodajni levak, closer board i prihod. Klikni bilo koju fazu levka da vidiš tačno koji leadovi su u njoj.' },
+  { n:'5', t:'Sinhronizacija',     d:'Podaci se sami povlače iz GHL-a na svakih 5 minuta. Dugme za osvežavanje ti treba samo ako ne želiš da čekaš.' },
 ];
-let _tourI = -1;
-function maybeStartOnboarding(){
-  try { if (localStorage.getItem('crmOnboarded') === '1') return; } catch(e) { return; }
-  sb.auth.getSession().then(({ data: { session } }) => { if (session && _tourI === -1) startTour(); }).catch(() => {});
-}
-function startTour(){
-  // Mark as seen the moment it starts — one showing per device, ever,
-  // even if the rep reloads mid-tour instead of finishing it.
+
+function renderOnboardingTab(){
+  const el = document.getElementById('mainContent');
+  if (!el || currentTab !== 'uputstvo') return;
   try { localStorage.setItem('crmOnboarded', '1'); } catch(e) {}
-  _tourI = -1; tourNext();
-}
-function endTour(){
-  try { localStorage.setItem('crmOnboarded', '1'); } catch(e) {}
-  const n = document.getElementById('tour-root'); if (n) n.remove();
-  _tourI = TOUR_STEPS.length;
-  if (currentTab !== 'leads') setTab('leads');
-}
-async function tourNext(){
-  _tourI++;
-  const step = TOUR_STEPS[_tourI];
-  if (!step){ endTour(); return; }
-  const old = document.getElementById('tour-root'); if (old) old.remove();
-  if (step.tab && currentTab !== step.tab) setTab(step.tab);
-  let el = null;
-  for (let t = 0; t < 40 && !el; t++){
-    el = step.find.map(s => document.querySelector(s)).find(x => x && x.getBoundingClientRect().height > 0) || null;
-    if (!el) await new Promise(r => setTimeout(r, 100));
-  }
-  if (!el){ tourNext(); return; }   // target missing on this device — skip the step
-  el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  await new Promise(r => setTimeout(r, 380));
-  renderTourStep(el, step);
-}
-function renderTourStep(el, step){
-  const r = el.getBoundingClientRect(), pad = 8;
-  const root = document.createElement('div');
-  root.id = 'tour-root';
-  const last = _tourI === TOUR_STEPS.length - 1;
-  const below = r.bottom + 210 < innerHeight;
-  root.innerHTML = `
-    <div class="tour-ring" style="left:${(r.left - pad).toFixed(0)}px;top:${(r.top - pad).toFixed(0)}px;width:${(r.width + pad * 2).toFixed(0)}px;height:${(r.height + pad * 2).toFixed(0)}px"></div>
-    <div class="tour-card" style="${below ? `top:${(r.bottom + 16).toFixed(0)}px` : `bottom:${(innerHeight - r.top + 16).toFixed(0)}px`};left:${Math.max(12, Math.min(r.left, innerWidth - 332)).toFixed(0)}px">
-      <div class="tour-step">${_tourI + 1} / ${TOUR_STEPS.length}</div>
-      <div class="tour-title">${step.title}</div>
-      <div class="tour-body">${step.body}</div>
-      <div class="tour-actions">
-        <button class="tour-skip" onclick="endTour()">Preskoči</button>
-        <button class="tour-next" onclick="tourNext()">${last ? 'Završi' : 'Dalje →'}</button>
+
+  const src = onbEmbedUrl(ONBOARDING_VIDEO);
+  const player = src
+    ? `<div class="onb-video"><iframe src="${esc(src)}" title="Uputstvo za CRM" frameborder="0"
+         allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`
+    : `<div class="onb-video onb-video-empty">
+         <div class="onb-empty-txt">Video uputstvo se dodaje uskoro.<span>Do tada te koraci ispod vode kroz sve što CRM radi.</span></div>
+       </div>`;
+
+  el.innerHTML = `<div class="onb-wrap">
+    <div class="onb-hero">
+      <img class="onb-mark" src="strale-mark-t.png" alt="" />
+      <div>
+        <h1 class="onb-h1">Dobrodošao u CRM</h1>
+        <p class="onb-sub">Pogledaj video, pa pređi na Leadove. Ovo uputstvo ti ostaje u meniju, vrati mu se kad god zatreba.</p>
       </div>
-    </div>`;
-  document.body.appendChild(root);
+    </div>
+    ${player}
+    <div class="onb-steps">
+      ${ONB_STEPS.map(s => `<div class="onb-step">
+        <span class="onb-step-n">${s.n}</span>
+        <div><div class="onb-step-t">${esc(s.t)}</div><div class="onb-step-d">${esc(s.d)}</div></div>
+      </div>`).join('')}
+    </div>
+    <button class="onb-cta" onclick="setTab('leads')">Kreni sa radom</button>
+  </div>`;
 }
-setTimeout(maybeStartOnboarding, 3800);
+
+/* First login lands on the guide instead of dropping the rep straight into
+   the pipeline. Once per device; the tab stays reachable forever after. */
+function maybeStartOnboarding(){
+  let seen = true;
+  try { seen = localStorage.getItem('crmOnboarded') === '1'; } catch(e) { return; }
+  if (seen) return;
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session && currentTab !== 'uputstvo') setTab('uputstvo');
+  }).catch(() => {});
+}
+setTimeout(maybeStartOnboarding, 1200);
 
 
 
@@ -5299,11 +5816,11 @@ async function renderAdsView(){
       <td class="num">${c.closes}</td>
       <td class="num"><span class="cvr-badge ${cvrCls}">${cvr}%</span></td>
       <td class="num"><input type="number" class="ad-spend-input" min="0" step="10" value="${spend||''}" placeholder="0" onblur="updateAdSpendCell('${esc(c.key)}',this.value)" onclick="event.stopPropagation()" /></td>
-      <td class="num">${cpl?'$'+cpl.toLocaleString('sr-RS'):'—'}</td>
-      <td class="num">${cpc?'$'+cpc.toLocaleString('sr-RS'):'—'}</td>
-      <td class="num">${roas?`<span class="roas-badge ${roasCls}">${roas}×</span>`:'—'}</td>
+      <td class="num">${cpl?'$'+cpl.toLocaleString('sr-RS'):'·'}</td>
+      <td class="num">${cpc?'$'+cpc.toLocaleString('sr-RS'):'·'}</td>
+      <td class="num">${roas?`<span class="roas-badge ${roasCls}">${roas}×</span>`:'·'}</td>
     </tr>`;
-  }).join('')||`<tr><td colspan="10" style="padding:48px 20px;text-align:center;color:var(--muted);font-size:13px;font-weight:700">Nema podataka — prvo sinhronizuj GHL</td></tr>`;
+  }).join('')||`<tr><td colspan="10" style="padding:48px 20px;text-align:center;color:var(--muted);font-size:13px;font-weight:700">Nema podataka: prvo sinhronizuj GHL</td></tr>`;
 
   const total=campaigns.reduce((s,c)=>s+c.leads,0);
   const totalCloses=campaigns.reduce((s,c)=>s+c.closes,0);
@@ -5346,7 +5863,7 @@ async function renderAdsView(){
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
         <button class="ads-view-btn active" onclick="toggleAdsView()">← Nazad na Leads</button>
-        <button class="sync-btn" title="Sinhronizacija sa GHL radi automatski svakih 5 min — klikni za ručnu" onclick="syncLeadsFromGHL()">${syncSvg}<span class="sync-label">Auto-sync</span></button>
+        <button class="sync-btn" title="Sinhronizacija sa GHL radi automatski svakih 5 min, klikni za ručnu" onclick="syncLeadsFromGHL()">${syncSvg}<span class="sync-label">Auto-sync</span></button>
       </div>
     </div>
     <div class="ads-tbl-wrap">
@@ -5577,10 +6094,10 @@ function buildLeadRows(leads){
       <td class="ltr-chk-cell" onclick="event.stopPropagation()">
         <input type="checkbox" class="ltr-chk" ${checked} onchange="toggleLeadSelection('${esc(c.id)}',this.checked)" />
       </td>
-      <td class="ltr-created col-desk">${fmtLeadDate(c.date_added)||'—'}</td>
+      <td class="ltr-created col-desk">${fmtLeadDate(c.date_added)||'·'}</td>
       <td><div class="ltr-contact">
         <div>
-          <div class="ltr-name">${esc(c.name)}${contactActions(c)}</div>
+          <div class="ltr-namerow"><div class="ltr-name">${esc(c.name)}</div>${contactActions(c)}</div>
           ${meta?`<div class="ltr-sub">${esc(meta)}</div>`:(!c.phone?`<div class="ltr-sub" style="color:var(--muted2);font-style:italic">nema broja · samo email</div>`:'')}
           ${lastAct?`<div class="last-action ${lastAct.cls}" title="${esc(lastAct.actor||'')} · ${esc(lastAct.when)}">${lastAct.icon} ${esc(lastAct.label)} · ${esc(lastAct.when)}</div>`:''}
         </div>
@@ -5588,7 +6105,7 @@ function buildLeadRows(leads){
       <td class="col-mob" onclick="event.stopPropagation()">
         <select class="mst ${stCls}" onchange="updateLeadStatus('${esc(c.id)}',this.value)">${stOpts}</select>
       </td>
-      <td>${typePill(c.lead_type)||'<span style="color:var(--muted2)">—</span>'}${(()=>{const s=leadScore(c);const h=leadHeat(s);return `<span class="heat ${h.cls}" title="Score: ${s}">${h.icon} ${h.label}</span>`;})()}</td>
+      <td>${typePill(c.lead_type)||'<span style="color:var(--muted2)">·</span>'}${(()=>{const s=leadScore(c);const h=leadHeat(s);return `<span class="heat ${h.cls}" title="Score: ${s}">${h.icon} ${h.label}</span>`;})()}</td>
       <td class="col-desk" onclick="event.stopPropagation()">
         <div class="ltr-assign">
           <button class="ltr-ab ${c.assigned_to==='nikola'?'on-m':''}" onclick="assignLead('${esc(c.id)}','nikola')">M</button>
@@ -5777,11 +6294,11 @@ function renderLeads(all){
       <div class="stale-banner-count">${staleLeads.length}</div>
     </div>`:''}
 
-    ${(()=>{const waiting=findWaitingLeads();return waiting.length?`<div class="wait-banner" style="margin-bottom:14px" onclick="alert('Leadovi koji čekaju > 15 min:\\n\\n'+${JSON.stringify(waiting.slice(0,8).map(l=>{const min=Math.round((Date.now()-new Date(l.date_added).getTime())/60000);return `• ${l.name||'?'} — čeka ${min}min`;}).join('\\n'))})">
+    ${(()=>{const waiting=findWaitingLeads();return waiting.length?`<div class="wait-banner" style="margin-bottom:14px" onclick="alert('Leadovi koji čekaju > 15 min:\\n\\n'+${JSON.stringify(waiting.slice(0,8).map(l=>{const min=Math.round((Date.now()-new Date(l.date_added).getTime())/60000);return `• ${l.name||'?'} · čeka ${min}min`;}).join('\\n'))})">
       <div class="wait-banner-icon">${UI.alert}</div>
       <div class="wait-banner-text">
         <div class="wait-banner-title">${waiting.length} lead${waiting.length===1?'':'a'} čeka odgovor</div>
-        <div class="wait-banner-sub">Prvi je stigao pre ${fmtMinutes(Math.round((Date.now()-new Date(waiting[0].date_added).getTime())/60000))} — javi se odmah da ne ohladi</div>
+        <div class="wait-banner-sub">Prvi je stigao pre ${fmtMinutes(Math.round((Date.now()-new Date(waiting[0].date_added).getTime())/60000))}, javi se odmah da ne ohladi</div>
       </div>
       <div class="wait-banner-count">${waiting.length}</div>
     </div>`:'';})()}
@@ -5841,7 +6358,7 @@ function renderLeads(all){
         <option value="">Svi statusi</option>
         ${['Novi','Follow Up','Closed','DQ'].map(s=>`<option value="${s}" ${leadsStatusFilter===s?'selected':''}>${s}</option>`).join('')}
       </select>
-      <button class="mbtn" title="Sinhronizacija sa GHL radi automatski svakih 5 min — klikni za ručnu" id="syncBtn" onclick="syncLeadsFromGHL()">
+      <button class="mbtn" title="Sinhronizacija sa GHL radi automatski svakih 5 min, klikni za ručnu" id="syncBtn" onclick="syncLeadsFromGHL()">
         ${syncSvg}<span class="sync-label">Auto-sync</span>
       </button>
       <div class="mochi-count" id="leadsCountLbl">${rowsCount} lead${rowsCount===1?'':'ova'}</div>
@@ -5883,7 +6400,7 @@ function openLeadDetail(id){
   const stOpts=['Novi','Follow Up','Closed','DQ'].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('');
   let fuCls=''; if(c.follow_up_date){fuCls=c.follow_up_date===todayStr?'fu-today':c.follow_up_date<todayStr?'fu-overdue':'';}
   const stCls2=c.status==='Follow Up'?'mst-fu':c.status==='Closed'?'mst-closed':c.status==='DQ'?'mst-dq':'mst-novi';
-  const dealOpts=Object.entries(DEALS).map(([k,v])=>`<option value="${k}" ${c.deal===k?'selected':''}>${v.icon} ${v.label} — ${v.price}</option>`).join('');
+  const dealOpts=Object.entries(DEALS).map(([k,v])=>`<option value="${k}" ${c.deal===k?'selected':''}>${v.icon} ${v.label}${v.price?" · "+v.price:""}</option>`).join('');
   const fields=[
     c.pain_point?{l:'Problem',v:c.pain_point,full:true}:null,
     c.experience?{l:'Iskustvo',v:c.experience}:null,
@@ -5908,7 +6425,7 @@ function openLeadDetail(id){
         <span class="ldp-il">Status:</span>
         <select class="mst ldp-mst ${stCls2}" onchange="updateLeadStatus('${esc(c.id)}',this.value)">${stOpts}</select>
         <span class="ldp-il" style="margin-left:10px">Tip:</span>
-        ${lb?`<span class="ldp-badge ${lb.c}">${lb.l}</span>`:'<span class="ldp-il">—</span>'}
+        ${lb?`<span class="ldp-badge ${lb.c}">${lb.l}</span>`:'<span class="ldp-il">·</span>'}
       </div>
       <div class="ldp-crows ldp-subgap">
         ${c.phone?`<a class="ldp-crow" href="${telLink(c.phone)||'#'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>${esc(c.phone)}</span></a>`:''}
@@ -5922,7 +6439,7 @@ function openLeadDetail(id){
       </div>
       <div class="ldp-subgap">
         <select class="lc-deal-sel" style="width:100%" onchange="updateLeadDeal('${esc(c.id)}',this.value)">
-          <option value="">— Nema deala —</option>
+          <option value="">Nema deala</option>
           ${dealOpts}
         </select>
       </div>
@@ -6020,14 +6537,14 @@ function openLeadDetail(id){
       <div id="ldpActivityList" class="lat-host"></div>
     </div>
 
-    <div style="font-size:10px;color:var(--muted);padding-top:2px;text-align:center">Dodat: ${c.date_added?new Date(c.date_added).toLocaleDateString('sr-RS'):'—'}</div>
+    <div style="font-size:10px;color:var(--muted);padding-top:2px;text-align:center">Dodat: ${c.date_added?new Date(c.date_added).toLocaleDateString('sr-RS'):'·'}</div>
 
     <button class="ldp-delete-btn" onclick="deleteLead('${esc(c.id)}')">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
       Obriši lead
     </button>
   `;
-  document.getElementById('leadDetailOverlay').classList.add('open');
+  document.getElementById('leadDetailOverlay').classList.add('open'); lockBody();
   renderLeadActivityInto('ldpActivityList', c.id);
   renderLeadSummary(c);
   renderLeadBookings('ldpBookingList', c.id);
@@ -6043,7 +6560,7 @@ async function renderLeadBookings(elId, contactId){
     const r=await fetch(`/api/ghl-appointments?contactId=${encodeURIComponent(contactId)}&start=${start}&end=${end}`);
     const j=await r.json().catch(()=>({}));
     if(!r.ok){
-      host.innerHTML=`<div class="ldp-appt-empty">Kalendar nedostupan${j&&j.hint?` — ${esc(j.hint)}`:''}</div>`;
+      host.innerHTML=`<div class="ldp-appt-empty">Kalendar nedostupan${j&&j.hint?`: ${esc(j.hint)}`:''}</div>`;
       return;
     }
     const evs=(j.events||[]).filter(e=>!e.deleted);
@@ -6064,7 +6581,7 @@ function renderApptRow(e){
   const t2=end?end.toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'}):'';
   const st=String(e.appointmentStatus||e.appoinmentStatus||'').toLowerCase();
   const map={confirmed:{l:'Zakazano',c:'a-booked'},new:{l:'Zakazano',c:'a-booked'},booked:{l:'Zakazano',c:'a-booked'},showed:{l:'Došao',c:'a-showed'},noshow:{l:'Nije došao',c:'a-noshow'},cancelled:{l:'Otkazano',c:'a-cancel'},invalid:{l:'Nevažeće',c:'a-cancel'}};
-  const s=map[st]||{l:st||'—',c:'a-booked'};
+  const s=map[st]||{l:st||'·',c:'a-booked'};
   const addr=e.address||'';
   const isUrl=/^https?:\/\//.test(addr);
   const upcoming=start.getTime()>Date.now() && (s.c==='a-booked');
@@ -6080,7 +6597,9 @@ function renderApptRow(e){
 }
 
 function closeLeadDetail(){
-  document.getElementById('leadDetailOverlay').classList.remove('open');
+  const ov = document.getElementById('leadDetailOverlay');
+  if (ov.classList.contains('open')) unlockBody();
+  ov.classList.remove('open');
   currentLeadId=null;
 }
 
@@ -6211,7 +6730,7 @@ function renderLeadCard(lead, subTab){
     <div class="lc-deal-row" style="margin-top:10px">
       <span class="lc-deal-lbl">PAKET</span>
       <select class="lc-deal-sel" onchange="updateLeadDeal('${esc(lead.id)}',this.value)">
-        <option value="">— Nije odabran —</option>
+        <option value="">Nije odabran</option>
         <option value="cpa"         ${lead.deal==='cpa'        ?'selected':''}>CPA (min. depozit $300)</option>
         <option value="funded_100k" ${lead.deal==='funded_100k'?'selected':''}>Funded 100K</option>
         <option value="funded_200k" ${lead.deal==='funded_200k'?'selected':''}>Funded 200K</option>
@@ -6632,7 +7151,7 @@ async function fetchSheetData(){
     else if(l.lead_type==='booked') st='rezervacija';
     else if(val>0) st='pipeline';
     if(!st) return null;
-    return {name:l.name||'',challenge:val,email:l.email||'',date:l.date_added,closer:(l.assigned_to?l.assigned_to.charAt(0).toUpperCase()+l.assigned_to.slice(1):'—'),status:st};
+    return {name:l.name||'',challenge:val,email:l.email||'',date:l.date_added,closer:(l.assigned_to?l.assigned_to.charAt(0).toUpperCase()+l.assigned_to.slice(1):'·'),status:st};
   }).filter(r=>r&&r.name);
 }
 
@@ -6657,7 +7176,7 @@ function renderRevenue(rows,sec){
     depozit:   {label:'Depozit',    cls:'pill-g'},
     pipeline:  {label:'Pipeline',   cls:'pill-y'},
     rezervacija:{label:'Rezervacija',cls:'pill-b'},
-    '':        {label:'—',          cls:''}
+    '':        {label:'·',          cls:''}
   };
 
   const tableRows=rows.map(r=>{
