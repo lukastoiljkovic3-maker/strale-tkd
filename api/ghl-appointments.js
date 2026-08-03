@@ -123,6 +123,7 @@ async function handleBlockWrite(req, res) {
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
+  if (req.method === 'GET') res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=120');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(204).end();
@@ -146,13 +147,19 @@ export default async function handler(req, res) {
     }
     const calendars = cal.json?.calendars || [];
 
-    // 2) Fetch events per calendar across the window, merge.
+    // 2) Fetch events for every calendar AT ONCE and merge. This used to be a
+    //    sequential for-loop, so opening the Kalendar tab paid one GHL
+    //    round-trip per calendar - six of them on this location, five of which
+    //    are personal calendars that hold no bookings at all. Same data, one
+    //    round-trip of latency instead of six.
     const events = [];
     const errors = [];
-    for (const c of calendars) {
-      const ev = await ghl(
-        `/calendars/events?locationId=${GHL_LOC}&calendarId=${c.id}&startTime=${start}&endTime=${end}`,
-      );
+    const perCal = await Promise.all(calendars.map(c =>
+      ghl(`/calendars/events?locationId=${GHL_LOC}&calendarId=${c.id}&startTime=${start}&endTime=${end}`)
+        .then(ev => ({ c, ev }))
+        .catch(err => ({ c, ev: { ok: false, status: 0, text: String(err && err.message || err) } }))
+    ));
+    for (const { c, ev } of perCal) {
       if (!ev.ok) {
         errors.push({ calendarId: c.id, status: ev.status, detail: (ev.text || '').slice(0, 160) });
         continue;
