@@ -2137,7 +2137,7 @@ button, .tab, .btn, .btn-add, .cal-cell, .log-table tbody tr { touch-action: man
 .mstat-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .mstat-hd .mstat-ic{margin-bottom:0;width:32px;height:32px;font-size:15px;border-radius:9px;}
 .live-pill{margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#fff;background:var(--s2);border:1px solid var(--b);border-radius:99px;padding:6px 13px;}
-.live-dot{width:8px;height:8px;border-radius:50%;background:#4ADE80;animation:live-pulse 2s ease-in-out infinite;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#4ADE80;}
 @keyframes live-pulse{50%{opacity:.35}}
 
 .cal-nav{margin-left:auto;display:flex;align-items:center;gap:10px;}
@@ -2339,6 +2339,53 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.6);cursor:p
 .mstat-ic .ui-ic{width:16px;height:16px;}
 .ldp-fu-icon .ui-ic{width:15px;height:15px;}
 
+
+/* ═══ Revenue curve · period deltas · source split ═══
+   Drawn as inline SVG rather than a chart library: the whole thing is under
+   3kb of markup and there is no bundle to download before the page can paint. */
+.rc-card{background:var(--s1);border:1px solid var(--b);border-radius:16px;padding:20px 22px 14px;margin-bottom:20px;}
+.rc-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:4px;}
+.rc-ttl{font-size:14px;font-weight:800;color:#fff;letter-spacing:-.01em;}
+.rc-sub{font-size:11.5px;color:var(--muted);margin-top:3px;}
+.rc-total{text-align:right;}
+.rc-total-val{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.02em;font-variant-numeric:tabular-nums;}
+.rc-total-lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);}
+.rc-plot{position:relative;width:100%;height:210px;margin-top:10px;}
+.rc-plot svg{display:block;width:100%;height:100%;overflow:visible;}
+.rc-grid line{stroke:var(--b);stroke-width:1;}
+.rc-area{fill:url(#rcFill);}
+.rc-line{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.rc-dot{fill:var(--accent);stroke:var(--s1);stroke-width:2.5;opacity:0;transition:opacity .12s;}
+.rc-hit{fill:transparent;cursor:pointer;}
+.rc-hit:hover + .rc-dot,.rc-dot.on{opacity:1;}
+.rc-xlbl{font-size:9.5px;fill:var(--muted2);text-anchor:middle;}
+.rc-ylbl{font-size:9.5px;fill:var(--muted2);text-anchor:end;}
+.rc-tip{position:absolute;pointer-events:none;transform:translate(-50%,-115%);background:var(--s3);border:1px solid var(--b2);
+  border-radius:9px;padding:6px 10px;font-size:11.5px;font-weight:700;color:#fff;white-space:nowrap;opacity:0;transition:opacity .12s;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);}
+.rc-tip.on{opacity:1;}
+.rc-tip span{display:block;font-size:10px;font-weight:600;color:var(--muted);margin-top:1px;}
+.rc-empty{display:flex;align-items:center;justify-content:center;height:210px;font-size:12.5px;color:var(--muted);}
+
+/* period-over-period delta on the hero stats */
+.mstat-delta{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;margin-top:6px;}
+.mstat-delta svg{width:12px;height:12px;}
+.mstat-delta.up{color:var(--green);} .mstat-delta.down{color:var(--red);} .mstat-delta.flat{color:var(--muted);}
+.mstat-delta em{font-style:normal;color:var(--muted2);font-weight:600;}
+
+/* source split */
+.src-list{display:flex;flex-direction:column;gap:11px;margin-top:14px;}
+.src-row{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:baseline;}
+.src-name{font-size:12.5px;font-weight:700;color:#fff;text-transform:capitalize;}
+.src-nums{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.src-nums b{color:var(--green);font-weight:700;}
+.src-bar{grid-column:1/-1;height:5px;border-radius:99px;background:var(--s3);overflow:hidden;}
+.src-bar i{display:block;height:100%;border-radius:99px;background:var(--accent);}
+@media (max-width:640px){
+  .rc-card{padding:16px 14px 10px;}
+  .rc-plot{height:180px;}
+  .rc-total-val{font-size:19px;}
+}
 
 /* ═══ iOS touch feedback ═══
    The global tap-highlight reset above removes the native flash, so every
@@ -3011,10 +3058,13 @@ async function renderMetricsTab(){
         <div class="metrics-logo-row-name">STRALETKD</div>
         <div class="metrics-logo-row-sub">Prodajne Metrike</div>
       </div>
-      <span class="live-pill"><span class="live-dot"></span>Live</span>
     </div>
 
     <div id="hero-stats-section"></div>
+
+    <div id="revenue-curve-section"></div>
+
+    <div id="sources-section"></div>
 
     <div id="activity-section"></div>
 
@@ -3031,6 +3081,8 @@ async function renderMetricsTab(){
   </div>`;
 
   renderHeroStats(appts, closedLeads, document.getElementById('hero-stats-section'), acts);
+  renderRevenueCurve(closedLeads, acts, document.getElementById('revenue-curve-section'));
+  renderSourceSplit(closedLeads, document.getElementById('sources-section'));
   renderActivitySection(acts, document.getElementById('activity-section'));
   // Revenue/clients table (GHL opportunities via /api/ghl-metrics)
   const _revSec = document.getElementById('revenue-section');
@@ -3638,7 +3690,7 @@ function countUpEls(root){
   root.querySelectorAll('.mstat-count').forEach(el => {
     const target = parseFloat(el.dataset.target) || 0;
     const cash = el.dataset.cash === '1';
-    const fmt = v => cash ? '€'+Math.round(v).toLocaleString('sr-RS') : Math.round(v).toLocaleString('sr-RS');
+    const fmt = v => cash ? '€'+Math.round(v).toLocaleString(_LOC) : Math.round(v).toLocaleString(_LOC);
     const start = performance.now(), dur = 900;
     (function frame(now){
       const p = Math.min((now - start)/dur, 1), e = 1 - Math.pow(1-p, 3);
@@ -3647,9 +3699,185 @@ function countUpEls(root){
     })(start);
   });
 }
+/* ══ REVENUE CURVE ══════════════════════════════════════════════
+   Weekly cash collected over the last 12 weeks. Bucketed by when the lead was
+   actually marked Closed (the status activity), not by when it arrived, so the
+   curve answers "when did money land" rather than "when did the lead sign up".
+   Leads closed before the activity log existed fall back to date_added.
+   Drawn as inline SVG: no chart library, nothing to download. */
+const _rcWeeks = 12;
+async function renderRevenueCurve(closedLeads, _acts, host){
+  if (!host) return;
+  host.innerHTML = `<div class="rc-card"><div class="rc-hd"><div><div class="rc-ttl">Prihod po nedeljama</div>
+    <div class="rc-sub">Poslednjih ${_rcWeeks} nedelja</div></div></div>
+    <div class="rc-plot"><div class="sk sk-line" style="height:100%;width:100%"></div></div></div>`;
+
+  // when each lead was closed
+  let closedAt = new Map();
+  try {
+    const { data } = await sb.from('lead_activities')
+      .select('lead_id,created_at')
+      .eq('action_type', 'status').eq('new_value', 'Closed')
+      .order('created_at', { ascending: true }).limit(4000);
+    (data || []).forEach(a => { if (!closedAt.has(a.lead_id)) closedAt.set(a.lead_id, a.created_at); });
+  } catch (e) { /* fall back to date_added below */ }
+  if (!document.getElementById('revenue-curve-section')) return;
+
+  const now = new Date(); now.setHours(23, 59, 59, 999);
+  const weekStart = i => { const d = new Date(now); d.setDate(d.getDate() - (_rcWeeks - 1 - i) * 7); d.setHours(0,0,0,0); return d; };
+  const buckets = Array.from({ length: _rcWeeks }, (_, i) => ({ at: weekStart(i), v: 0 }));
+
+  (closedLeads || []).forEach(l => {
+    const val = Number(l.deal_value) || 0;
+    if (!val) return;
+    const when = new Date(closedAt.get(l.id) || l.date_added || l.created_at);
+    if (isNaN(when)) return;
+    for (let i = _rcWeeks - 1; i >= 0; i--) {
+      if (when >= buckets[i].at) { buckets[i].v += val; return; }
+    }
+  });
+
+  const total = buckets.reduce((s, b) => s + b.v, 0);
+  const head = `<div class="rc-hd">
+      <div><div class="rc-ttl">Prihod po nedeljama</div><div class="rc-sub">Poslednjih ${_rcWeeks} nedelja, zatvoreni poslovi</div></div>
+      <div class="rc-total"><div class="rc-total-val">€${Math.round(total).toLocaleString(_LOC)}</div><div class="rc-total-lbl">Ukupno</div></div>
+    </div>`;
+
+  if (!total){
+    host.innerHTML = `<div class="rc-card">${head}<div class="rc-empty">Još nema zatvorenih poslova sa upisanom vrednošću.</div></div>`;
+    return;
+  }
+
+  const W = 1000, H = 210, PT = 14, PB = 26, PL = 46, PR = 18;
+  const max = Math.max(...buckets.map(b => b.v)) * 1.15 || 1;
+  const x = i => PL + (i * (W - PL - PR)) / Math.max(1, _rcWeeks - 1);
+  const y = v => PT + (1 - v / max) * (H - PT - PB);
+
+  // smooth the polyline into a cubic path so the curve reads as a trend
+  const pts = buckets.map((b, i) => [x(i), y(b.v)]);
+  let d = `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++){
+    const [x0, y0] = pts[i], [x1, y1] = pts[i + 1];
+    const cx = (x0 + x1) / 2;
+    d += ` C${cx.toFixed(1)},${y0.toFixed(1)} ${cx.toFixed(1)},${y1.toFixed(1)} ${x1.toFixed(1)},${y1.toFixed(1)}`;
+  }
+  const area = `${d} L${x(_rcWeeks - 1).toFixed(1)},${(H - PB).toFixed(1)} L${x(0).toFixed(1)},${(H - PB).toFixed(1)} Z`;
+
+  const gridVals = [0, max / 2, max];
+  const grid = gridVals.map(v => `<line x1="${PL}" y1="${y(v).toFixed(1)}" x2="${W - PR}" y2="${y(v).toFixed(1)}"/>`).join('');
+  const ylbl = gridVals.map(v => `<text class="rc-ylbl" x="${PL - 8}" y="${(y(v) + 3).toFixed(1)}">€${Math.round(v).toLocaleString(_LOC)}</text>`).join('');
+  const fmtW = dt => dt.toLocaleDateString(_LOC, { day: 'numeric', month: 'short' });
+  const xlbl = buckets.map((b, i) =>
+    (i % 2 === 0 || i === _rcWeeks - 1)
+      ? `<text class="rc-xlbl" x="${x(i).toFixed(1)}" y="${H - 6}">${esc(fmtW(b.at))}</text>` : '').join('');
+  const hits = buckets.map((b, i) => {
+    const w = (W - PL - PR) / _rcWeeks;
+    return `<rect class="rc-hit" x="${(x(i) - w / 2).toFixed(1)}" y="${PT}" width="${w.toFixed(1)}" height="${H - PT - PB}"
+      data-i="${i}" data-v="${b.v}" data-w="${esc(fmtW(b.at))}"></rect>
+      <circle class="rc-dot" cx="${x(i).toFixed(1)}" cy="${y(b.v).toFixed(1)}" r="4"></circle>`;
+  }).join('');
+
+  host.innerHTML = `<div class="rc-card">${head}
+    <div class="rc-plot" id="rcPlot">
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Prihod po nedeljama">
+        <defs><linearGradient id="rcFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#3B82F6" stop-opacity=".30"/>
+          <stop offset="100%" stop-color="#3B82F6" stop-opacity="0"/>
+        </linearGradient></defs>
+        <g class="rc-grid">${grid}</g>${ylbl}
+        <path class="rc-area" d="${area}"/><path class="rc-line" d="${d}"/>
+        ${xlbl}${hits}
+      </svg>
+      <div class="rc-tip" id="rcTip"></div>
+    </div>
+  </div>`;
+
+  const plot = document.getElementById('rcPlot'), tip = document.getElementById('rcTip');
+  if (!plot || !tip) return;
+  plot.querySelectorAll('.rc-hit').forEach(r => {
+    const show = () => {
+      const i = +r.dataset.i, v = +r.dataset.v;
+      const box = plot.getBoundingClientRect();
+      tip.innerHTML = `€${Math.round(v).toLocaleString(_LOC)}<span>nedelja od ${esc(r.dataset.w)}</span>`;
+      tip.style.left = `${(x(i) / W) * box.width}px`;
+      tip.style.top = `${(y(v) / H) * box.height}px`;
+      tip.classList.add('on');
+    };
+    const hide = () => tip.classList.remove('on');
+    r.addEventListener('mouseenter', show);
+    r.addEventListener('mouseleave', hide);
+    r.addEventListener('touchstart', show, { passive: true });
+    r.addEventListener('touchend', hide);
+  });
+}
+
+/* ══ SOURCE SPLIT ═══════════════════════════════════════════════
+   Which channel actually produces money, not just leads. Sorted by revenue,
+   because the source with the most leads is often not the one that pays. */
+async function renderSourceSplit(closedLeads, host){
+  if (!host) return;
+  let all = [];
+  try { all = await sbAllLeads(); } catch (e) { all = []; }
+  if (!document.getElementById('sources-section')) return;
+  if (!all.length){ host.innerHTML = ''; return; }
+
+  const key = l => (l.utm_source || '').trim().toLowerCase() || 'direktno';
+  const closedVal = new Map();
+  (closedLeads || []).forEach(l => {
+    const v = Number(l.deal_value) || 0;
+    if (v) closedVal.set(key(l), (closedVal.get(key(l)) || 0) + v);
+  });
+
+  const bySrc = new Map();
+  all.forEach(l => { const k = key(l); bySrc.set(k, (bySrc.get(k) || 0) + 1); });
+
+  const rows = [...bySrc.entries()]
+    .map(([k, n]) => ({ k, n, v: closedVal.get(k) || 0 }))
+    .sort((a, b) => b.v - a.v || b.n - a.n)
+    .slice(0, 6);
+  if (!rows.length){ host.innerHTML = ''; return; }
+  const maxN = Math.max(...rows.map(r => r.n)) || 1;
+
+  host.innerHTML = `<div class="rc-card">
+    <div class="rc-hd"><div><div class="rc-ttl">Izvori</div>
+      <div class="rc-sub">Leadovi i naplaćeno po kanalu</div></div></div>
+    <div class="src-list">
+      ${rows.map(r => `<div class="src-row">
+        <span class="src-name">${esc(r.k)}</span>
+        <span class="src-nums">${r.n} ${r.n === 1 ? 'lead' : 'leadova'}${r.v ? ` · <b>€${Math.round(r.v).toLocaleString(_LOC)}</b>` : ''}</span>
+        <span class="src-bar"><i style="width:${((r.n / maxN) * 100).toFixed(1)}%"></i></span>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+/* Period-over-period, computed only where the data supports it honestly.
+   Bookings have a startTime and closes have a status activity, so both give a
+   real 30d-vs-previous-30d figure. Cash cannot be split by period from what is
+   loaded here, so that card deliberately carries no delta rather than a
+   number that would look precise and be wrong. */
+function _deltaHtml(cur, prev){
+  if (!prev && !cur) return '';
+  const pct = prev ? Math.round(((cur - prev) / prev) * 100) : (cur ? 100 : 0);
+  const dir = pct > 0 ? 'up' : pct < 0 ? 'down' : 'flat';
+  const arrow = dir === 'up'
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>'
+    : dir === 'down'
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10M17 9v8H9"/></svg>'
+    : '';
+  return `<div class="mstat-delta ${dir}">${arrow}${pct > 0 ? '+' : ''}${pct}% <em>vs. prethodnih 30d</em></div>`;
+}
+
 function renderHeroStats(appts, closedLeads, host, acts = []){
   if(!host) return;
   const booked = appts.filter(a => ['confirmed','new','booked'].includes(_apptSt(a))).length;
+  const _now = Date.now(), _d30 = _now - 30 * 864e5, _d60 = _now - 60 * 864e5;
+  const _inWin = (t, from, to) => { const x = new Date(t).getTime(); return x >= from && x < to; };
+  const bookedCur  = appts.filter(a => _apptSt(a) !== 'cancelled' && _inWin(a.startTime, _d30, _now)).length;
+  const bookedPrev = appts.filter(a => _apptSt(a) !== 'cancelled' && _inWin(a.startTime, _d60, _d30)).length;
+  const closeActs  = (acts || []).filter(a => a.action_type === 'status' && a.new_value === 'Closed');
+  const closedCur  = closeActs.filter(a => _inWin(a.created_at, _d30, _now)).length;
+  const closedPrev = closeActs.filter(a => _inWin(a.created_at, _d60, _d30)).length;
   const wonCount = closedLeads.length;
   const cash = closedLeads.reduce((s,l) => s + (Number(l.deal_value)||0), 0);
   const withVal = closedLeads.filter(l => l.deal_value != null).length;
@@ -3659,16 +3887,18 @@ function renderHeroStats(appts, closedLeads, host, acts = []){
       <div class="mstat-hd"><div class="mstat-lbl">Zakazani pozivi</div><div class="mstat-ic" style="background:rgba(56,189,248,.12);color:#38bdf8">${UI.calendar}</div></div>
       <div class="mstat-val mstat-count" data-target="${booked}" style="color:#38bdf8">${booked}</div>
       <div class="mstat-sub">${appts.length} ukupno u kalendaru</div>
+      ${_deltaHtml(bookedCur, bookedPrev)}
     </div>
     <div class="mstat spot mstat-rich">
       <div class="mstat-chart" data-spark="closed" data-color="#4ADE80"></div>
       <div class="mstat-hd"><div class="mstat-lbl">Zatvoreni klijenti</div><div class="mstat-ic" style="background:rgba(74,222,128,.12);color:var(--green)">${UI.trophy}</div></div>
       <div class="mstat-val mstat-count" data-target="${wonCount}" style="color:var(--green)">${wonCount}</div>
       <div class="mstat-sub">Status: Closed</div>
+      ${_deltaHtml(closedCur, closedPrev)}
     </div>
     <div class="mstat spot">
       <div class="mstat-hd"><div class="mstat-lbl">Cash Collected</div><div class="mstat-ic" style="background:rgba(59,130,246,.12);color:var(--accent)">${UI.euro}</div></div>
-      <div class="mstat-val mstat-count" data-target="${cash}" data-cash="1" style="color:var(--accent)">€${cash.toLocaleString('sr-RS')}</div>
+      <div class="mstat-val mstat-count" data-target="${cash}" data-cash="1" style="color:var(--accent)">€${cash.toLocaleString(_LOC)}</div>
       <div class="mstat-sub">${withVal}/${wonCount} sa upisanom vrednošću</div>
     </div>
   </div>`;
@@ -3688,10 +3918,10 @@ function renderClosersBoard(appts, closedLeads, host){
   const won    = [...closedLeads].sort((a,b)=>(Number(b.deal_value)||0)-(Number(a.deal_value)||0));
   const apptCard = a => {
     const d = new Date(a.startTime);
-    const when = isNaN(d) ? '' : `${d.toLocaleDateString('sr-RS',{day:'numeric',month:'short'})} · ${d.toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'})}`;
+    const when = isNaN(d) ? '' : `${d.toLocaleDateString(_LOC,{day:'numeric',month:'short'})} · ${d.toLocaleTimeString(_LOC,{hour:'2-digit',minute:'2-digit'})}`;
     return `<div class="kan-card"><div class="kan-card-name">${esc(a.title||'Poziv')}</div><div class="kan-card-meta">${esc(when)}</div></div>`;
   };
-  const wonCard = l => `<div class="kan-card"><div class="kan-card-name">${esc(l.name||'Klijent')}</div><div class="kan-card-meta" style="color:var(--green)">${l.deal_value!=null?'€'+Number(l.deal_value).toLocaleString('sr-RS'):'·'}</div></div>`;
+  const wonCard = l => `<div class="kan-card"><div class="kan-card-name">${esc(l.name||'Klijent')}</div><div class="kan-card-meta" style="color:var(--green)">${l.deal_value!=null?'€'+Number(l.deal_value).toLocaleString(_LOC):'·'}</div></div>`;
   const col = (cls,title,items,render) => `<div class="kan-col ${cls}"><div class="kan-col-hd"><span class="kan-col-ttl">${title}</span><span class="kan-count">${items.length}</span></div>${items.length?items.slice(0,30).map(render).join(''):'<div class="kan-empty">·</div>'}</div>`;
   host.innerHTML = `<div class="metrics-sec">
     <div class="metrics-sec-lbl">CLOSER BOARD · Nikola</div>
@@ -3869,7 +4099,7 @@ async function generateAIInsights(){
 }
 
 function renderInsightsContent(host, text, ts){
-  const when = ts ? new Date(ts).toLocaleString('sr-RS',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+  const when = ts ? new Date(ts).toLocaleString(_LOC,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
   // Basic markdown formatting: ** for headers, - for bullets
   const html = esc(text)
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -3958,7 +4188,7 @@ async function renderFunnelSection(appts = []){
     <div class="fnl-cards">
       ${stages.map(s => `<div class="fnl-card fnl-click" onclick="openFunnelDrill(\'${s.key}\')" title="Prikaži leadove">
         <div class="fnl-card-hd" style="color:${s.color}">${ICON[s.key]}<span style="color:var(--muted)">${s.label}</span></div>
-        <div class="fnl-card-val mstat-count" data-target="${s.count}">${s.count.toLocaleString('sr-RS')}</div>
+        <div class="fnl-card-val mstat-count" data-target="${s.count}">${s.count.toLocaleString(_LOC)}</div>
       </div>`).join('')}
     </div>
     <div class="fnlc">
@@ -3976,7 +4206,7 @@ async function renderFunnelSection(appts = []){
       }).join('')}
     </div>
     <div class="fnl-foot">
-      <div class="fnl-foot-item fnl-click" onclick="openFunnelDrill('dq')" style="cursor:pointer;border-radius:8px;padding:2px 6px" title="Prikaži leadove"><span class="fnl-foot-dot" style="background:var(--red)"></span>Diskvalifikovani: <b>${(dqR.count||0).toLocaleString('sr-RS')}</b></div>
+      <div class="fnl-foot-item fnl-click" onclick="openFunnelDrill('dq')" style="cursor:pointer;border-radius:8px;padding:2px 6px" title="Prikaži leadove"><span class="fnl-foot-dot" style="background:var(--red)"></span>Diskvalifikovani: <b>${(dqR.count||0).toLocaleString(_LOC)}</b></div>
       <div class="fnl-foot-item"><span class="fnl-foot-dot" style="background:var(--green)"></span>Lead → zatvoren: <b>${conv(stages[0].count, stages[3].count)}%</b></div>
       <div class="fnl-foot-item"><span class="fnl-foot-dot" style="background:#38bdf8"></span>Close rate (zakazan → zatvoren): <b>${conv(stages[2].count, stages[3].count)}%</b></div>
     </div>
@@ -3987,7 +4217,9 @@ async function renderFunnelSection(appts = []){
 
 /* ═══ 21st.dev vanilla ports: iOS spinner, badge kit, funnel drill-down,
    metric sparklines, activity split ═══ */
-const _LOC = 'sr-RS';
+/* sr-Latn-RS, not sr-RS: the plain tag renders dates in Cyrillic ("4. авг")
+   under a Latin UI. */
+const _LOC = 'sr-Latn-RS';
 const iosSpin = (px=20) => `<span class="ios-spin" style="width:${px}px;height:${px}px">${'<i></i>'.repeat(12)}</span>`;
 
 /* Badge kit (badge-1 port): tag/status -> tinted pill */
@@ -4434,7 +4666,7 @@ function renderLeadSummary(lead){
       <div style="font-size:10px;color:var(--muted2);margin-top:6px">Kratak brif na osnovu podataka i aktivnosti leada.</div>`;
     return;
   }
-  const when = lead.ai_summary_at ? new Date(lead.ai_summary_at).toLocaleString('sr-RS',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+  const when = lead.ai_summary_at ? new Date(lead.ai_summary_at).toLocaleString(_LOC,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
   host.innerHTML = `
     <div class="ai-summary-text">${esc(lead.ai_summary)}</div>
     <div class="ai-summary-foot">
@@ -4961,7 +5193,7 @@ function timeAgoSr(iso){
   if (diff < 3600) return `pre ${Math.floor(diff/60)}min`;
   if (diff < 86400) return `pre ${Math.floor(diff/3600)}h`;
   if (diff < 86400*7) return `pre ${Math.floor(diff/86400)}d`;
-  return new Date(iso).toLocaleDateString('sr-RS', { day:'numeric', month:'short', year:'2-digit' });
+  return new Date(iso).toLocaleDateString(_LOC, { day:'numeric', month:'short', year:'2-digit' });
 }
 
 async function renderLeadActivityInto(elId, leadId){
@@ -5846,8 +6078,8 @@ async function renderAdsView(){
       <td class="num">${c.closes}</td>
       <td class="num"><span class="cvr-badge ${cvrCls}">${cvr}%</span></td>
       <td class="num"><input type="number" class="ad-spend-input" min="0" step="10" value="${spend||''}" placeholder="0" onblur="updateAdSpendCell('${esc(c.key)}',this.value)" onclick="event.stopPropagation()" /></td>
-      <td class="num">${cpl?'$'+cpl.toLocaleString('sr-RS'):'·'}</td>
-      <td class="num">${cpc?'$'+cpc.toLocaleString('sr-RS'):'·'}</td>
+      <td class="num">${cpl?'$'+cpl.toLocaleString(_LOC):'·'}</td>
+      <td class="num">${cpc?'$'+cpc.toLocaleString(_LOC):'·'}</td>
       <td class="num">${roas?`<span class="roas-badge ${roasCls}">${roas}×</span>`:'·'}</td>
     </tr>`;
   }).join('')||`<tr><td colspan="10" style="padding:48px 20px;text-align:center;color:var(--muted);font-size:13px;font-weight:700">Nema podataka: prvo sinhronizuj GHL</td></tr>`;
@@ -5879,11 +6111,11 @@ async function renderAdsView(){
           <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-top:2px">CVR</div>
         </div>
         ${totalSpend?`<div style="background:var(--s2);border:1px solid var(--b);border-radius:12px;padding:14px 20px;min-width:100px;">
-          <div style="font-size:22px;font-weight:900;color:var(--red)">€${totalSpend.toLocaleString('sr-RS')}</div>
+          <div style="font-size:22px;font-weight:900;color:var(--red)">€${totalSpend.toLocaleString(_LOC)}</div>
           <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-top:2px">Ad spend</div>
         </div>`:''}
         ${totalRev?`<div style="background:var(--s2);border:1px solid var(--b);border-radius:12px;padding:14px 20px;min-width:100px;">
-          <div style="font-size:22px;font-weight:900;color:var(--green)">€${totalRev.toLocaleString('sr-RS')}</div>
+          <div style="font-size:22px;font-weight:900;color:var(--green)">€${totalRev.toLocaleString(_LOC)}</div>
           <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-top:2px">Revenue</div>
         </div>`:''}
         ${totalRoas?`<div style="background:var(--s2);border:1px solid var(--b);border-radius:12px;padding:14px 20px;min-width:100px;">
@@ -6395,8 +6627,8 @@ function renderLeads(all){
     </div>
 
     ${(()=>{const pv=pipelineValue(cachedLeads);return (pv.open||pv.closed)?`<div class="pipeline-strip">
-      <div class="pipeline-cell"><span class="pipeline-lbl">Pipeline (open)</span><span class="pipeline-val">€${pv.open.toLocaleString('sr-RS')}</span></div>
-      <div class="pipeline-cell"><span class="pipeline-lbl">Zatvoreno</span><span class="pipeline-val" style="color:var(--green)">€${pv.closed.toLocaleString('sr-RS')}</span></div>
+      <div class="pipeline-cell"><span class="pipeline-lbl">Pipeline (open)</span><span class="pipeline-val">€${pv.open.toLocaleString(_LOC)}</span></div>
+      <div class="pipeline-cell"><span class="pipeline-lbl">Zatvoreno</span><span class="pipeline-val" style="color:var(--green)">€${pv.closed.toLocaleString(_LOC)}</span></div>
     </div>`:'';})()}
     ${(()=>{const sm=loadSnoozeMap();const today=new Date().toISOString().slice(0,10);const n=Object.values(sm).filter(d=>d>today).length;return n?`<div class="snooze-toggle" onclick="toggleShowSnoozed()" style="margin-bottom:12px">${leadsShowSnoozed?`Prikazujem ${n} snoozed lead-ova · klikni da sakriješ`:`${n} snoozed lead-ova sakriveno · klikni da prikažeš`}</div>`:'';})()}
 
@@ -6496,11 +6728,11 @@ function openLeadDetail(id){
       <div class="ldp-sec-lbl">Podsetnik</div>
       <button type="button" class="ldp-fu-btn" onclick="(this.querySelector('.ldp-fu-native')||{}).showPicker?this.querySelector('.ldp-fu-native').showPicker():0">
         <span class="ldp-fu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
-        <span class="ldp-fu-text ${c.follow_up_date?(fuCls||'has-date'):''}">${c.follow_up_date?new Date(c.follow_up_date+'T00:00').toLocaleDateString('sr-RS',{day:'numeric',month:'long',year:'numeric'}):'Postavi follow-up datum'}</span>
+        <span class="ldp-fu-text ${c.follow_up_date?(fuCls||'has-date'):''}">${c.follow_up_date?new Date(c.follow_up_date+'T00:00').toLocaleDateString(_LOC,{day:'numeric',month:'long',year:'numeric'}):'Postavi follow-up datum'}</span>
         <svg class="ldp-fu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         <input type="date" class="ldp-fu-native" value="${c.follow_up_date||''}" onclick="event.stopPropagation();try{this.showPicker()}catch(e){}" onchange="updateLeadFollowUpPanel('${esc(c.id)}',this.value,this)" />
       </button>
-      <div class="ldp-sec-lbl ldp-subgap" style="border:none;padding:0;margin-bottom:8px">Snooze ${isSnoozed(c.id)?`<span style="color:var(--yellow);font-weight:700;text-transform:none;letter-spacing:.3px">do ${new Date((loadSnoozeMap()[c.id])+'T00:00').toLocaleDateString('sr-RS')}</span>`:''}</div>
+      <div class="ldp-sec-lbl ldp-subgap" style="border:none;padding:0;margin-bottom:8px">Snooze ${isSnoozed(c.id)?`<span style="color:var(--yellow);font-weight:700;text-transform:none;letter-spacing:.3px">do ${new Date((loadSnoozeMap()[c.id])+'T00:00').toLocaleDateString(_LOC)}</span>`:''}</div>
       <div class="ldp-snooze-row">
         <button class="ldp-snooze-btn" onclick="snoozeLead('${esc(c.id)}', (function(){const d=new Date();d.setDate(d.getDate()+3);return d.toISOString().slice(0,10);})())">3 dana</button>
         <button class="ldp-snooze-btn" onclick="snoozeLead('${esc(c.id)}', (function(){const d=new Date();d.setDate(d.getDate()+7);return d.toISOString().slice(0,10);})())">1 nedelja</button>
@@ -6567,7 +6799,7 @@ function openLeadDetail(id){
       <div id="ldpActivityList" class="lat-host"></div>
     </div>
 
-    <div style="font-size:10px;color:var(--muted);padding-top:2px;text-align:center">Dodat: ${c.date_added?new Date(c.date_added).toLocaleDateString('sr-RS'):'·'}</div>
+    <div style="font-size:10px;color:var(--muted);padding-top:2px;text-align:center">Dodat: ${c.date_added?new Date(c.date_added).toLocaleDateString(_LOC):'·'}</div>
 
     <button class="ldp-delete-btn" onclick="deleteLead('${esc(c.id)}')">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
@@ -6605,10 +6837,10 @@ async function renderLeadBookings(elId, contactId){
 
 function renderApptRow(e){
   const start=new Date(e.startTime), end=e.endTime?new Date(e.endTime):null;
-  const dow=start.toLocaleDateString('sr-RS',{weekday:'short'});
-  const day=start.toLocaleDateString('sr-RS',{day:'numeric',month:'short'});
-  const t1=start.toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'});
-  const t2=end?end.toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'}):'';
+  const dow=start.toLocaleDateString(_LOC,{weekday:'short'});
+  const day=start.toLocaleDateString(_LOC,{day:'numeric',month:'short'});
+  const t1=start.toLocaleTimeString(_LOC,{hour:'2-digit',minute:'2-digit'});
+  const t2=end?end.toLocaleTimeString(_LOC,{hour:'2-digit',minute:'2-digit'}):'';
   const st=String(e.appointmentStatus||e.appoinmentStatus||'').toLowerCase();
   const map={confirmed:{l:'Zakazano',c:'a-booked'},new:{l:'Zakazano',c:'a-booked'},booked:{l:'Zakazano',c:'a-booked'},showed:{l:'Došao',c:'a-showed'},noshow:{l:'Nije došao',c:'a-noshow'},cancelled:{l:'Otkazano',c:'a-cancel'},invalid:{l:'Nevažeće',c:'a-cancel'}};
   const s=map[st]||{l:st||'·',c:'a-booked'};
@@ -6700,7 +6932,7 @@ function renderLeadCard(lead, subTab){
     : '';
   const noteOpen=openNotes.has(lead.id);
   const notePrev=lead.notes?(lead.notes.length>52?lead.notes.substring(0,52)+'…':lead.notes):null;
-  const dateStr=lead.date_added?new Date(lead.date_added).toLocaleDateString('sr-RS',{day:'numeric',month:'short',year:'numeric'}):'';
+  const dateStr=lead.date_added?new Date(lead.date_added).toLocaleDateString(_LOC,{day:'numeric',month:'short',year:'numeric'}):'';
 
   // Avatar initials
   const words=(lead.name||'?').trim().split(/\s+/);
@@ -6829,7 +7061,7 @@ function updateLeadFollowUpPanel(id,date,input){
   if(!txt)return;
   if(date){
     const d=new Date(date+'T00:00');
-    txt.textContent=d.toLocaleDateString('sr-RS',{day:'numeric',month:'long',year:'numeric'});
+    txt.textContent=d.toLocaleDateString(_LOC,{day:'numeric',month:'long',year:'numeric'});
     txt.className='ldp-fu-text has-date';
   } else {
     txt.textContent='Postavi datum';
@@ -7188,9 +7420,9 @@ async function fetchSheetData(){
 function parseGvizDate(d){
   if(!d)return '';
   const m=String(d).match(/Date\((\d+),(\d+),(\d+)\)/);
-  if(m) return new Date(+m[1],+m[2],+m[3]).toLocaleDateString('sr-RS',{day:'numeric',month:'short',year:'numeric'});
+  if(m) return new Date(+m[1],+m[2],+m[3]).toLocaleDateString(_LOC,{day:'numeric',month:'short',year:'numeric'});
   const dt=new Date(d);
-  if(!isNaN(dt.getTime())) return dt.toLocaleDateString('sr-RS',{day:'numeric',month:'short',year:'numeric'});
+  if(!isNaN(dt.getTime())) return dt.toLocaleDateString(_LOC,{day:'numeric',month:'short',year:'numeric'});
   return String(d);
 }
 
