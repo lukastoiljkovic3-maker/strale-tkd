@@ -40,7 +40,8 @@ async function ghl(path) {
    which is the format GHL both returns and expects. Needs the GHL_TOKEN to
    carry "Edit Calendar Events"; if it does not, GHL's 401/403 is passed
    through verbatim so the SPA can say exactly what to fix. */
-const BOOKING_CALENDAR_ID = 'BATeCPn32yi97i8DYecm';   // "TKD Investing - Konsultacija"
+const BOOKING_CALENDAR_ID = 'BATeCPn32yi97i8DYecm';
+const BOOKING_USER_ID     = '1tw72QebfDlQpRphLWz0';   // the closer every booking on that calendar is assigned to   // "TKD Investing - Konsultacija"
 const OFFSET_ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?([+-]\d{2}:\d{2}|Z)$/;
 
 async function ghlWrite(path, init) {
@@ -84,19 +85,26 @@ async function handleBlockWrite(req, res) {
     return res.status(400).json({ error: 'endTime must be after startTime' });
   }
 
-  let calendarId = BOOKING_CALENDAR_ID;
+  /* GHL blocks time on a USER, not on a service calendar - posting a
+     calendarId here answers "The calendar is not an event calendar". Every
+     appointment on the booking calendar is assigned to the same closer, so
+     blocking that user removes the slot from the booking widget. */
+  let assignedUserId = BOOKING_USER_ID;
   const post = () => ghlWrite('/calendars/events/block-slots', {
     method: 'POST',
-    body: JSON.stringify({ calendarId, locationId: GHL_LOC, startTime, endTime, title }),
+    body: JSON.stringify({ locationId: GHL_LOC, assignedUserId, startTime, endTime, title }),
   });
   let created = await post();
 
-  // Stale calendar id -> find the one that is not somebody's personal calendar.
-  if (!created.ok && (created.status === 404 || created.status === 400)) {
-    const cal = await ghl(`/calendars/?locationId=${GHL_LOC}`);
-    const list = (cal.ok && cal.json?.calendars) || [];
-    const found = (list.filter(c => !/personal calendar/i.test(c.name || ''))[0] || list[0] || {}).id;
-    if (found && found !== calendarId) { calendarId = found; created = await post(); }
+  // If that user is gone, re-derive the closer from a recent booking.
+  if (!created.ok && (created.status === 404 || created.status === 400 || created.status === 422)) {
+    const now = Date.now();
+    const ev = await ghl(`/calendars/events?locationId=${GHL_LOC}&calendarId=${BOOKING_CALENDAR_ID}`
+                       + `&startTime=${now - 120 * 864e5}&endTime=${now + 60 * 864e5}`);
+    const ids = ((ev.ok && ev.json?.events) || []).map(e => e.assignedUserId).filter(Boolean);
+    const found = ids.sort((a, b) =>
+      ids.filter(x => x === b).length - ids.filter(x => x === a).length)[0];
+    if (found && found !== assignedUserId) { assignedUserId = found; created = await post(); }
   }
 
   if (!created.ok) {
@@ -110,7 +118,7 @@ async function handleBlockWrite(req, res) {
   }
 
   const eventId = created.json?.id || created.json?.event?.id || created.json?.data?.id || null;
-  return res.status(200).json({ ok: true, eventId, calendarId });
+  return res.status(200).json({ ok: true, eventId, assignedUserId });
 }
 
 export default async function handler(req, res) {
