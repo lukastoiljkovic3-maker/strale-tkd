@@ -41,6 +41,7 @@ async function ghl(path) {
    carry "Edit Calendar Events"; if it does not, GHL's 401/403 is passed
    through verbatim so the SPA can say exactly what to fix. */
 const BOOKING_CALENDAR_ID = 'BATeCPn32yi97i8DYecm';
+const BOOKING_CALENDAR_NAME = 'TKD Investing - Konsultacija';
 const BOOKING_USER_ID     = '1tw72QebfDlQpRphLWz0';   // the closer every booking on that calendar is assigned to   // "TKD Investing - Konsultacija"
 const OFFSET_ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?([+-]\d{2}:\d{2}|Z)$/;
 
@@ -135,7 +136,27 @@ export default async function handler(req, res) {
     const end   = String(req.query.end   || (now + 30 * 864e5));
     const contactId = req.query.contactId || null;
 
-    // 1) List the location's calendars.
+    /* Fast path: go straight to the calendar the booking widget writes to.
+       Listing every calendar first cost a second sequential GHL round-trip and
+       then five more event fetches against personal calendars that have never
+       held a booking. One request covers every real appointment; the slow path
+       below only runs if that request fails. */
+    const fast = await ghl(
+      `/calendars/events?locationId=${GHL_LOC}&calendarId=${BOOKING_CALENDAR_ID}`
+      + `&startTime=${start}&endTime=${end}`,
+    );
+    if (fast.ok) {
+      let out = (fast.json?.events || []).map(e => ({ ...e, calendarName: BOOKING_CALENDAR_NAME }));
+      if (contactId) out = out.filter(e => e.contactId === contactId);
+      out.sort((a, b) => String(a.startTime).localeCompare(String(b.startTime)));
+      return res.status(200).json({
+        calendars: [{ id: BOOKING_CALENDAR_ID, name: BOOKING_CALENDAR_NAME }],
+        count: out.length,
+        events: out,
+      });
+    }
+
+    // 1) Slow path — list the location's calendars.
     const cal = await ghl(`/calendars/?locationId=${GHL_LOC}`);
     if (!cal.ok) {
       return res.status(cal.status).json({

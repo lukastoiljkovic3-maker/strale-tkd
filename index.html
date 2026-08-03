@@ -3086,13 +3086,19 @@ async function renderKalendarTab(){
   if (_calCache) renderCalUI();
   else el.innerHTML = '<div class="fdrill-loading" style="padding:80px 0">' + iosSpin(26) + '</div>';
   const now = Date.now();
-  const [data, leadRows] = await Promise.all([
-    fetch(`/api/ghl-appointments?start=${now - 180 * 864e5}&end=${now + 180 * 864e5}`).then(r => r.json()).catch(() => ({ error: 'fetch' })),
-    sb.from('ghl_leads').select('id,name,phone,tags').limit(5000).then(r => r.data || []).catch(() => []),
+  /* Paint as soon as the appointments land. The lead table is only needed to
+     swap a booking's title for the tracked lead name, so waiting on it before
+     drawing anything meant the whole grid sat behind the slowest of the two
+     queries. It now streams in and repaints. */
+  const leadsP = sb.from('ghl_leads').select('id,name,phone,tags').limit(1000)
+    .then(r => r.data || []).catch(() => []);
+  const [data] = await Promise.all([
+    fetch(`/api/ghl-appointments?start=${now - 90 * 864e5}&end=${now + 120 * 864e5}`).then(r => r.json()).catch(() => ({ error: 'fetch' })),
     // .catch so a blocks failure can never take the whole Kalendar tab down
     // with it (the table may not exist yet on a fresh project).
     loadCalBlocks().catch(() => { _calBlocks = []; }),
   ]);
+  const leadRows = [];
   if (data.error){
     if (staleRender(_seq, 'kalendar')) return;
     if (!_calCache) el.innerHTML = `<div class="empty" style="padding:40px"><div class="empty-icon" style="font-size:22px">${UI.calendar}</div><div class="empty-text">Kalendar trenutno nedostupan.<br><span style="color:var(--muted);font-size:12px">${esc(data.hint || data.error)}</span></div></div>`;
@@ -3113,6 +3119,11 @@ async function renderKalendarTab(){
   };
   if (staleRender(_seq, 'kalendar')) return;
   renderCalUI();
+  leadsP.then(rows => {
+    if (!_calCache || !rows.length) return;
+    _calCache.leadById = new Map(rows.map(l => [l.id, l]));
+    if (currentTab === 'kalendar') renderCalUI();
+  });
 }
 
 /* ── NO-SHOW CHASER ─────────────────────────
