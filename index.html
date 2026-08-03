@@ -2616,12 +2616,26 @@ let leadsSearch  = '';
 // Persist it to localStorage so it survives the Google OAuth round-trip (which returns to the bare origin).
 const DEEP_LEAD_ID = (() => { try { return new URLSearchParams(window.location.search).get('lead'); } catch(e) { return null; } })();
 if (DEEP_LEAD_ID) { try { localStorage.setItem('stl_deeplink', JSON.stringify({ id: DEEP_LEAD_ID, t: Date.now() })); } catch(e) {} }
+/* A lead cannot be both under-100 and over-100. Since 2026-07-30 a GHL
+   automation has been stamping budget-under-100 on every contact, including
+   the 43 that booked a call and answered a higher budget, which made the funnel
+   report 100 disqualified and a 0% close rate. A real budget answer (or an
+   explicit qualified tag) therefore always beats budget-under-100 - here, and
+   in every count and drill-down below, so the numbers agree with each other. */
+const TAGS_DQ_OVERRIDE = ['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus'];
+const TAGS_DQ = ['straletkd-disqualified','budget-under-100','dq'];
+const pgArr = a => '{' + a.map(t => '"' + t + '"').join(',') + '}';
+const isDq = tags => {
+  const a = tags || [];
+  return a.some(t => TAGS_DQ.includes(t)) && !a.some(t => TAGS_DQ_OVERRIDE.includes(t));
+};
+
 function leadTypeFromTags(tags){
   tags = tags || [];
   if (tags.includes('customer')) return 'customer';
   if (tags.includes('booked-call')) return 'booked';
-  if (tags.some(t => ['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus'].includes(t))) return 'qualified';
-  if (tags.some(t => ['straletkd-disqualified','budget-under-100','dq'].includes(t))) return 'disqualified';
+  if (tags.some(t => TAGS_DQ_OVERRIDE.includes(t))) return 'qualified';
+  if (isDq(tags)) return 'disqualified';
   return 'qualified';
 }
 let leadsShowFollowUp = false;  // when true, only show leads needing follow-up today
@@ -3039,8 +3053,9 @@ const _calSpan = () => _calView === 'day' ? 1 : _calView === '3day' ? 3 : 7;
 /* Lead qualification from tags — DQ patterns first ('disqualified' contains 'qualified'). */
 const calQual = tags => {
   const a = tags || [];
-  if (a.some(t => /(dis|un)qualif|(^|[^a-z])low-|(^|[^a-z])under|^dq$/i.test(t))) return 'dq';
-  if (a.some(t => /qualified|high|priority|budget-(100-300|300|1000)/i.test(t))) return 'qual';
+  const real = a.some(t => TAGS_DQ_OVERRIDE.includes(t));
+  if (!real && a.some(t => /(dis|un)qualif|(^|[^a-z])low-|(^|[^a-z])under|^dq$/i.test(t))) return 'dq';
+  if (real || a.some(t => /qualified|high|priority|budget-(100-300|300|1000)/i.test(t))) return 'qual';
   return 'none';
 };
 
@@ -3875,8 +3890,8 @@ async function renderFunnelSection(appts = []){
     <div style="display:grid;gap:10px"><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div><div class="sk-card"><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:62%"></div></div></div>
   </div>`;
 
-  const qualTags = ['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus'];
-  const dqTags   = ['straletkd-disqualified','budget-under-100','dq'];
+  const qualTags = TAGS_DQ_OVERRIDE;
+  const dqTags   = TAGS_DQ;
   _fnlDrillCfg = { qual: qualTags, dq: dqTags };
 
   const [allR, qualR, bookedR, closedR, dqR] = await Promise.all([
@@ -3884,7 +3899,7 @@ async function renderFunnelSection(appts = []){
     sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags', qualTags),
     sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags', ['booked-call']),
     sb.from('ghl_leads').select('id',{count:'exact',head:true}).eq('status','Closed'),
-    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags', dqTags),
+    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags', dqTags).not('tags','ov',pgArr(TAGS_DQ_OVERRIDE)),
   ]);
 
   const ICON = {
@@ -4032,7 +4047,7 @@ async function openFunnelDrill(stage){
     } else {
       let q = sb.from('ghl_leads').select(SEL).order('date_added', { ascending: false }).limit(2000);
       if (stage === 'qual')   q = q.overlaps('tags', cfg.qual);
-      if (stage === 'dq')     q = q.overlaps('tags', cfg.dq);
+      if (stage === 'dq')     q = q.overlaps('tags', cfg.dq).not('tags','ov',pgArr(TAGS_DQ_OVERRIDE));
       if (stage === 'closed') q = q.eq('status', 'Closed');
       rows = (await q).data || [];
     }
@@ -4336,9 +4351,9 @@ async function loadLeads(lead_type){
   // Sub-tabs now slice the shared snapshot instead of re-querying per tab.
   const all=await sbAllLeads();
   if(!lead_type||lead_type==='all') return all;
+  if(lead_type==='disqualified') return all.filter(l=>isDq(l.tags));
   const tagMap={
-    qualified:['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus'],
-    disqualified:['straletkd-disqualified','budget-under-100','dq'],
+    qualified:TAGS_DQ_OVERRIDE,
     booked:['booked-call'],
     customer:['customer'],
     };
@@ -5401,7 +5416,7 @@ async function loadLeadCounts(){
   const [allR,qR,dqR,bR,cR]=await Promise.all([
     sb.from('ghl_leads').select('id',{count:'exact',head:true}),
     sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',['straletkd-qualified','budget-100-300','budget-300-1000','budget-1000-plus']),
-    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',['straletkd-disqualified','budget-under-100','dq']),
+    sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',TAGS_DQ).not('tags','ov',pgArr(TAGS_DQ_OVERRIDE)),
     sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',['booked-call']),
     sb.from('ghl_leads').select('id',{count:'exact',head:true}).overlaps('tags',['customer']),
   ]);
