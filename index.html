@@ -3327,9 +3327,9 @@ function renderCalUI(){
 /* ══ BLOCKED TIME ═══════════════════════════════════════════════
    The closer marks a range as unavailable ("16:00-17:00, doktor") and
    nobody can book it. Two writes per block, in this order:
-     1. GHL blocked slot  (api/cal-block) — this is what actually stops the
+     1. GHL blocked slot  (api/ghl-appointments POST) - this is what actually stops the
         public booking widget. A row in our own database cannot.
-     2. public.calendar_blocks — the CRM's own record, so the grid can draw it
+     2. public.calendar_blocks - the CRM's own record, so the grid can draw it
         and so the block survives a GHL hiccup.
    If step 1 fails we still save step 2 and say so plainly, rather than
    pretending the slot is protected when it is not.
@@ -3529,7 +3529,7 @@ async function calBlockSave(){
   // 1) GHL — the write that actually closes the slot on the booking widget.
   let ghlEventId = null, ghlCalId = null, ghlWarn = '';
   try {
-    const r = await fetch('/api/cal-block', {
+    const r = await fetch('/api/ghl-appointments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ startTime: localISO(start), endTime: localISO(end), title: CAL_BLOCK_TITLE }),
@@ -3558,7 +3558,7 @@ async function calBlockSave(){
 
   if (error){
     // The GHL block would otherwise linger with nothing pointing at it.
-    if (ghlEventId) fetch(`/api/cal-block?eventId=${encodeURIComponent(ghlEventId)}`, { method: 'DELETE' }).catch(() => {});
+    if (ghlEventId) fetch(`/api/ghl-appointments?eventId=${encodeURIComponent(ghlEventId)}`, { method: 'DELETE' }).catch(() => {});
     return calBlockErr(/does not exist|schema cache|PGRST205/i.test(error.message || '')
       ? 'Tabela calendar_blocks još ne postoji u bazi. Pokreni calendar-blocks.sql u Supabase SQL editoru.'
       : `Čuvanje nije uspelo: ${error.message}`);
@@ -3583,7 +3583,7 @@ async function calBlockDelete(id){
 
   if (b.ghl_event_id){
     try {
-      const r = await fetch(`/api/cal-block?eventId=${encodeURIComponent(b.ghl_event_id)}`, { method: 'DELETE' });
+      const r = await fetch(`/api/ghl-appointments?eventId=${encodeURIComponent(b.ghl_event_id)}`, { method: 'DELETE' });
       if (!r.ok){
         const j = await r.json().catch(() => ({}));
         showToast({ variant: 'warning', title: 'GHL blokada nije uklonjena',
