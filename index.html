@@ -2387,6 +2387,105 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.6);cursor:p
   .rc-total-val{font-size:19px;}
 }
 
+/* ═══ LANDING (signed-out front door) ═══════════════════════════
+   The auth gate used to be a logo and a Google button on black. This is the
+   first thing a client ever sees of the system they are paying for, so it now
+   introduces the product. Ported from a shadcn SaaS template, minus the parts
+   that read as generated: no gradient-filled headline, no hotlinked glow PNG,
+   no scale-105 hover, and the system font stack instead of Poppins so the
+   landing and the app underneath are the same typeface. No pricing and no
+   "get started": there is exactly one action, and it is signing in. */
+#auth-gate { display:block !important; overflow-y:auto; -webkit-overflow-scrolling:touch; background:var(--bg); }
+.lp { min-height:100%; display:flex; flex-direction:column; }
+
+.lp-nav { position:sticky; top:0; z-index:20; border-bottom:1px solid var(--b);
+  background:rgba(10,10,11,.82); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
+.lp-nav-in { max-width:1120px; margin:0 auto; height:60px; padding:0 20px;
+  display:flex; align-items:center; gap:16px; }
+.lp-logo { display:inline-flex; align-items:center; gap:9px; font-size:15px; font-weight:800;
+  letter-spacing:-.01em; color:#fff; text-decoration:none; }
+.lp-logo img { width:26px; height:26px; border-radius:7px; object-fit:contain; }
+.lp-logo b { color:var(--accent); font-weight:800; }
+.lp-links { display:flex; align-items:center; gap:26px; margin:0 auto; }
+.lp-links a { font-size:13px; font-weight:500; color:var(--muted); text-decoration:none; transition:color .15s; }
+.lp-cta-sm { height:36px; padding:0 15px; border-radius:9px; border:none; background:#fff; color:#0a0a0b;
+  font-family:var(--font); font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap;
+  -webkit-tap-highlight-color:transparent; transition:opacity .15s; }
+.lp-burger { display:none; width:38px; height:38px; align-items:center; justify-content:center;
+  background:none; border:none; color:#fff; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.lp-burger svg { width:20px; height:20px; }
+.lp-mob { display:none; border-top:1px solid var(--b); padding:10px 20px 16px; }
+.lp-mob.open { display:block; }
+.lp-mob a { display:block; padding:11px 0; font-size:14px; color:var(--muted); text-decoration:none; }
+
+.lp-hero { max-width:1120px; margin:0 auto; padding:64px 20px 0; display:flex; flex-direction:column;
+  align-items:center; text-align:center; position:relative; }
+.lp-glow { position:absolute; top:-120px; left:50%; transform:translateX(-50%); width:760px; height:420px;
+  max-width:130%; pointer-events:none; border-radius:50%;
+  background:radial-gradient(ellipse, rgba(59,130,246,.13) 0%, transparent 70%); }
+.lp-pill { position:relative; display:inline-flex; align-items:center; gap:8px; padding:6px 14px;
+  border-radius:999px; border:1px solid var(--b2); background:var(--s1); font-size:11.5px; color:var(--muted); }
+.lp-pill i { width:6px; height:6px; border-radius:50%; background:var(--green); flex-shrink:0; }
+.lp-h1 { position:relative; margin:22px 0 0; font-size:clamp(32px,5.4vw,52px); font-weight:800;
+  line-height:1.1; letter-spacing:-.03em; color:#fff; max-width:15ch; }
+.lp-h1 span { color:var(--accent); }
+.lp-sub { position:relative; margin:16px 0 0; max-width:52ch; font-size:15px; line-height:1.65; color:var(--muted); }
+.lp-actions { position:relative; margin:30px 0 0; display:flex; flex-direction:column; align-items:center; gap:10px; }
+.lp-cta { display:inline-flex; align-items:center; justify-content:center; gap:10px; height:50px; padding:0 26px;
+  border-radius:12px; border:none; background:#fff; color:#0a0a0b; font-family:var(--font);
+  font-size:15px; font-weight:700; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  transition:opacity .15s, transform .12s; }
+.lp-cta:active { transform:scale(.985); }
+.lp-note { font-size:11.5px; color:var(--muted2); }
+
+/* Product preview, built in DOM rather than a screenshot: always sharp, never
+   a stale picture of a version that shipped months ago. */
+.lp-shot { position:relative; width:100%; max-width:940px; margin:52px auto 0;
+  border:1px solid var(--b2); border-top-left-radius:14px; border-top-right-radius:14px;
+  background:var(--s1); overflow:hidden; box-shadow:0 -1px 0 rgba(255,255,255,.05), 0 30px 70px rgba(0,0,0,.6); }
+.lp-shot::after { content:''; position:absolute; inset:auto 0 0 0; height:110px; pointer-events:none;
+  background:linear-gradient(to bottom, transparent, var(--bg)); }
+.lp-bar { display:flex; align-items:center; gap:6px; padding:11px 14px; border-bottom:1px solid var(--b); background:var(--s2); }
+.lp-bar i { width:9px; height:9px; border-radius:50%; background:var(--muted2); opacity:.5; }
+.lp-bar span { margin-left:8px; font-size:10.5px; color:var(--muted2); }
+.lp-body { padding:18px; text-align:left; }
+.lp-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
+.lp-stat { background:var(--s2); border:1px solid var(--b); border-radius:11px; padding:12px 13px; }
+.lp-stat-l { font-size:8.5px; font-weight:800; letter-spacing:.9px; text-transform:uppercase; color:var(--muted2); }
+.lp-stat-v { font-size:19px; font-weight:900; color:#fff; margin-top:5px; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.lp-stat-d { font-size:10px; font-weight:700; color:var(--green); margin-top:3px; }
+.lp-chart { background:var(--s2); border:1px solid var(--b); border-radius:11px; padding:14px; }
+.lp-chart-t { font-size:11.5px; font-weight:800; color:#fff; margin-bottom:10px; }
+.lp-chart svg { display:block; width:100%; height:118px; }
+
+.lp-feats { max-width:1120px; margin:0 auto; padding:76px 20px 0;
+  display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.lp-feat { background:var(--s1); border:1px solid var(--b); border-radius:14px; padding:22px 20px; }
+.lp-feat-ic { width:34px; height:34px; border-radius:10px; background:rgba(59,130,246,.12); color:var(--accent);
+  display:flex; align-items:center; justify-content:center; margin-bottom:13px; }
+.lp-feat-ic svg { width:17px; height:17px; }
+.lp-feat h3 { font-size:14px; font-weight:800; color:#fff; letter-spacing:-.01em; }
+.lp-feat p { font-size:12.5px; line-height:1.65; color:var(--muted); margin-top:7px; }
+
+.lp-foot { max-width:1120px; width:100%; margin:auto auto 0; padding:70px 20px 32px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.lp-foot span { font-size:11.5px; color:var(--muted2); }
+.lp-err { max-width:420px; margin:16px auto 0; }
+
+@media (hover:hover){
+  .lp-links a:hover, .lp-mob a:hover { color:#fff; }
+  .lp-cta:hover, .lp-cta-sm:hover { opacity:.9; }
+}
+@media (max-width:860px){
+  .lp-links { display:none; }
+  .lp-burger { display:flex; }
+  .lp-nav-in .lp-cta-sm { display:none; }
+  .lp-feats { grid-template-columns:1fr; padding-top:56px; }
+  .lp-stats { grid-template-columns:1fr 1fr; }
+  .lp-hero { padding-top:44px; }
+  .lp-shot { margin-top:38px; }
+}
+
 /* ═══ iOS touch feedback ═══
    The global tap-highlight reset above removes the native flash, so every
    tappable surface needs its own pressed state or the app feels dead under
@@ -2510,17 +2609,90 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.6);cursor:p
 
 <!-- AUTH GATE -->
 <div id="auth-gate">
-  <div class="auth-card">
-    <div class="auth-title">STRALETKD</div>
-    <div class="auth-sub">Sales Dashboard</div>
-    <div id="auth-error" style="display:none" class="auth-error"></div>
-    <button class="shiny-btn" onclick="signInWithGoogle()">
-      <span class="shiny-btn-inner">
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
-        Sign in with Google
-      </span>
-    </button>
-  </div>
+ <div class="lp">
+  <header class="lp-nav">
+    <div class="lp-nav-in">
+      <a class="lp-logo" href="#"><img src="strale-mark-t.png" alt="" />STRALETKD <b>CRM</b></a>
+      <nav class="lp-links">
+        <a href="#lp-sta">Šta radi</a>
+        <a href="#lp-kako">Kako radi</a>
+        <a href="#lp-sig">Pristup</a>
+      </nav>
+      <button class="lp-cta-sm" onclick="signInWithGoogle()">Prijavi se</button>
+      <button class="lp-burger" onclick="lpMenu()" aria-label="Meni">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+    </div>
+    <div class="lp-mob" id="lpMob">
+      <a href="#lp-sta" onclick="lpMenu(0)">Šta radi</a>
+      <a href="#lp-kako" onclick="lpMenu(0)">Kako radi</a>
+      <a href="#lp-sig" onclick="lpMenu(0)">Pristup</a>
+      <button class="lp-cta" style="width:100%;margin-top:10px" onclick="signInWithGoogle()">Prijavi se</button>
+    </div>
+  </header>
+
+  <section class="lp-hero">
+    <div class="lp-glow" aria-hidden="true"></div>
+    <span class="lp-pill"><i></i>Interni sistem STRALETKD tima</span>
+    <h1 class="lp-h1">Ceo prodajni proces <span>na jednom mestu</span></h1>
+    <p class="lp-sub">Leadovi, zakazani pozivi i prihod, uživo. Svaki lead sa istorijom poziva, statusom i vrednošću deala, bez tabela i bez ručnog prepisivanja.</p>
+
+    <div class="lp-actions">
+      <button class="lp-cta" onclick="signInWithGoogle()">
+        <svg width="17" height="17" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Prijavi se
+      </button>
+      <span class="lp-note">Pristup samo za članove tima</span>
+    </div>
+    <div id="auth-error" style="display:none" class="auth-error lp-err"></div>
+
+    <div class="lp-shot" aria-hidden="true">
+      <div class="lp-bar"><i></i><i></i><i></i><span>STRALETKD · Sales CRM</span></div>
+      <div class="lp-body">
+        <div class="lp-stats">
+          <div class="lp-stat"><div class="lp-stat-l">Leadovi</div><div class="lp-stat-v">214</div><div class="lp-stat-d">+18%</div></div>
+          <div class="lp-stat"><div class="lp-stat-l">Zakazano</div><div class="lp-stat-v">47</div><div class="lp-stat-d">+9%</div></div>
+          <div class="lp-stat"><div class="lp-stat-l">Zatvoreno</div><div class="lp-stat-v">25</div><div class="lp-stat-d">+12%</div></div>
+          <div class="lp-stat"><div class="lp-stat-l">Naplaćeno</div><div class="lp-stat-v">€38.8k</div><div class="lp-stat-d">+24%</div></div>
+        </div>
+        <div class="lp-chart">
+          <div class="lp-chart-t">Prihod po nedeljama</div>
+          <svg viewBox="0 0 900 118" preserveAspectRatio="none">
+            <defs><linearGradient id="lpFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#3B82F6" stop-opacity=".30"/><stop offset="100%" stop-color="#3B82F6" stop-opacity="0"/>
+            </linearGradient></defs>
+            <path fill="url(#lpFill)" d="M0,96 C60,92 90,74 150,72 C210,70 240,88 300,84 C360,80 390,34 450,32 C510,30 540,62 600,58 C660,54 690,26 750,22 C810,18 850,40 900,36 L900,118 L0,118 Z"/>
+            <path fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"
+              d="M0,96 C60,92 90,74 150,72 C210,70 240,88 300,84 C360,80 390,34 450,32 C510,30 540,62 600,58 C660,54 690,26 750,22 C810,18 850,40 900,36"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lp-feats" id="lp-sta">
+    <div class="lp-feat">
+      <div class="lp-feat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></div>
+      <h3>Svaki lead na svom mestu</h3>
+      <p>Leadovi stižu automatski, sa izvorom, tagovima i celom istorijom poziva. Status, beleške i vrednost deala se upisuju u dva klika i ostaju zabeleženi.</p>
+    </div>
+    <div class="lp-feat" id="lp-kako">
+      <div class="lp-feat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      <h3>Kalendar koji radi za tebe</h3>
+      <p>Svi zakazani pozivi po danu, tri dana ili nedelji. Kad ti termin ne odgovara, blokiraš ga i niko ne može da zakaže poziv u tom periodu.</p>
+    </div>
+    <div class="lp-feat" id="lp-sig">
+      <div class="lp-feat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+      <h3>Brojevi bez tabela</h3>
+      <p>Prodajni levak, prihod po nedeljama i izvori koji stvarno donose novac. Sve se računa iz istih podataka koje tim ionako unosi.</p>
+    </div>
+  </section>
+
+  <footer class="lp-foot">
+    <span>© 2026 STRALETKD</span>
+    <span>Pristup samo za članove tima</span>
+  </footer>
+ </div>
 </div>
 
 <!-- LOADING SCREEN -->
@@ -2968,11 +3140,13 @@ function setTab(tab) {
   // Auto-refresh Metrics tab every 60s (picks up new Sheet data)
   if (tab === 'metrics') {
     metricsRefreshInterval = setInterval(() => {
-      // Skip while the app is backgrounded, and never repaint over someone
-      // who has scrolled into the page - the full rebuild resets scroll.
       if (currentTab !== 'metrics' || document.hidden) return;
-      if (window.scrollY > 240) return;
-      renderMetricsTab();
+      // renderMetricsTab rebuilds #mainContent wholesale, which drops the
+      // reader back to the top. Hold their position across the repaint rather
+      // than skipping the refresh - skipping meant the numbers froze for
+      // anyone who had scrolled far enough to actually be reading them.
+      const y = window.scrollY;
+      Promise.resolve(renderMetricsTab()).then(() => window.scrollTo(0, y)).catch(() => {});
     }, 60000);
   }
 
@@ -5802,12 +5976,32 @@ function tickNowLine(){
   if (_tickDay === null) _tickDay = day0;
   if (day0 !== _tickDay){
     _tickDay = day0;
-    // Midnight: "today" is a different column now, so the grid has to be rebuilt.
+    // Midnight. The calendar's "today" column moved, and everything on the
+    // Leads tab keyed to today - the follow-up banner, the overdue date
+    // colouring, the 14-day stale cutoff - is now a day behind.
     if (currentTab === 'kalendar' && _calCache) renderCalUI();
+    else if (currentTab === 'leads') renderLeadsSection();
+    else if (currentTab === 'metrics') renderMetricsTab();
     return;
   }
   const top = _nowLineTop(d).toFixed(1) + 'px';
   document.querySelectorAll('.tg-now').forEach(el => { el.style.top = top; });
+}
+
+/* The speed-to-lead banner counts up on its own, and appears or disappears
+   when the 15-minute threshold is actually crossed rather than whenever the
+   next GHL sync happens to land. */
+function tickWait(){
+  document.querySelectorAll('[data-wait]').forEach(el => {
+    const iso = el.getAttribute('data-wait');
+    if (!iso) return;
+    const next = fmtMinutes(Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+    if (el.textContent !== next) el.textContent = next;
+  });
+  if (currentTab !== 'leads') return;
+  const shown = document.querySelectorAll('[data-wait]').length ? 1 : 0;
+  const due = findWaitingLeads().length ? 1 : 0;
+  if (shown !== due) renderLeadsSection();
 }
 
 /** Any element carrying data-ago="<iso>" re-states itself on every tick. */
@@ -5840,7 +6034,13 @@ function tick(){
   if (document.hidden) return;
   tickNowLine();
   tickAgo();
+  tickWait();
   void tickCalendar();
+}
+
+function lpMenu(open){
+  const m = document.getElementById('lpMob');
+  if (m) m.classList.toggle('open', open === undefined ? !m.classList.contains('open') : !!open);
 }
 
 function startTicker(){
@@ -6636,7 +6836,7 @@ function renderLeads(all){
       <div class="wait-banner-icon">${UI.alert}</div>
       <div class="wait-banner-text">
         <div class="wait-banner-title">${waiting.length} lead${waiting.length===1?'':'a'} čeka odgovor</div>
-        <div class="wait-banner-sub">Prvi je stigao pre ${fmtMinutes(Math.round((Date.now()-new Date(waiting[0].date_added).getTime())/60000))}, javi se odmah da ne ohladi</div>
+        <div class="wait-banner-sub">Prvi je stigao pre <span data-wait="${esc(waiting[0].date_added||'')}">${fmtMinutes(Math.round((Date.now()-new Date(waiting[0].date_added).getTime())/60000))}</span>, javi se odmah da ne ohladi</div>
       </div>
       <div class="wait-banner-count">${waiting.length}</div>
     </div>`:'';})()}
