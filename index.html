@@ -5212,7 +5212,7 @@ async function renderLeadActivityInto(elId, leadId){
       <div class="lat-icon">${f.icon}</div>
       <div class="lat-body">
         <div class="lat-line"><span class="lat-actor">${esc(who)}</span> <span class="lat-action">${esc(f.label.toLowerCase())}</span> <span class="lat-desc">${esc(f.desc)}</span></div>
-        <div class="lat-time">${timeAgoSr(a.created_at)}</div>
+        <div class="lat-time" data-ago="${esc(a.created_at)}">${timeAgoSr(a.created_at)}</div>
       </div>
     </div>`;
   }).join('');
@@ -5777,6 +5777,82 @@ async function autoSyncGHL(){
 }
 setInterval(autoSyncGHL, GHL_AUTO_SYNC_MS);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) autoSyncGHL(); });
+/* ══ LIVE CLOCK ═════════════════════════════════════════════════
+   Everything time-derived used to be computed once at render and then frozen.
+   The red now-line pointed at whatever time the page was opened, and "pre 2min"
+   still said "pre 2min" an hour later. Closers leave this tab open from morning
+   to night, so that is most of the working day showing yesterday's clock.
+
+   One shared 30s interval fixes it, and it is deliberately cheap: it patches
+   the DOM in place, never re-rendering. A full re-render happens only when the
+   calendar day actually rolls over (today moves to a different column), and a
+   network refetch only while the Kalendar tab is the visible one. Nothing runs
+   at all while the tab is backgrounded. */
+const TICK_MS = 30000;
+const CAL_POLL_MS = 120000;
+let _tickTimer = null, _tickDay = null, _calPolledAt = 0;
+
+/** Fractional-minute position so the line creeps rather than jumping each tick. */
+function _nowLineTop(d){
+  return ((d.getHours() * 60 + d.getMinutes() + d.getSeconds() / 60) / 60) * 56;
+}
+
+function tickNowLine(){
+  const d = new Date(), day0 = _calDay0(d);
+  if (_tickDay === null) _tickDay = day0;
+  if (day0 !== _tickDay){
+    _tickDay = day0;
+    // Midnight: "today" is a different column now, so the grid has to be rebuilt.
+    if (currentTab === 'kalendar' && _calCache) renderCalUI();
+    return;
+  }
+  const top = _nowLineTop(d).toFixed(1) + 'px';
+  document.querySelectorAll('.tg-now').forEach(el => { el.style.top = top; });
+}
+
+/** Any element carrying data-ago="<iso>" re-states itself on every tick. */
+function tickAgo(){
+  document.querySelectorAll('[data-ago]').forEach(el => {
+    const iso = el.getAttribute('data-ago');
+    if (!iso) return;
+    const next = timeAgoSr(iso);
+    if (el.textContent !== next) el.textContent = next;
+  });
+}
+
+/* New bookings should appear on their own. Expiring the cache rather than
+   clearing it keeps the current grid on screen while the fetch is in flight,
+   instead of flashing a spinner over it every two minutes. */
+async function tickCalendar(){
+  if (currentTab !== 'kalendar' || document.hidden || !_calCache) return;
+  if (Date.now() - _calPolledAt < CAL_POLL_MS) return;
+  _calPolledAt = Date.now();
+  const before = document.getElementById('tg-scroll');
+  const keep = before ? before.scrollTop : null;
+  _calCache.at = 0;
+  try { await renderKalendarTab(); } catch (e) { return; }
+  const after = document.getElementById('tg-scroll');
+  // renderCalUI auto-scrolls on every render; hold the closer's position.
+  if (after && keep != null) after.scrollTop = keep;
+}
+
+function tick(){
+  if (document.hidden) return;
+  tickNowLine();
+  tickAgo();
+  void tickCalendar();
+}
+
+function startTicker(){
+  if (_tickTimer) return;
+  _tickDay = _calDay0(new Date());
+  _tickTimer = setInterval(tick, TICK_MS);
+  // Coming back to the tab should not wait up to 30s to look right.
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
+  tick();
+}
+startTicker();
+
 setTimeout(autoSyncGHL, 2500);
 
 /* PWA: offline shell + fast repeat loads */
@@ -5995,7 +6071,7 @@ function lastActionBadge(act){
     else if (act.new_value === 'DQ') cls = 'la-bad';
     else if (act.new_value === 'Follow Up') cls = 'la-warm';
   }
-  return { icon, label, cls, when: timeAgoSr(act.created_at), actor: (act.actor_email||'').split('@')[0] };
+  return { icon, label, cls, when: timeAgoSr(act.created_at), ts: act.created_at, actor: (act.actor_email||'').split('@')[0] };
 }
 
 async function toggleAdsView(){
@@ -6361,7 +6437,7 @@ function buildLeadRows(leads){
         <div>
           <div class="ltr-namerow"><div class="ltr-name">${esc(c.name)}</div>${contactActions(c)}</div>
           ${meta?`<div class="ltr-sub">${esc(meta)}</div>`:(!c.phone?`<div class="ltr-sub" style="color:var(--muted2);font-style:italic">nema broja · samo email</div>`:'')}
-          ${lastAct?`<div class="last-action ${lastAct.cls}" title="${esc(lastAct.actor||'')} · ${esc(lastAct.when)}">${lastAct.icon} ${esc(lastAct.label)} · ${esc(lastAct.when)}</div>`:''}
+          ${lastAct?`<div class="last-action ${lastAct.cls}" title="${esc(lastAct.actor||'')} · ${esc(lastAct.when)}">${lastAct.icon} ${esc(lastAct.label)} · <span data-ago="${esc(lastAct.ts||'')}">${esc(lastAct.when)}</span></div>`:''}
         </div>
       </div></td>
       <td class="col-mob" onclick="event.stopPropagation()">
