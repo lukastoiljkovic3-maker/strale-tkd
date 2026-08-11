@@ -122,12 +122,101 @@ async function handleBlockWrite(req, res) {
   return res.status(200).json({ ok: true, eventId, assignedUserId });
 }
 
+/* ── Reschedule (PUT) ───────────────────────────────────────────
+   The closer moves a call to a new time from the lead panel.
+
+     PUT /api/ghl-appointments?eventId=<id>    { startTime, endTime, calendarId?, notify? }
+       -> moves that appointment.
+     PUT /api/ghl-appointments?contactId=<id>  { startTime, endTime, title?, notify? }
+       -> books a fresh call for that contact. Used when the old appointment is
+          cancelled or a no-show: moving a dead appointment would erase the fact
+          that the lead missed one, so the history stays and a new call is added.
+
+   Times are offset ISO, exactly like the block writes above. Needs "Edit
+   Calendar Events" on the GHL_TOKEN.
+
+   ignoreFreeSlotValidation / ignoreDateRange are on deliberately: the CRM
+   already refuses a time that collides with another call or a block, and the
+   closer has to be able to place a call outside the booking widget's published
+   hours or further out than its date range allows. */
+async function handleReschedule(req, res) {
+  if (!GHL_TOKEN) return res.status(503).json({ error: 'GHL_TOKEN missing in Vercel env.' });
+
+  const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+  const eventId    = String(req.query.eventId || '').trim();
+  const contactId  = String(req.query.contactId || '').trim();
+  const startTime  = String(body.startTime || '').trim();
+  const endTime    = String(body.endTime || '').trim();
+  const calendarId = String(body.calendarId || '').trim();
+
+  if (!eventId && !contactId) return res.status(400).json({ error: 'eventId or contactId required' });
+  if (!OFFSET_ISO.test(startTime) || !OFFSET_ISO.test(endTime)) {
+    return res.status(400).json({ error: 'startTime and endTime must be ISO with offset, e.g. 2026-08-05T16:00:00+02:00' });
+  }
+  if (new Date(endTime).getTime() <= new Date(startTime).getTime()) {
+    return res.status(400).json({ error: 'endTime must be after startTime' });
+  }
+
+  const scopeHint = 'GHL_TOKEN is missing the "Edit Calendar Events" scope. Add it in GHL -> Settings -> Private Integrations, regenerate the token, update GHL_TOKEN in Vercel, redeploy.';
+  const base = {
+    startTime,
+    endTime,
+    toNotify: body.notify !== false,   // let GHL send the lead its own reschedule notice
+    ignoreFreeSlotValidation: true,
+    ignoreDateRange: true,
+  };
+  const fail = (r, what) => res.status(r.status || 502).json({
+    error: `GHL ${what} failed (${r.status})`,
+    detail: (r.text || '').slice(0, 240),
+    hint: (r.status === 401 || r.status === 403) ? scopeHint : undefined,
+  });
+
+  if (eventId) {
+    const put = extra => ghlWrite(`/calendars/events/appointments/${encodeURIComponent(eventId)}`, {
+      method: 'PUT', body: JSON.stringify({ ...base, ...extra }),
+    });
+    let moved = await put(calendarId ? { calendarId } : {});
+    // Some locations refuse the update unless the calendar is named explicitly.
+    if (!moved.ok && !calendarId && (moved.status === 400 || moved.status === 422)) {
+      moved = await put({ calendarId: BOOKING_CALENDAR_ID });
+    }
+    if (!moved.ok) return fail(moved, 'reschedule');
+    return res.status(200).json({ ok: true, eventId, startTime, endTime });
+  }
+
+  const title = String(body.title || '').slice(0, 120);
+  const post = extra => ghlWrite('/calendars/events/appointments', {
+    method: 'POST',
+    body: JSON.stringify({
+      ...base,
+      locationId: GHL_LOC,
+      calendarId: calendarId || BOOKING_CALENDAR_ID,
+      contactId,
+      appointmentStatus: 'confirmed',
+      ...(title ? { title } : {}),
+      ...extra,
+    }),
+  });
+  // Assign to the closer the booking calendar belongs to; if that user is gone,
+  // let the calendar's own assignment rules take over rather than failing.
+  let created = await post({ assignedUserId: BOOKING_USER_ID });
+  if (!created.ok && (created.status === 400 || created.status === 404 || created.status === 422)) {
+    created = await post({});
+  }
+  if (!created.ok) return fail(created, 'booking');
+
+  const j = created.json || {};
+  const newId = j.id || j.appointment?.id || j.event?.id || j.data?.id || null;
+  return res.status(200).json({ ok: true, eventId: newId, startTime, endTime, created: true });
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method === 'GET') res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=120');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(204).end();
+  if (req.method === 'PUT') return handleReschedule(req, res);
   if (req.method === 'POST' || req.method === 'DELETE') return handleBlockWrite(req, res);
 
   try {

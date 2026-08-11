@@ -519,6 +519,13 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
 .lc-ab.on-m  { background:rgba(168,85,247,.12); color:var(--nikola); border-color:rgba(168,85,247,.3); }
 .lc-ab.on-d  { background:rgba(249,115,22,.12); color:var(--dusica); border-color:rgba(249,115,22,.3); }
 .lc-ab img   { width:18px; height:18px; border-radius:50%; object-fit:cover; }
+/* Initial badge standing in for the closer's photo. */
+.lc-ab-ini   {
+  width:18px; height:18px; border-radius:50%;
+  display:inline-grid; place-items:center;
+  background:rgba(168,85,247,.18); color:var(--nikola);
+  font-size:10px; font-weight:900; line-height:1;
+}
 .lc-stsel {
   padding:8px 10px; border-radius:99px; border:1px solid var(--b);
   background:var(--s2); color:var(--text); font-family:var(--font);
@@ -546,6 +553,13 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
 .lc-dealval-input { width:100%; padding:11px 14px 11px 28px; border-radius:10px; border:1px solid var(--b);
   background:var(--s2); color:var(--green); font-family:var(--font); font-size:15px; font-weight:800; letter-spacing:-.3px; }
 .lc-dealval-input:focus { border-color:rgba(74,222,128,.4); background:rgba(74,222,128,.03); outline:none; }
+/* Depozit / rezervacija marker */
+.lc-dep-row { display:flex; align-items:center; gap:8px; margin-top:10px;
+  font-size:12px; font-weight:600; color:var(--muted); cursor:pointer; user-select:none; }
+.lc-dep-row input { accent-color:#eab308; width:15px; height:15px; cursor:pointer; }
+.lc-dep-badge { display:inline-block; margin-left:8px; padding:2px 7px; border-radius:6px;
+  font-size:10px; font-weight:800; letter-spacing:.06em;
+  background:rgba(234,179,8,.14); color:#eab308; border:1px solid rgba(234,179,8,.3); }
 
 /* Note button */
 .lc-note-btn {
@@ -1061,6 +1075,20 @@ tr.row-flash > td { animation: row-flash 1.6s ease-out; }
 .ldp-appt-status.a-noshow { background:rgba(244,63,94,.12); color:var(--red); }
 .ldp-appt-status.a-cancel { background:var(--s2); color:var(--muted); }
 .ldp-appt-empty { font-size:12px; color:var(--muted); padding:6px 2px; }
+/* right-hand rail of an appointment row: status pill + the reschedule button */
+.ldp-appt-side { flex-shrink:0; display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+.ldp-appt-move { border:1px solid var(--b2); background:var(--s2); color:var(--muted); cursor:pointer;
+  font-family:var(--font); font-size:10.5px; font-weight:700; padding:5px 9px; border-radius:8px;
+  white-space:nowrap; transition:color .15s, border-color .15s, background .15s; }
+.ldp-appt-move:active { color:#fff; border-color:var(--accent); }
+@media (hover:hover){ .ldp-appt-move:hover { color:#fff; border-color:var(--accent); background:var(--ag); } }
+/* reschedule dialog — same furniture as the block dialog (.cblk-*), so only
+   the parts blocking time has no equivalent for need their own rules */
+.rsch-cur { font-size:12px; color:var(--muted); background:var(--s1); border:1px solid var(--b);
+  border-radius:11px; padding:10px 12px; line-height:1.5; }
+.rsch-cur b { color:#fff; font-weight:700; }
+.rsch-notify { display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--muted); cursor:pointer; }
+.rsch-notify input { width:17px; height:17px; accent-color:var(--accent); flex-shrink:0; }
 
 /* attribution / email key-value rows */
 .ldp-kv { display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid var(--b); font-size:12px; }
@@ -2889,11 +2917,24 @@ function saveTargets(t) { localStorage.setItem('toc_targets', JSON.stringify(t))
 // No fixed package prices, so DEAL_PRICES stays empty and revenue = opportunities.
 const DEAL_PRICES = {};
 
+/* Full deal menu: funded tiers 10K-500K, bot na mesečnom ili godišnjem
+   planu, i broker CPA. Keys are stored in ghl_leads.deal and mirrored as
+   closes.deal_type in the partner ledger, so deal-update.sql must widen the
+   closes check constraint before the new keys land there. Cjure's 20% cut
+   applies to funded_* and bot_* only, never CPA. */
 const DEALS = {
+  funded_10k:  { label: 'Funded 10K',  price: '', icon: '' },
+  funded_25k:  { label: 'Funded 25K',  price: '', icon: '' },
+  funded_50k:  { label: 'Funded 50K',  price: '', icon: '' },
+  funded_100k: { label: 'Funded 100K', price: '', icon: '' },
+  funded_200k: { label: 'Funded 200K', price: '', icon: '' },
+  funded_500k: { label: 'Funded 500K', price: '', icon: '' },
+  bot_monthly: { label: 'Bot (mesečno)',  price: '', icon: '' },
+  bot_yearly:  { label: 'Bot (godišnje)', price: '', icon: '' },
   cpa:         { label: 'CPA (min. depozit $300)', price: 'var.', icon: '' },
-  funded_100k: { label: 'Funded 100K',             price: '',    icon: '' },
-  funded_200k: { label: 'Funded 200K',             price: '',    icon: '' },
 };
+/* Deals that feed the Cjure partner cut. */
+const CJURE_DEALS = k => k && k !== 'cpa';
 
 let currentTab = 'leads';
 /* Async tab renders can outlive a tab switch — a slow Metrics fetch must not
@@ -3244,6 +3285,8 @@ async function renderMetricsTab(){
 
     <div id="revenue-section"></div>
 
+    <div id="commission-section"></div>
+
     <div id="closers-board-section"></div>
 
     <div id="funnel-section"></div>
@@ -3261,6 +3304,12 @@ async function renderMetricsTab(){
   // Revenue/clients table (GHL opportunities via /api/ghl-metrics)
   const _revSec = document.getElementById('revenue-section');
   if (_revSec) renderRevenue(sheetRows, _revSec);
+  // Partner commission (Cjure's 20%). Async and non-blocking: a slow ledger
+  // read must not hold up the rest of the metrics paint.
+  renderCommissionSection().then(html => {
+    const host = document.getElementById('commission-section');
+    if (host && !staleRender(_seq, 'metrics')) host.innerHTML = html;
+  }).catch(e => console.error(e));
   renderClosersBoard(appts, closedLeads, document.getElementById('closers-board-section'));
   renderFunnelSection(appts);
   renderTimeToCloseSection();
@@ -4080,7 +4129,7 @@ function renderHeroStats(appts, closedLeads, host, acts = []){
   renderMstatSparks(host, appts, acts);
 }
 
-/* Closer board (single closer = Nikola): Booked / Won / Lost / No-show.
+/* Closer board (single closer = closer-goat): Booked / Won / Lost / No-show.
    Booked/Lost/No-show come from GHL calendar appointment statuses; Won = tracker
    Closed leads with their entered close value (deal_value). */
 function renderClosersBoard(appts, closedLeads, host){
@@ -4098,7 +4147,7 @@ function renderClosersBoard(appts, closedLeads, host){
   const wonCard = l => `<div class="kan-card"><div class="kan-card-name">${esc(l.name||'Klijent')}</div><div class="kan-card-meta" style="color:var(--green)">${l.deal_value!=null?'€'+Number(l.deal_value).toLocaleString(_LOC):'·'}</div></div>`;
   const col = (cls,title,items,render) => `<div class="kan-col ${cls}"><div class="kan-col-hd"><span class="kan-col-ttl">${title}</span><span class="kan-count">${items.length}</span></div>${items.length?items.slice(0,30).map(render).join(''):'<div class="kan-empty">·</div>'}</div>`;
   host.innerHTML = `<div class="metrics-sec">
-    <div class="metrics-sec-lbl">CLOSER BOARD · Nikola</div>
+    <div class="metrics-sec-lbl">CLOSER BOARD · closer-goat</div>
     <div class="kanban">
       ${col('k-booked','Zakazano',booked,apptCard)}
       ${col('k-won','Zatvoreno',won,wonCard)}
@@ -4659,48 +4708,48 @@ function updateTarget(key,val){
   renderMetricsTab();
 }
 
+/* PROVIZIJA — Strale gross vs. the partner's cut, read from the `closes`
+   ledger. That's the same table the partner app reads, so what Cjure sees
+   and what we see can never drift apart.
+
+   Replaces the old split, which multiplied deals against DEAL_PRICES — an
+   empty map for Strale (prices are per-deal, not fixed), so every cell
+   always rendered €0. It also billed a "Dusica" who isn't on this account. */
 async function renderCommissionSection(){
-  // Load all closed leads with deals from Supabase
-  const {data}=await sb.from('ghl_leads').select('assigned_to,deal').eq('status','Closed').not('deal','is',null);
+  const {data,error}=await sb.from('closes')
+    .select('deal_type,amount_eur,commission_eur,commission_rate,closed_on');
+  if(error){console.error(error);return'';}
   const rows=data||[];
+  if(!rows.length) return '';
 
-  const calcComm=(member)=>{
-    const memberDeals=rows.filter(r=>r.assigned_to===member&&r.deal&&DEAL_PRICES[r.deal]);
-    const total=memberDeals.reduce((s,r)=>s+(DEAL_PRICES[r.deal]||0),0);
-    const byDeal={};
-    memberDeals.forEach(r=>{ byDeal[r.deal]=(byDeal[r.deal]||0)+1; });
-    return{total,byDeal,count:memberDeals.length};
-  };
+  const eur=n=>'€'+Number(n||0).toLocaleString(_LOC,{maximumFractionDigits:0});
+  const sum=(a,k)=>a.reduce((s,r)=>s+Number(r[k]||0),0);
+  const monthKey=new Date().toISOString().slice(0,7);
+  const mo=rows.filter(r=>String(r.closed_on||'').startsWith(monthKey));
+  const rate=rows[0]?.commission_rate!=null?Number(rows[0].commission_rate):0.20;
 
-  const cM=calcComm('nikola'), cD=calcComm('dusica');
-
-  const dealRows=(byDeal)=>Object.entries(byDeal).map(([key,cnt])=>{
-    const d=DEALS[key];
-    if(!d)return'';
-    return`<div class="comm-deal-row">
-      <span class="comm-deal-name">${d.icon} ${d.label} ×${cnt}</span>
-      <span class="comm-deal-val">${d.price}</span>
-    </div>`;
-  }).join('');
-
-  const commCell=(name,member,c,color)=>`
-    <div class="comm-cell">
-      <div class="comm-name">
-        <div class="mc-av ${member}" style="width:30px;height:30px;flex-shrink:0">
-          <img src="${member}.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>
-        </div>
-        <span style="color:${color}">${name}</span>
-      </div>
-      <div class="comm-amount" style="color:${color}">€${c.total.toLocaleString()}</div>
-      <div class="comm-sub">${c.count} zatvorenih deala</div>
-      ${c.count?`<div class="comm-deals">${dealRows(c.byDeal)}</div>`:''}
-    </div>`;
+  const byType={};
+  rows.forEach(r=>{ byType[r.deal_type]=(byType[r.deal_type]||0)+1; });
+  const typeRows=Object.entries(byType).map(([k,cnt])=>`
+    <div class="comm-deal-row">
+      <span class="comm-deal-name">${esc(DEALS[k]?.label||k)} ×${cnt}</span>
+      <span class="comm-deal-val">${eur(sum(rows.filter(r=>r.deal_type===k),'amount_eur'))}</span>
+    </div>`).join('');
 
   return`<div class="metrics-sec">
-    <div class="metrics-sec-lbl">PROVIZIJA · Svi Zatvoreni Dealovi</div>
+    <div class="metrics-sec-lbl">PROVIZIJA · ${rows.length} zatvorenih dealova</div>
     <div class="comm-grid">
-      ${commCell('Nikola','nikola',cM,'var(--nikola)')}
-      ${commCell('Dusica','dusica',cD,'var(--dusica)')}
+      <div class="comm-cell">
+        <div class="comm-name"><span>STRALE · Promet</span></div>
+        <div class="comm-amount">${eur(sum(rows,'amount_eur'))}</div>
+        <div class="comm-sub">ovaj mesec ${eur(sum(mo,'amount_eur'))}</div>
+        <div class="comm-deals">${typeRows}</div>
+      </div>
+      <div class="comm-cell">
+        <div class="comm-name"><span style="color:var(--green)">CJURE · Provizija ${(rate*100).toFixed(0)}% · funded + bot, bez CPA</span></div>
+        <div class="comm-amount" style="color:var(--green)">${eur(sum(rows.filter(r=>CJURE_DEALS(r.deal_type)),'commission_eur'))}</div>
+        <div class="comm-sub">ovaj mesec ${eur(sum(mo.filter(r=>CJURE_DEALS(r.deal_type)),'commission_eur'))}</div>
+      </div>
     </div>
   </div>`;
 }
@@ -5405,7 +5454,7 @@ function cleanPhone(p){
 }
 function waGreetingFor(lead){
   const firstName = (lead.name || '').split(' ')[0] || '';
-  const repName   = lead.assigned_to === 'nikola' ? 'Nikola' : '';
+  const repName   = lead.assigned_to === 'nikola' ? 'closer-goat' : '';
   const booked    = Array.isArray(lead.tags) && lead.tags.includes('booked-call');
   const name = firstName || '';
   const intro = repName ? `ovde ${repName} iz STRALETKD tima` : `javljam ti se iz STRALETKD tima`;
@@ -5742,7 +5791,7 @@ async function mergeDupGroup(idx){
   const RANK={'DQ':0,'Novi':1,'Follow Up':2,'Closed':3};
   const patch={};
   dupes.forEach(d=>{
-    ['phone','email','instagram','experience','time_frame','knowledge','qualification','pain_point','utm_source','utm_medium','utm_campaign','utm_content','deal','follow_up_date','assigned_to'].forEach(f=>{
+    ['phone','email','instagram','experience','time_frame','knowledge','qualification','pain_point','utm_source','utm_medium','utm_campaign','utm_content','deal','deal_deposit','follow_up_date','assigned_to'].forEach(f=>{
       if(!target[f]&&d[f]&&patch[f]==null) patch[f]=d[f];
     });
     if(d.deal_value&&!target.deal_value&&patch.deal_value==null) patch.deal_value=d.deal_value;
@@ -5755,6 +5804,7 @@ async function mergeDupGroup(idx){
     if(Object.keys(patch).length){
       let {error}=await sb.from('ghl_leads').update(patch).eq('id',target.id);
       if(error&&/deal_value/i.test(error.message||'')){ delete patch.deal_value; ({error}=await sb.from('ghl_leads').update(patch).eq('id',target.id)); }
+      if(error&&/deal_deposit/i.test(error.message||'')){ delete patch.deal_deposit; ({error}=await sb.from('ghl_leads').update(patch).eq('id',target.id)); }
       if(error) throw error;
       Object.assign(target,patch);
     }
@@ -6074,7 +6124,7 @@ if ('serviceWorker' in navigator) {
 
 /* Paste the Loom share link here (or a YouTube / Vimeo link - all three work).
    Until it is set the page shows everything except the player. */
-const ONBOARDING_VIDEO = '';
+const ONBOARDING_VIDEO = 'https://vimeo.com/1215625538/05d8a7f403';
 
 /** Accepts a share link, an embed link or a bare id and returns an embed src. */
 function onbEmbedUrl(raw){
@@ -6083,7 +6133,10 @@ function onbEmbedUrl(raw){
   let m;
   if ((m = u.match(/loom\.com\/(?:share|embed)\/([A-Za-z0-9]+)/))) return `https://www.loom.com/embed/${m[1]}`;
   if ((m = u.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/))) return `https://www.youtube.com/embed/${m[1]}?rel=0`;
-  if ((m = u.match(/vimeo\.com\/(?:video\/)?(\d+)/))) return `https://player.vimeo.com/video/${m[1]}`;
+  // The trailing id on an unlisted Vimeo link is the privacy hash; without it
+  // the player answers "private video", so it has to ride along as ?h=.
+  if ((m = u.match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/([A-Za-z0-9]+))?/)))
+    return `https://player.vimeo.com/video/${m[1]}${m[2] ? `?h=${m[2]}` : ''}`;
   if (/^[A-Za-z0-9]{20,}$/.test(u)) return `https://www.loom.com/embed/${u}`;   // bare Loom id
   if (/^https?:\/\//.test(u)) return u;                                          // already an embed url
   return '';
@@ -6646,7 +6699,7 @@ function buildLeadRows(leads){
       <td>${typePill(c.lead_type)||'<span style="color:var(--muted2)">·</span>'}${(()=>{const s=leadScore(c);const h=leadHeat(s);return `<span class="heat ${h.cls}" title="Score: ${s}">${h.icon} ${h.label}</span>`;})()}</td>
       <td class="col-desk" onclick="event.stopPropagation()">
         <div class="ltr-assign">
-          <button class="ltr-ab ${c.assigned_to==='nikola'?'on-m':''}" onclick="assignLead('${esc(c.id)}','nikola')">M</button>
+          <button class="ltr-ab ${c.assigned_to==='nikola'?'on-m':''}" onclick="assignLead('${esc(c.id)}','nikola')" title="closer-goat">C</button>
         </div>
       </td>
       <td class="col-desk" onclick="event.stopPropagation()">
@@ -6700,7 +6753,7 @@ function renderBulkBar(){
     <div class="bulk-sep"></div>
     <div class="bulk-group">
       <span class="bulk-lbl">Dodeli</span>
-      <button class="bulk-btn bulk-m" onclick="bulkAssign('nikola')">Nikola</button>
+      <button class="bulk-btn bulk-m" onclick="bulkAssign('nikola')">closer-goat</button>
       <button class="bulk-btn" onclick="bulkAssign(null)">Niko</button>
     </div>
     <div class="bulk-sep"></div>
@@ -6866,7 +6919,7 @@ function renderLeads(all){
       <span class="mochi-vsep"></span>
       <select class="msel" onchange="filterLeads(this.value)" title="Filtriraj po closeru">
         <option value="all" ${leadsFilter==='all'?'selected':''}>Svi closeri (${fc.all})</option>
-        <option value="nikola" ${leadsFilter==='nikola'?'selected':''}>Nikola (${fc.nikola||0})</option>
+        <option value="nikola" ${leadsFilter==='nikola'?'selected':''}>closer-goat (${fc.nikola||0})</option>
         <option value="unassigned" ${leadsFilter==='unassigned'?'selected':''}>Nedodeljeni (${fc.unassigned})</option>
       </select>
       <select class="msel" onchange="setTagFilter(this.value)" title="Filtriraj po tagu">
@@ -6972,7 +7025,7 @@ function openLeadDetail(id){
       </div>
       <div class="ldp-assign-row">
         <button class="ldp-assign-btn ${c.assigned_to==='nikola'?'ldp-ab-m':''}" onclick="assignLeadPanel('${esc(c.id)}','nikola')">
-          <span style="font-size:15px;font-weight:900;font-family:var(--font)">N</span> Nikola
+          <span style="font-size:15px;font-weight:900;font-family:var(--font)">C</span> closer-goat
         </button>
       </div>
       <div class="ldp-subgap">
@@ -6989,6 +7042,11 @@ function openLeadDetail(id){
                  value="${c.deal_value!=null?c.deal_value:''}" onchange="updateLeadDealValue('${esc(c.id)}',this.value)">
         </div>
       </div>
+      <label class="lc-dep-row">
+        <input type="checkbox" ${c.deal_deposit?'checked':''}
+          onchange="updateLeadDeposit('${esc(c.id)}',this.checked)"/>
+        Depozit / rezervacija
+      </label>
       <div class="ldp-notes-lbl">TEAM NOTES</div>
       <textarea class="lc-note-input ldp-notes" placeholder="Dodaj belešku o leadu…" onblur="saveLeadNote('${esc(c.id)}',this.value)">${esc(c.notes||'')}</textarea>
       <div class="ldp-notes-lbl">ZAKAZANI POZIVI</div>
@@ -7089,6 +7147,12 @@ function openLeadDetail(id){
 }
 
 /* ─── Lead-detail booking block: fetch this contact's GHL appointments ─── */
+/* The rows the panel is currently showing, kept so the reschedule dialog can
+   read an appointment by id (times, calendar, status) without a refetch, and so
+   a successful move can repaint from local state - the GET is edge-cached for
+   30s, long enough to hand back the old time right after a write. */
+let _apptRows = { contactId:null, host:null, evs:[] };
+
 async function renderLeadBookings(elId, contactId){
   const host=document.getElementById(elId);
   if(!host) return;
@@ -7101,14 +7165,24 @@ async function renderLeadBookings(elId, contactId){
       host.innerHTML=`<div class="ldp-appt-empty">Kalendar nedostupan${j&&j.hint?`: ${esc(j.hint)}`:''}</div>`;
       return;
     }
-    const evs=(j.events||[]).filter(e=>!e.deleted);
-    if(!evs.length){ host.innerHTML='<div class="ldp-appt-empty">Nema zakazanih poziva.</div>'; return; }
-    // newest first
-    evs.sort((a,b)=>String(b.startTime).localeCompare(String(a.startTime)));
-    host.innerHTML=evs.map(renderApptRow).join('');
+    // The closer may already have moved on to another lead; a late answer must
+    // not repaint their panel or leave the wrong rows behind the Pomeri button.
+    if(currentLeadId && currentLeadId!==contactId) return;
+    _apptRows={ contactId, host:elId, evs:(j.events||[]).filter(e=>!e.deleted) };
+    paintLeadBookings();
   }catch(e){
     host.innerHTML='<div class="ldp-appt-empty">Greška pri učitavanju poziva.</div>';
   }
+}
+
+function paintLeadBookings(){
+  const host=document.getElementById(_apptRows.host||'');
+  if(!host) return;
+  const evs=_apptRows.evs;
+  if(!evs.length){ host.innerHTML='<div class="ldp-appt-empty">Nema zakazanih poziva.</div>'; return; }
+  // newest first
+  evs.sort((a,b)=>String(b.startTime).localeCompare(String(a.startTime)));
+  host.innerHTML=evs.map(renderApptRow).join('');
 }
 
 function renderApptRow(e){
@@ -7123,6 +7197,8 @@ function renderApptRow(e){
   const addr=e.address||'';
   const isUrl=/^https?:\/\//.test(addr);
   const upcoming=start.getTime()>Date.now() && (s.c==='a-booked');
+  const dead=!_apptLive(e);
+  const canMove=/^[A-Za-z0-9_-]+$/.test(e.id||'') && (!dead || /^[A-Za-z0-9_-]+$/.test(e.contactId||''));
   return `<div class="ldp-appt">
     <div class="ldp-appt-date ${upcoming?'up':''}"><span class="d-dow">${esc(dow)}</span><span class="d-day">${esc(day)}</span></div>
     <div class="ldp-appt-main">
@@ -7130,8 +7206,219 @@ function renderApptRow(e){
       <div class="ldp-appt-time">${esc(t1)}${t2?'–'+esc(t2):''}</div>
       ${addr?`<div class="ldp-appt-loc">${isUrl?`<a href="${esc(addr)}" target="_blank" rel="noopener">${UI.link} Join Meet</a>`:`${UI.pin} ${esc(addr)}`}</div>`:''}
     </div>
-    <span class="ldp-appt-status ${s.c}">${esc(s.l)}</span>
+    <div class="ldp-appt-side">
+      <span class="ldp-appt-status ${s.c}">${esc(s.l)}</span>
+      ${canMove?`<button class="ldp-appt-move" onclick="apptMoveOpen('${e.id}')">${dead?'Zakaži ponovo':'Pomeri'}</button>`:''}
+    </div>
   </div>`;
+}
+
+/* ══ RESCHEDULE ═════════════════════════════════════════════════
+   "Pomeri" on a call in the lead panel. One dialog, two writes behind it:
+     · a live call  -> PUT ?eventId=…   moves it, GHL notifies the lead
+     · a no-show or cancelled call -> PUT ?contactId=…  books a new one, so the
+       missed call stays visible in the lead's history
+   The clash check runs here rather than on GHL: the API call deliberately
+   passes ignoreFreeSlotValidation (a closer must be able to book outside the
+   widget's published hours), so this is the only thing standing between the
+   closer and a double-booking. It sees every call in the Kalendar cache plus
+   every blocked range. */
+const APPT_STEPS = [
+  ['Sutra',        1],
+  ['Za 2 dana',    2],
+  ['Za nedelju',   7],
+];
+
+function _apptFind(id){ return (_apptRows.evs||[]).find(e=>String(e.id)===String(id)) || null; }
+
+/* Only a call still ahead of us gets moved. One that already happened - showed,
+   no-show, cancelled - keeps its place in the lead's history and the closer
+   gets a fresh call instead. */
+function _apptLive(e){
+  const st=String(e.appointmentStatus||e.appoinmentStatus||'').toLowerCase();
+  if(/^(cancelled|invalid|noshow|showed)$/.test(st)) return false;
+  const endTs=new Date(e.endTime||e.startTime).getTime();
+  return Number.isFinite(endTs) && endTs>Date.now();
+}
+
+function apptMoveOpen(id){
+  const e=_apptFind(id);
+  if(!e) return;
+  const dead=!_apptLive(e);
+  const s0raw=new Date(e.startTime);
+  const s0=Number.isFinite(s0raw.getTime())?s0raw:new Date();
+  const e0=e.endTime?new Date(e.endTime):new Date(s0.getTime()+30*6e4);
+  const mins=Math.min(Math.max(Math.round((e0-s0)/6e4)||30,5),480);
+
+  /* Default to the same time of day, on the next day that has not happened
+     yet - a closer reaching for this button is almost never rebooking into
+     the past. */
+  const d=new Date(s0);
+  while(d.getTime()<=Date.now()) d.setDate(d.getDate()+1);
+  const p=n=>String(n).padStart(2,'0');
+
+  document.getElementById('rsch-overlay')?.remove();
+  const ov=document.createElement('div');
+  ov.id='rsch-overlay'; ov.className='fdrill-overlay';
+  ov.style.zIndex='600';               // above the lead panel (z-index 500)
+  ov.dataset.eventId=String(e.id);
+  ov.dataset.mins=String(mins);
+  ov.dataset.mode=dead?'new':'move';
+  const was=`${s0.toLocaleDateString(_LOC,{weekday:'long',day:'numeric',month:'long'})} u ${s0.toLocaleTimeString(_LOC,{hour:'2-digit',minute:'2-digit'})}`;
+  ov.innerHTML=`<div class="fdrill fdrill-sm" role="dialog" aria-modal="true" aria-label="${dead?'Zakaži novi termin':'Pomeri termin'}">
+    <div class="fdrill-hd">
+      <div class="fdrill-ttl">${dead?'Zakaži novi termin':'Pomeri termin'}</div>
+      <button class="fdrill-x" onclick="apptMoveClose()" aria-label="Zatvori">&times;</button>
+    </div>
+    <div class="fdrill-body">
+      <div class="cblk-form">
+        <div class="rsch-cur">${dead
+          ? `Poziv od <b>${esc(was)}</b> ostaje u istoriji. Zakazuje se novi termin, ${mins} min.`
+          : `Trenutno: <b>${esc(was)}</b> · ${mins} min`}</div>
+        <div class="cblk-times">
+          <div class="cblk-row">
+            <label class="cblk-lbl" for="rsch-date">Novi datum</label>
+            <input class="cblk-in" type="date" id="rsch-date" value="${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}" />
+          </div>
+          <div class="cblk-row">
+            <label class="cblk-lbl" for="rsch-time">Vreme</label>
+            <input class="cblk-in" type="time" id="rsch-time" value="${p(s0.getHours())}:${p(s0.getMinutes())}" step="900" />
+          </div>
+        </div>
+        <div class="cblk-quick">
+          ${APPT_STEPS.map(([lbl,n])=>`<button class="cblk-qbtn" onclick="apptMoveQuick(${n})">${lbl}</button>`).join('')}
+        </div>
+        <label class="rsch-notify"><input type="checkbox" id="rsch-notify" checked /> Obavesti leada o novom terminu</label>
+        <div class="cblk-err" id="rsch-err" style="display:none"></div>
+        <div class="cblk-actions">
+          <button class="cblk-cancel" onclick="apptMoveClose()">Otkaži</button>
+          <button class="cblk-save" id="rsch-save" onclick="apptMoveSave()">${dead?'Zakaži':'Pomeri'}</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  ov.addEventListener('click',ev=>{ if(ev.target===ov) apptMoveClose(); });
+  document.body.appendChild(ov);
+  lockBody();
+  document.addEventListener('keydown',_rschEsc);
+  // Warm what the clash check needs, in case the closer came straight to a lead
+  // and never opened Kalendar this session.
+  if(!_calBlocks.length) loadCalBlocks().catch(()=>{});
+}
+const _rschEsc=e=>{ if(e.key==='Escape') apptMoveClose(); };
+function apptMoveClose(){
+  if(document.getElementById('rsch-overlay')) unlockBody();
+  document.getElementById('rsch-overlay')?.remove();
+  document.removeEventListener('keydown',_rschEsc);
+}
+/** Quick chips move the date only - the time the lead already agreed to stays. */
+function apptMoveQuick(days){
+  const el=document.getElementById('rsch-date');
+  if(!el) return;
+  const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+days);
+  const p=n=>String(n).padStart(2,'0');
+  el.value=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+}
+function apptMoveErr(msg){
+  const el=document.getElementById('rsch-err');
+  if(!el) return;
+  el.textContent=msg||'';
+  el.style.display=msg?'':'none';
+}
+
+async function apptMoveSave(){
+  const ov=document.getElementById('rsch-overlay');
+  const btn=document.getElementById('rsch-save');
+  if(!ov) return;
+  const ev=_apptFind(ov.dataset.eventId);
+  if(!ev) return apptMoveErr('Termin više nije dostupan. Zatvori i osveži.');
+  const mode=ov.dataset.mode, mins=Number(ov.dataset.mins)||30;
+  const dateV=(document.getElementById('rsch-date')||{}).value||'';
+  const timeV=(document.getElementById('rsch-time')||{}).value||'';
+  const notify=!!(document.getElementById('rsch-notify')||{}).checked;
+  apptMoveErr('');
+
+  if(!dateV||!timeV) return apptMoveErr('Izaberi datum i vreme.');
+  const [y,m,d]=dateV.split('-').map(Number);
+  const [hh,mm]=timeV.split(':').map(Number);
+  const start=new Date(y,m-1,d,hh,mm,0,0);
+  const end=new Date(start.getTime()+mins*6e4);
+  if(start.getTime()<Date.now()-6e4) return apptMoveErr('Taj termin je već prošao.');
+
+  const tt=x=>x.toLocaleTimeString(_LOC,{hour:'2-digit',minute:'2-digit'});
+  const idle=()=>{ if(btn){ btn.disabled=false; btn.textContent=mode==='new'?'Zakaži':'Pomeri'; } };
+  const busy=txt=>{ if(btn){ btn.disabled=true; btn.textContent=txt; } };
+
+  // Another call in that slot? GHL is not checking, so we do. Straight to a lead
+  // without opening Kalendar leaves the cache cold, so fetch that one day.
+  let known=_calCache?.evs;
+  if(!known){
+    busy('Proveravam...');
+    const d0=new Date(y,m-1,d).getTime();
+    known=await fetch(`/api/ghl-appointments?start=${d0}&end=${d0+864e5}`)
+      .then(r=>r.ok?r.json():null).then(j=>(j&&j.events||[]).filter(x=>!x.deleted)).catch(()=>null);
+    idle();
+    if(!known) return apptMoveErr('Kalendar trenutno nije dostupan, pa ne mogu da proverim da li je termin slobodan. Pokušaj ponovo.');
+  }
+  const clash=known.find(x=>{
+    if(String(x.id)===String(ev.id)) return false;
+    if(_apptSt(x)==='cancelled') return false;
+    const s=new Date(x.startTime).getTime(), en=new Date(x.endTime||x.startTime).getTime();
+    return s<end.getTime() && en>start.getTime();
+  });
+  if(clash) return apptMoveErr(`U tom terminu već postoji poziv (${tt(new Date(clash.startTime))}). Izaberi drugo vreme.`);
+  const blocked=(_calBlocks||[]).find(b=>b.s<end.getTime() && b.e>start.getTime());
+  if(blocked) return apptMoveErr(`To vreme je blokirano (${tt(new Date(blocked.s))}–${tt(new Date(blocked.e))}). Ukloni blokadu ili izaberi drugo vreme.`);
+
+  busy('Čuvam...');
+  const startISO=localISO(start), endISO=localISO(end);
+  const q=mode==='new'
+    ? `contactId=${encodeURIComponent(ev.contactId||'')}`
+    : `eventId=${encodeURIComponent(ev.id)}`;
+  let j={}, ok=false, status=0;
+  try{
+    const r=await fetch(`/api/ghl-appointments?${q}`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        startTime:startISO, endTime:endISO, notify,
+        ...(ev.calendarId?{calendarId:ev.calendarId}:{}),
+        ...(mode==='new'&&ev.title?{title:ev.title}:{}),
+      }),
+    });
+    status=r.status;
+    j=await r.json().catch(()=>({}));
+    ok=r.ok;
+  }catch(e){ j={error:'Mreža nije dostupna.'}; }
+
+  idle();
+  if(!ok){
+    return apptMoveErr((status===401||status===403)
+      ? 'GHL token nema dozvolu za izmenu termina ("Edit Calendar Events"). Javi Luki da je doda.'
+      : (j.detail||j.error||`Nije uspelo (${status||'greška'}).`));
+  }
+
+  /* Repaint from local state. The calendar GET is edge-cached for 30s, so
+     refetching right now can hand back the old time. */
+  if(mode==='new'){
+    const fresh={ ...ev, id:j.eventId||`new-${startISO}`, startTime:startISO, endTime:endISO,
+      appointmentStatus:'confirmed', address:'' };
+    _apptRows.evs=[fresh,..._apptRows.evs];
+    if(_calCache) _calCache.evs=[..._calCache.evs,fresh];
+  }else{
+    ev.startTime=startISO; ev.endTime=endISO;
+    const cached=(_calCache?.evs||[]).find(x=>String(x.id)===String(ev.id));
+    if(cached){ cached.startTime=startISO; cached.endTime=endISO; }
+  }
+  if(_calCache) _calCache.at=0;          // next Kalendar visit refetches for real
+  paintLeadBookings();
+  apptMoveClose();
+  if(currentTab==='kalendar') renderCalUI();
+
+  const whenLbl=`${start.toLocaleDateString(_LOC,{weekday:'long',day:'numeric',month:'long'})} u ${tt(start)}`;
+  showToast({ variant:'success',
+    title: mode==='new' ? 'Novi termin zakazan' : 'Termin pomeren',
+    message: `${whenLbl}.${notify?' Lead je obavešten.':' Lead nije obavešten.'}` });
 }
 
 function closeLeadDetail(){
@@ -7242,7 +7529,7 @@ function renderLeadCard(lead, subTab){
       <span class="lc-status ${stPillCls}">${st}</span>
     </div>
 
-    ${hasDeal?`<div class="lc-deal-badge">${DEALS[lead.deal].icon} ${DEALS[lead.deal].label}<strong>${DEALS[lead.deal].price}</strong></div>`:''}
+    ${hasDeal?`<div class="lc-deal-badge">${DEALS[lead.deal].icon} ${DEALS[lead.deal].label}<strong>${DEALS[lead.deal].price}</strong>${lead.deal_deposit?'<span class="lc-dep-badge">DEPOZIT</span>':''}</div>`:lead.deal_deposit?'<div class="lc-deal-badge"><span class="lc-dep-badge">DEPOZIT</span></div>':''}
 
     ${fields.length?`<div class="lc-sep"></div>
     <div class="lc-fields" style="margin-bottom:14px">
@@ -7254,7 +7541,7 @@ function renderLeadCard(lead, subTab){
     <div class="lc-actions" style="margin-top:14px">
       <div class="lc-assign">
         <button class="lc-ab ${assigned==='nikola'?'on-m':''}" onclick="assignLead('${esc(lead.id)}','nikola')">
-          <img src="nikola.png" onerror="this.style.display='none'"/> Nikola
+          <span class="lc-ab-ini">C</span> closer-goat
         </button>
       </div>
       <select class="lc-stsel" onchange="updateLeadStatus('${esc(lead.id)}',this.value)">
@@ -7269,11 +7556,14 @@ function renderLeadCard(lead, subTab){
       <span class="lc-deal-lbl">PAKET</span>
       <select class="lc-deal-sel" onchange="updateLeadDeal('${esc(lead.id)}',this.value)">
         <option value="">Nije odabran</option>
-        <option value="cpa"         ${lead.deal==='cpa'        ?'selected':''}>CPA (min. depozit $300)</option>
-        <option value="funded_100k" ${lead.deal==='funded_100k'?'selected':''}>Funded 100K</option>
-        <option value="funded_200k" ${lead.deal==='funded_200k'?'selected':''}>Funded 200K</option>
+        ${Object.entries(DEALS).map(([k,v])=>`<option value="${k}" ${lead.deal===k?'selected':''}>${v.label}${v.price?' · '+v.price:''}</option>`).join('')}
       </select>
     </div>
+    <label class="lc-dep-row">
+      <input type="checkbox" ${lead.deal_deposit?'checked':''}
+        onchange="updateLeadDeposit('${esc(lead.id)}',this.checked)"/>
+      Depozit / rezervacija
+    </label>
 
     <div class="lc-fu-row">
       <span class="lc-fu-lbl">${UI.calendar} Follow-up</span>
@@ -7374,6 +7664,14 @@ async function updateLeadStatus(id,status){
   const oldStatus=lead?(lead.status||'Novi'):null;
   if (oldStatus === status) return;  // no-op
   const {error}=await sb.from('ghl_leads').update({status}).eq('id',id);
+  // A failed write used to fall through silently: no toast, no log, no revert,
+  // so the button looked like it worked while nothing reached the database.
+  if(error){
+    console.error('[updateLeadStatus] write failed', { id, status, error });
+    showToast({ variant:'error', title:'Status nije sačuvan',
+                message: error.message || error.hint || 'Nepoznata greška' });
+    return;
+  }
   if(!error){
     if(lead){
       if (status === 'Closed') notifySlack('closed', lead, { deal_value: lead.deal_value, closer: (lead.assigned_to ? lead.assigned_to.charAt(0).toUpperCase()+lead.assigned_to.slice(1) : '') });
@@ -7416,6 +7714,23 @@ async function pushStatusToGHL(contactId, oldStatus, newStatus){
       body: JSON.stringify(payload),
     });
   } catch (e) { /* non-fatal */ }
+}
+
+async function updateLeadDeposit(id,val){
+  const lead=cachedLeads.find(l=>l.id===id);
+  const {error}=await sb.from('ghl_leads').update({deal_deposit:!!val}).eq('id',id);
+  if(error){
+    /* Most likely the column is missing: deal-update.sql has not been run yet.
+       Say so instead of silently un-checking. */
+    showToast({ variant:'error', title:'Depozit nije sačuvan',
+      message:/deal_deposit/i.test(error.message||'')
+        ? 'Kolona deal_deposit ne postoji. Pokreni deal-update.sql u Supabase SQL editoru.'
+        : (error.message||'Nepoznata greška') });
+    renderLeads(cachedLeads);
+    return;
+  }
+  if(lead){ lead.deal_deposit=!!val; renderLeads(cachedLeads);
+    logActivity(id,'deal_deposit',null,val?'da':'ne'); }
 }
 
 async function updateLeadDeal(id,deal){
@@ -7465,14 +7780,42 @@ async function updateLeadDealValue(id,val){
   const num = val==='' || val==null ? null : Number(val);
   if (num!=null && (isNaN(num) || num<0)) return;
   const oldVal = lead ? (lead.deal_value!=null ? lead.deal_value : null) : null;
-  const {error}=await sb.from('ghl_leads').update({deal_value:num}).eq('id',id);
-  if(!error){
-    if(lead){
-      lead.deal_value=num;renderLeads(cachedLeads);
-      if(lead.status==='Closed'&&num>0&&num!==oldVal) notifySlack('closed', lead, { deal_value: num, closer: (lead.assigned_to ? lead.assigned_to.charAt(0).toUpperCase()+lead.assigned_to.slice(1) : ''), note: 'Vrednost ažurirana' });
-    }
-    logActivity(id,'deal_value',oldVal!=null?'€'+oldVal:null,num!=null?'€'+num:null);
+
+  // "Zatvoreno za €X" IS a close - the field's label promises it. Entering an
+  // amount used to leave status untouched, so leads sat on Novi with money on
+  // them, invisible to Metrics and to the partner commission ledger.
+  const oldStatus = lead ? (lead.status||'Novi') : null;
+  const autoClose = num>0 && lead && oldStatus!=='Closed';
+  const patch = autoClose ? { deal_value:num, status:'Closed' } : { deal_value:num };
+
+  const {error}=await sb.from('ghl_leads').update(patch).eq('id',id);
+  if(error){
+    console.error('[updateLeadDealValue] write failed', { id, patch, error });
+    showToast({ variant:'error', title:'Iznos nije sačuvan',
+                message: error.message || error.hint || 'Nepoznata greška' });
+    return;
   }
+  if(lead){
+    lead.deal_value=num;
+    if(autoClose){
+      lead.status='Closed';
+      setLocalLastActivity(id, 'status', 'Closed', oldStatus);
+      logActivity(id,'status',oldStatus,'Closed');
+      pushStatusToGHL(id, oldStatus, 'Closed');
+      if (currentLeadId === id) updatePanelStatusButtons('Closed');
+      showToast({ variant:'success', title:'Lead zatvoren',
+                  message:`${lead.name||'Lead'} · €${num.toLocaleString(_LOC)}` });
+      // The commission ledger mirrors a close only once a deal type is picked.
+      if(!lead.deal){
+        showToast({ variant:'warning', title:'Izaberi tip deala',
+                    message:'Bez tipa (CPA / Funded) deal ne ulazi u proviziju.' });
+      }
+    }
+    renderLeads(cachedLeads);
+    if((lead.status==='Closed')&&num>0&&num!==oldVal)
+      notifySlack('closed', lead, { deal_value: num, closer: (lead.assigned_to ? lead.assigned_to.charAt(0).toUpperCase()+lead.assigned_to.slice(1) : ''), note: autoClose ? 'Zatvoreno unosom vrednosti' : 'Vrednost ažurirana' });
+  }
+  logActivity(id,'deal_value',oldVal!=null?'€'+oldVal:null,num!=null?'€'+num:null);
 }
 
 /* ── GOOGLE SHEETS REVENUE ── */
@@ -7599,11 +7942,11 @@ async function syncClosedFromSheet(opts = {}){
 
 /* ─────────────────── AUTO ROUND-ROBIN ASSIGNMENT ──────────────────
  * Fairly distributes unassigned tracker-relevant leads between
- * Nikola and Dušica. Whoever has fewer open leads (status not in
+ * closer-goat and Dušica. Whoever has fewer open leads (status not in
  * Closed/DQ) gets the next one. Activity log records each.
  * ─────────────────────────────────────────────────────────────── */
 async function autoAssignUnassigned(){
-  // Single closer (Nikola): claim every unassigned, open, qualified lead.
+  // Single closer (closer-goat): claim every unassigned, open, qualified lead.
   const { data, error } = await sb.from('ghl_leads')
     .select('id,date_added,tags,status')
     .is('assigned_to', null)
