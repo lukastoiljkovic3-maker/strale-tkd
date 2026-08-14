@@ -148,6 +148,37 @@ SETTER VIBE — OBAVEZNO:
 
 Vrati SAMO tekst poruke, bez navodnika, bez objašnjenja, bez potpisa.`;
 
+const ASKFX_KB = `
+=== CJURE / CjureFX (Marko Ćurguz, @cjuree) ===
+Offer: AI Trading Bot (Trading AI Mind, tradingaimind.com) + funded nalozi. Jezik: srpski (ekavica).
+Funnel: cjurefx.org (webinar optin) -> /pitanja kvalifikacija -> WhatsApp grupa; poziv se zakazuje na cjurefx.org/zakazi (30 min, besplatan).
+Paketi: funded nalog (npr. 100.000 EUR nalog = 1.000 EUR jednokratno) + pristup botu: mesečni plan, godišnji plan ili doživotni (lifetime, npr. 2.000 EUR jednokratno). VIP grupa sa signalima kao bonus.
+Bot: radi automatizovano na MT5, XAUUSD fokus, klijent dobija podešavanja od tima (nikad sam ne podešava). Radi i na malim i na funded nalozima.
+Funded nalozi: preko prop firmi (npr. Tradova), do 500.000 EUR tuđeg kapitala. KYC obavezan. Isplate vrši prop firma po svojim pravilima.
+Garancija zamene: ako bot sa ZVANIČNIM podešavanjima spali funded nalog (bez ručnih trejdova/izmena), firma o svom trošku daje nov nalog iste vrednosti (30 dana, uz proveru istorije trgovanja).
+Pravno lice: CJR TOP STRIKER LLC. Ugovor se potpisuje pre uplate.
+Social proof: testimonijali na cjurefx.org/david (isplata $2.781) i /miodrag ($1.200 sa Tradove); rezultati članova u kanalima.
+
+=== MAMINJO / MaminjoFX (Leo Alagić, @maminjjo) ===
+Jezik: hrvatski (standardni HR). Zajednica 20.000+ članova, signali od 2018, 5-7 signala dnevno.
+Offer: besplatni webinar (maminjo.com) -> pitanja (/pitanja) -> WhatsApp grupa (/hvala). Na webinaru: kako čitaju tržište, ulasci/izlasci, risk management, AI bot uživo na pravom računu, put do funded računa.
+Posle webinara prodaja: pristup botu + signali + edukacija (uslovi po aktuelnoj ponudi tima).
+Ton: bez obećanja zarade, edukativno, "sustav iza signala".
+
+=== STRALE / StraleTKD ===
+Jezik: srpski. Offer: precizni forex signali + pristup funded nalozima do $200.000 bez depozita.
+Funnel: straletkd.com (VSL + typeform prijava) -> kvalifikovani idu na /hvala sa GHL kalendarom (zakazivanje poziva) -> /booked potvrda; nekvalifikovani idu u besplatnu Telegram grupu (t.me/tkdvision1).
+Partnerstvo: Cjure uzima 20% od svakog Strale close-a (bot + funded); CPA dealovi bez provizije.
+Bot: isti AI trading bot (Tradova), H1 za forex parove, H4 za XAUUSD.
+
+=== ZAJEDNIČKA PRAVILA ZA TIM ===
+- NIKAD ne obećavaj zaradu, profit ni "garantovane" prinose. Trading nosi rizik. Prošli rezultati nisu garancija.
+- Cene i uslovi iz ugovora su merodavni; ako nisi siguran za cenu, reci da proveriš sa Lukom/Markom.
+- Poziv je konsultativan: situacija, cilj, kapital, pa preporuka paketa.
+- Isplate uvek radi prop firma / platforma, ne mi.
+- DQ lead (dq/low-value tag): ne gurati na poziv, uputiti na besplatnu grupu i sadržaj.
+`;
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -159,6 +190,29 @@ export default async function handler(req, res) {
   let body;
   try { body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {}); }
   catch { return res.status(400).json({ error: 'Invalid JSON' }); }
+  /* Ask FX AI mode: internal knowledge assistant for the dialer team. */
+  if (body && body.ask === true) {
+    const messages = Array.isArray(body.messages) ? body.messages.slice(-12) : [];
+    if (!messages.length) return res.status(400).json({ error: 'No messages' });
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({
+          model: MODEL,
+          max_tokens: 700,
+          system: `Ti si "FX AI", interni asistent za sales/dialer tim agencije 2Busy. Odgovaraš na pitanja o tri ponude: CJURE, MAMINJO i STRALE, isključivo na osnovu baze znanja ispod. Odgovaraj kratko, konkretno i praktično, na srpskom (za Maminjo pitanja možeš na hrvatskom). Ako nešto nije u bazi, reci iskreno da ne znaš i da se proveri sa Lukom. Nikad ne obećavaj zaradu.\n\nBAZA ZNANJA:\n${ASKFX_KB}`,
+          messages: messages.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content || '').slice(0, 4000) })),
+        }),
+      });
+      const json = await r.json();
+      if (!r.ok) return res.status(500).json({ error: json.error?.message || `Anthropic ${r.status}` });
+      const answer = (json.content || []).map(c => c.text || '').join('').trim();
+      if (!answer) return res.status(500).json({ error: 'Empty response' });
+      return res.status(200).json({ answer });
+    } catch (e) { return res.status(500).json({ error: e.message }); }
+  }
+
 
   const lead = body.lead || {};
   const scenario = body.scenario || 'first-touch';

@@ -672,6 +672,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 40px; display: flex; fle
 .mochi-count { margin-left: auto; font-size: 12px; color: #71717A; font-weight: 500; white-space: nowrap; }
 
 .mst {
+  color: var(--text); background: rgba(255,255,255,.06);
   appearance: none; -webkit-appearance: none; border: none; cursor: pointer; outline: none;
   padding: 4px 10px; border-radius: 6px; font-size: 10.5px; font-weight: 600;
   font-family: var(--font); text-transform: uppercase; letter-spacing: .4px; text-align: center;
@@ -2631,6 +2632,144 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.6);cursor:p
   .close-celebrate { top: calc(24px + env(safe-area-inset-top)) !important; }
 }
 
+
+/* FXPORT-V1 */
+/* ── GLASS POLISH (21st.dev recipe: top hairline + bottom inset + soft depth) ── */
+.kpi{box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.stale-banner,.dupe-banner{box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 8px 28px -12px rgba(0,0,0,.5)}
+.leads-tbl-wrap,.ads-tbl-wrap{box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 16px 44px -18px rgba(0,0,0,.55)}
+.stl-toast{box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -1px 0 rgba(0,0,0,.3),0 16px 40px rgba(0,0,0,.5)}
+.lead-detail-panel{box-shadow:inset 0 1px 0 rgba(255,255,255,.07),-24px 0 60px -20px rgba(0,0,0,.6)}
+.mtab.active{box-shadow:inset 0 1px 0 rgba(255,255,255,.65),0 2px 10px rgba(0,0,0,.35)}
+.filter-btn,.mbtn,.msel{box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.filter-btn:hover,.mbtn:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 4px 14px rgba(0,0,0,.3)}
+.ldp-card{box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 10px 30px -14px rgba(0,0,0,.5)}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid rgba(59,130,246,.5);outline-offset:2px}
+
+/* ── MOBILE POLISH (dialer pass) ── */
+@media (max-width:640px){
+  /* Toasts: bottom sheet style, max 2 visible, never a full-screen pile */
+  .stl-toast{padding:10px 12px;border-radius:12px}
+  .stl-toast-wrap .stl-toast:nth-last-child(n+3){display:none}
+  /* Leads table: drop the cramped Tip column, contact cell gets the room */
+  .leads-tbl thead th:nth-child(5), .leads-tbl tbody td:nth-child(5){display:none}
+  /* Alert banners: compact, numbers stop shouting */
+  .stale-banner{padding:11px 14px;gap:10px;margin-bottom:10px}
+  .stale-banner-count{font-size:20px}
+  .stale-banner-title{font-size:12px}
+  .stale-banner-sub{font-size:10.5px}
+  /* Filter rail: compact controls, consistent height */
+  .msel{font-size:14px!important;padding:9px 11px!important;max-width:46vw;border-radius:10px}
+  .mbtn{padding:9px 12px;font-size:12px}
+  .mtab{padding:8px 12px;font-size:11.5px}
+  .mdate{padding:7px 10px;font-size:11.5px}
+  /* Breathing room between control rows */
+  .mochi-filter-row{gap:8px;margin-bottom:10px}
+  .leads-toolbar{margin-bottom:10px}
+  /* Row internals: looser vertical rhythm */
+  .leads-tbl tbody td{padding:16px 8px}
+  .ltr-sub{font-size:10px}
+  .last-action{font-size:10px;margin-top:5px}
+}
+/* ── SIDENAV (desktop, GHL-style rail) ── */
+.sidenav{display:none}
+@media (min-width:1100px){
+  .sidenav{position:fixed;left:0;top:64px;bottom:0;width:192px;z-index:60;
+    display:flex;flex-direction:column;gap:4px;padding:18px 12px;
+    background:rgba(13,13,16,.92);-webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+    border-right:1px solid var(--b)}
+  main{margin-left:192px}
+  .toolbar .tabs{display:none}
+  .bnav{display:none!important}
+}
+.sn-item{display:flex;align-items:center;gap:11px;width:100%;padding:11px 13px;border-radius:11px;
+  background:none;border:1px solid transparent;color:var(--muted);font-family:var(--font);
+  font-size:13px;font-weight:700;cursor:pointer;text-align:left;transition:all .15s}
+.sn-item:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.sn-item.active{background:rgba(255,255,255,.07);border-color:var(--b);color:var(--text);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.sn-item svg{flex-shrink:0;opacity:.8}
+.sn-sep{height:1px;background:var(--b);margin:8px 4px}
+.sn-item.sn-ai{color:#93c5fd}
+.sn-item.sn-ai:hover,.sn-item.sn-ai.active{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.35);color:#bfdbfe}
+
+/* ── ASK FX AI chat ── */
+.afx-wrap{max-width:760px;margin:0 auto;width:100%}
+.afx-head{margin-bottom:14px}
+.afx-title{font-size:17px;font-weight:900;color:var(--text)}
+.afx-sub{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.6}
+.afx-thread{display:flex;flex-direction:column;gap:10px;min-height:200px;margin-bottom:14px}
+.afx-msg{max-width:85%;padding:11px 15px;border-radius:16px;font-size:13.5px;line-height:1.65;white-space:pre-wrap}
+.afx-msg.u{align-self:flex-end;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:var(--text);border-bottom-right-radius:5px}
+.afx-msg.a{align-self:flex-start;background:var(--s2);border:1px solid var(--b);color:var(--text);border-bottom-left-radius:5px}
+.afx-msg.thinking{color:var(--muted);font-style:italic}
+.afx-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.afx-chip{padding:8px 14px;border-radius:99px;border:1px solid var(--b);background:var(--s2);color:var(--muted);
+  font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.afx-chip:hover{border-color:rgba(59,130,246,.45);color:var(--text)}
+.afx-inputrow{display:flex;gap:8px;position:sticky;bottom:12px}
+.afx-input{flex:1;min-height:48px;padding:13px 16px;border-radius:14px;border:1px solid var(--b);
+  background:var(--s2);color:var(--text);font-family:var(--font);font-size:14px;outline:none;resize:none}
+.afx-input:focus{border-color:rgba(59,130,246,.5)}
+.afx-send{padding:0 20px;border-radius:14px;border:none;background:#3B82F6;color:#fff;
+  font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer}
+.afx-send:disabled{opacity:.5;cursor:wait}
+@media (max-width:640px){ .afx-input{font-size:16px} .afx-msg{max-width:94%} }
+
+/* ── WA template manager ── */
+.wt-overlay{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px}
+.wt-panel{width:min(560px,100%);max-height:86vh;overflow:auto;background:var(--s1,#0d0d10);border:1px solid var(--b);border-radius:18px;padding:20px;box-shadow:0 24px 80px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06)}
+.wt-title{display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:900;color:var(--text);margin-bottom:10px}
+.wt-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1}
+.wt-vars{font-size:11.5px;color:var(--muted);line-height:1.7;margin-bottom:14px}
+.wt-vars code{background:rgba(255,255,255,.07);border-radius:5px;padding:1px 5px;color:var(--text)}
+.wt-row{border:1px solid var(--b);border-radius:14px;padding:12px;margin-bottom:10px;background:var(--s2)}
+.wt-row.on{border-color:var(--accent)}
+.wt-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.wt-name{flex:1;background:none;border:none;color:var(--text);font-family:var(--font);font-size:13px;font-weight:800;outline:none}
+.wt-del{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer}
+.wt-text{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:10px;color:var(--text);font-family:var(--font);font-size:13px;line-height:1.6;padding:10px;outline:none;resize:vertical}
+.wt-text:focus{border-color:var(--accent)}
+.wt-add{margin-top:2px}
+@media (max-width:640px){ .wt-text{font-size:16px} }
+/* ── Ads view v2: responsive stats, hint, mobile cards ── */
+.ads-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(108px,1fr));gap:10px;margin-bottom:14px}
+.ads-stat{background:var(--s2);border:1px solid var(--b);border-radius:14px;padding:14px 12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.ads-stat-v{font-size:21px;font-weight:900;color:var(--text);letter-spacing:-.5px}
+.ads-stat-l{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-top:3px}
+.ads-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-bottom:14px;flex-wrap:wrap}
+.ads-hint{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.3);border-radius:14px;padding:13px 16px;font-size:12.5px;line-height:1.65;color:var(--muted);margin-bottom:14px}
+.ads-hint b{color:var(--text)}
+.ads-bar-fill{transform-origin:left}
+.ads-mobile{display:none}
+.ads-card{background:var(--s2);border:1px solid var(--b);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.ads-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.ads-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.ads-card-grid b{display:block;font-size:16px;font-weight:900;color:var(--text)}
+.ads-card-grid span{font-size:8.5px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+.ads-card-grid .cvr-high{color:var(--green)}.ads-card-grid .cvr-mid{color:var(--yellow)}.ads-card-grid .cvr-low{color:var(--red)}
+.ads-card-grid .roas-good{color:var(--green)}.ads-card-grid .roas-ok{color:var(--yellow)}.ads-card-grid .roas-bad{color:var(--red)}
+.ads-card-spend{display:flex;align-items:center;gap:10px;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+.ads-card-spend .ad-spend-input{flex:1;font-size:16px}
+@media (max-width:720px){
+  .ads-desktop{display:none}
+  .ads-mobile{display:block}
+  .ads-stats{grid-template-columns:repeat(2,1fr)}
+  .ads-actions{justify-content:stretch}
+  .ads-actions .ads-view-btn,.ads-actions .sync-btn{flex:1;justify-content:center}
+}
+
+select { color: var(--text); }
+select option { background: #1C1C22; color: #f0f0f4; }
+.ltr-namerow { display:flex; align-items:center; gap:8px; min-width:0; }
+.ltr-namerow .ltr-name { flex:0 1 auto; min-width:0; }
+.ltr-namerow .ca-row { flex-shrink:0; margin-left:0; }
+.ltr-contact .ltr-sub { display:inline-flex; align-items:center; margin-right:6px; vertical-align:middle; }
+.ldp-contact-actions { grid-template-columns: repeat(auto-fit, minmax(min(132px,100%), 1fr)) !important; }
+.ldp-contact-actions > * { min-width: 0; }
+.ldp-contact-actions .ldp-ca-btn, .ldp-ai-group .ldp-ca-ai { min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.ldp-call-outcomes { grid-template-columns: repeat(auto-fit, minmax(min(110px,100%), 1fr)) !important; }
+.ldp-call-outcomes .ldp-co-btn { min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 </style>
 </head>
 <body>
@@ -2771,11 +2910,38 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.6);cursor:p
       <button class="tab" data-member="metrics" onclick="setTab('metrics')">
         <span class="tab-pip" style="background:var(--yellow)"></span> Metrics
       </button>
+      <button class="tab" data-member="askfx" onclick="setTab('askfx')"><span class="tab-pip" style="background:#60a5fa"></span> Ask FX AI</button>
       <button class="tab" data-member="uputstvo" onclick="setTab('uputstvo')">
         <span class="tab-pip" style="background:#a78bfa"></span> Uputstvo
       </button>
     </div>
   </div>
+  <!-- SIDEBAR (desktop, GHL-style) -->
+  <aside class="sidenav" id="sidenav">
+    <button class="sn-item active" data-tab="leads" onclick="setTab('leads')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Leads
+    </button>
+    <button class="sn-item" data-tab="kalendar" onclick="setTab('kalendar')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Kalendar
+    </button>
+    <button class="sn-item" data-tab="metrics" onclick="setTab('metrics')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+      Metrics
+    </button>
+    <button class="sn-item" data-tab="uputstvo" onclick="setTab('uputstvo')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Uputstvo
+    </button>
+    <div class="sn-sep"></div>
+    <button class="sn-item sn-ai" data-tab="askfx" onclick="setTab('askfx')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.7L19.6 10l-5.7 1.9L12 17.6l-1.9-5.7L4.4 10l5.7-1.9z"/></svg>
+      Ask FX AI
+    </button>
+  </aside>
+
+
 
   <!-- KPI -->
   <div class="kpi-grid" id="kpiGrid"></div>
@@ -3173,6 +3339,7 @@ function setTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.member === tab));
   document.querySelectorAll('.bnav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.sn-item').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   const _fab = document.querySelector('.fab'); if (_fab) _fab.classList.add('fab-hidden');
 
   // Clear any existing metrics refresh interval
@@ -3222,6 +3389,12 @@ async function render() {
     kpi.innerHTML = '';
     mc.style.cssText = 'display:block;';
     await renderMetricsTab();
+    return;
+  }
+  if (currentTab === 'askfx') {
+    kpi.innerHTML = '';
+    mc.style.cssText = 'display:block;';
+    renderAskFX();
     return;
   }
   if (currentTab === 'kalendar') {
@@ -3528,7 +3701,7 @@ function renderCalUI(){
     el.innerHTML = `<div class="cal-wrap">${header(monthName, mc)}
       <div class="cal-grid-hd" style="margin-top:0">${['Pon','Uto','Sre','Čet','Pet','Sub','Ned'].map(x => `<div>${x}</div>`).join('')}</div>
       <div class="cal-grid">${cells}</div>
-      <div class="tg-foot">${mc.total} poziva ovog meseca · ${mc.q} kvalifikovanih · ${mc.dq} diskvalifikovanih</div>
+      <div class="tg-foot">${mc.total} zakazanih poziva ovog meseca · ishod: ${mc.q} kvalifikovano · ${mc.dq} DQ · ${Math.max(0,mc.total-mc.q-mc.dq)} bez ishoda</div>
     </div>`;
     return;
   }
@@ -5155,7 +5328,7 @@ function showToast(opts){
   const remove=()=>{ if(toast._gone)return; toast._gone=true; toast.classList.add('leaving'); setTimeout(()=>toast.remove(),250); };
   toast.querySelector('.stl-toast-close').onclick=(e)=>{ e.stopPropagation(); remove(); };
   toast.onclick=remove;
-  wrap.appendChild(toast);
+  wrap.appendChild(toast); while(wrap.children.length>3) wrap.firstChild.remove();
   setTimeout(remove, opts.duration||4000);
   return toast;
 }
@@ -5181,7 +5354,7 @@ function showCallOutcomeToast(name, outcome){
   `;
   const dismiss=()=>{toast.classList.add('leaving');setTimeout(()=>toast.remove(),250);};
   toast.querySelector('.stl-toast-close').onclick=(e)=>{e.stopPropagation();dismiss();};
-  wrap.appendChild(toast); setTimeout(dismiss, 5000);
+  wrap.appendChild(toast); while(wrap.children.length>3) wrap.firstChild.remove(); setTimeout(dismiss, 5000);
 }
 
 /* ─────────────────── AUTO-RECYCLE STALE FOLLOW-UPS ────────────────
@@ -5259,7 +5432,7 @@ function showRecycleToast(r){
   `;
   const dismiss=()=>{toast.classList.add('leaving');setTimeout(()=>toast.remove(),250);};
   toast.querySelector('.stl-toast-close').onclick=(e)=>{e.stopPropagation();dismiss();};
-  wrap.appendChild(toast); setTimeout(dismiss, 9000);
+  wrap.appendChild(toast); while(wrap.children.length>3) wrap.firstChild.remove(); setTimeout(dismiss, 9000);
 }
 
 /* ─────────────────── LEAD SCORING ─────────────────────────────────
@@ -5373,7 +5546,7 @@ function showActivityLogSetupWarning(kind, rawError){
   `;
   const dismiss=()=>{toast.classList.add('leaving');setTimeout(()=>toast.remove(),250);};
   toast.querySelector('.stl-toast-close').onclick=(e)=>{e.stopPropagation();dismiss();};
-  wrap.appendChild(toast);
+  wrap.appendChild(toast); while(wrap.children.length>3) wrap.firstChild.remove();
   setTimeout(dismiss, 25000);
 }
 
@@ -5569,7 +5742,7 @@ function stlShowToast(contact){
       }
     }, 600);
   });
-  wrap.appendChild(toast);
+  wrap.appendChild(toast); while(wrap.children.length>3) wrap.firstChild.remove();
   setTimeout(dismiss, 12000);
 }
 
@@ -5923,6 +6096,7 @@ async function syncLeadsFromGHL(opts = {}){
     if(!res.ok)throw new Error(`API HTTP ${res.status}`);
     const json=await res.json();
     if(json.error)throw new Error(json.error);
+    mapContact._cf = json.cfNames || {};
     // Merge all contacts by ID — tags stored from GHL, lead_type = highest priority match
     const seen=new Map();
     // Highest-priority bucket wins the lead_type pill: customer > booked > qualified > disqualified.
@@ -6918,7 +7092,7 @@ function renderLeads(all){
       <button class="mdate ${leadsDateFilter==='7d'?'active':''}" onclick="setLeadsDateFilter('7d')">Zadnjih 7 dana</button>
       <span class="mochi-vsep"></span>
       <select class="msel" onchange="filterLeads(this.value)" title="Filtriraj po closeru">
-        <option value="all" ${leadsFilter==='all'?'selected':''}>Svi closeri (${fc.all})</option>
+        <option value="all" ${leadsFilter==='all'?'selected':''}>Svi closeri</option>
         <option value="nikola" ${leadsFilter==='nikola'?'selected':''}>closer-goat (${fc.nikola||0})</option>
         <option value="unassigned" ${leadsFilter==='unassigned'?'selected':''}>Nedodeljeni (${fc.unassigned})</option>
       </select>
@@ -6929,6 +7103,7 @@ function renderLeads(all){
       <button class="mbtn" onclick="resetLeadFilters()">Reset</button>
       <span style="margin-left:auto;display:inline-flex;gap:6px;align-items:center">
         <button class="mbtn ${leadsSmartView?'active':''}" onclick="toggleSmartView()" title="Prikaži samo hot/warm leadove, sortirano po skoru">${leadsSmartView?'✓ Smart':'Smart'}</button>
+        <button class="mbtn" onclick="openWaTemplates()" title="WhatsApp šabloni poruka">WA</button>
         <button class="mbtn ${leadsView==='ads'?'active':''}" onclick="toggleAdsView()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 8h2m4 0h2M7 12h10"/></svg>
           Ads
@@ -7988,7 +8163,7 @@ function showRoundRobinToast(r){
   `;
   const dismiss=()=>{toast.classList.add('leaving');setTimeout(()=>toast.remove(),250);};
   toast.querySelector('.stl-toast-close').onclick=(e)=>{e.stopPropagation();dismiss();};
-  wrap.appendChild(toast); setTimeout(dismiss, 9000);
+  wrap.appendChild(toast); while(wrap.children.length>3) wrap.firstChild.remove(); setTimeout(dismiss, 9000);
 }
 
 // In-app toast for sync result (shares the .stl-toast style)
@@ -8014,7 +8189,7 @@ function showSheetSyncToast(result){
   `;
   const dismiss = () => { toast.classList.add('leaving'); setTimeout(()=>toast.remove(),250); };
   toast.querySelector('.stl-toast-close').onclick = (e) => { e.stopPropagation(); dismiss(); };
-  wrap.appendChild(toast);
+  wrap.appendChild(toast); while(wrap.children.length>3) wrap.firstChild.remove();
   setTimeout(dismiss, 8000);
 }
 
@@ -8112,6 +8287,355 @@ function renderRevenue(rows,sec){
 
 /* ── CHART ── */
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+
+/* ═══ FXPORT-V1: ported from cjure-crm ═══ */
+const LASTACT_LS='strale:lastact';
+const _lastActCache = new Map(
+  (()=>{try{return Object.entries(JSON.parse(localStorage.getItem(LASTACT_LS)||'{}'));}catch(e){return [];}})()
+);
+let _lastActSaveT=null;
+function _saveLastActCache(){
+  clearTimeout(_lastActSaveT);
+  _lastActSaveT=setTimeout(()=>{
+    try{
+      // Cap the persisted cache so localStorage stays small: newest 3000.
+      const entries=[..._lastActCache.entries()]
+        .sort((a,b)=>String(b[1]?.created_at||'').localeCompare(String(a[1]?.created_at||'')))
+        .slice(0,3000);
+      localStorage.setItem(LASTACT_LS, JSON.stringify(Object.fromEntries(entries)));
+    }catch(e){}
+  },800);
+}
+async function renderLeadsSection(){
+  const _seq = ++_renderSeq;
+  [cachedLeads, leadCounts]=await Promise.all([loadLeads(leadsSubTab), loadLeadCounts()]);
+  if (staleRender(_seq, 'leads')) return;
+  if(leadsView==='ads') { await renderAdsView(); return; }
+  // Hydrate from cache BEFORE the first paint - no chip pop-in.
+  cachedLeads.forEach(l => { if (_lastActCache.has(l.id)) l.last_activity = _lastActCache.get(l.id); });
+  renderLeads(cachedLeads);
+  // Then fetch fresh activities and re-render ONLY if something changed.
+  attachLastActivities(cachedLeads).then(touched => {
+    if (touched && !staleRender(_seq, 'leads')) refreshLeadRows();
+  });
+}
+
+// For the currently loaded leads, fetch the most recent activity per
+// lead (call outcome, status change, assign, etc.) so the UI can
+// show "Poslednja akcija: Javio se · pre 2h" without opening the panel.
+async function attachLastActivities(leads){
+  const ids = (leads||[]).map(l => l.id).filter(Boolean);
+  if (!ids.length) return false;
+  // Query in chunks to avoid URL length issues
+  const CHUNK = 200;
+  const map = new Map();
+  for (let i = 0; i < ids.length; i += CHUNK) {
+    const slice = ids.slice(i, i + CHUNK);
+    const { data, error } = await sb.from('lead_activities')
+      .select('lead_id, action_type, new_value, old_value, actor_email, created_at')
+      .in('lead_id', slice)
+      .order('created_at', { ascending: false })
+      .limit(2000);
+    if (error || !data) continue;
+    data.forEach(a => {
+      // First row per lead_id wins (already sorted DESC)
+      if (!map.has(a.lead_id)) map.set(a.lead_id, a);
+    });
+  }
+  if (!map.size) return false;
+  // Detect real changes vs the cache: identical data means no re-render.
+  let changed = false;
+  leads.forEach(l => {
+    const fresh = map.get(l.id) || null;
+    const prev = _lastActCache.get(l.id) || null;
+    if ((fresh?.created_at || null) !== (prev?.created_at || null)) changed = true;
+    if (fresh) _lastActCache.set(l.id, fresh);
+    l.last_activity = fresh || prev || null;
+  });
+  if (changed) _saveLastActCache();
+  return changed;
+}
+
+
+/* ── WA message templates: presets editable in the CRM (localStorage).
+   Variables: {ime} = first name, {closer} = assigned closer (or "CjureFX tim"),
+   {zakazao} = ", vidim da si zakazao poziv" when the lead has booked-call. ── */
+const WA_TPL_KEY='strale:wa-templates';
+const WA_TPL_DEFAULT={active:0,list:[
+  {name:'Standard',text:'Ćao {ime}, ovde {closer} iz STRALETKD tima{zakazao}. Jel imaš sekund?'},
+  {name:'Follow-up',text:'Ćao {ime}, {closer} ovde iz STRALETKD tima. Javljam se da vidim gde si stao, jel imaš minut?'},
+  {name:'Pre poziva',text:'Ćao {ime}, ovde {closer} iz STRALETKD tima. Podsetnik za naš poziv: vidimo se u zakazano vreme. Jel ti i dalje odgovara termin?'},
+]};
+function waTemplates(){
+  try{const v=JSON.parse(localStorage.getItem(WA_TPL_KEY)||'null');if(v&&Array.isArray(v.list)&&v.list.length)return v;}catch(e){}
+  return JSON.parse(JSON.stringify(WA_TPL_DEFAULT));
+}
+function waTemplatesSave(v){localStorage.setItem(WA_TPL_KEY,JSON.stringify(v));}
+function waGreetingFor(lead){
+  const t=waTemplates();
+  const tpl=t.list[t.active]||t.list[0];
+  const firstName=(lead.name||'').split(' ')[0]||'';
+  const repName=closerName(lead.assigned_to)||'CjureFX tim';
+  const booked=Array.isArray(lead.tags)&&lead.tags.includes('booked-call');
+  return (tpl.text||'')
+    .replace(/\{ime\}/g,firstName)
+    .replace(/\{closer\}/g,repName)
+    .replace(/\{zakazao\}/g,booked?', vidim da si zakazao poziv':'')
+    .replace(/\s+,/g,',').replace(/\s{2,}/g,' ').trim();
+}
+function openWaTemplates(){
+  document.getElementById('waTplOverlay')?.remove();
+  const t=waTemplates();
+  const rows=t.list.map((x,i)=>`
+    <div class="wt-row${i===t.active?' on':''}">
+      <label class="wt-head">
+        <input type="radio" name="wtActive" ${i===t.active?'checked':''} onchange="waTplSetActive(${i})">
+        <input class="wt-name" value="${esc(x.name)}" onblur="waTplEdit(${i},'name',this.value)">
+        ${t.list.length>1?`<button class="wt-del" title="Obriši" onclick="waTplDelete(${i})">×</button>`:''}
+      </label>
+      <textarea class="wt-text" rows="3" onblur="waTplEdit(${i},'text',this.value)">${esc(x.text)}</textarea>
+    </div>`).join('');
+  document.body.insertAdjacentHTML('beforeend',`
+  <div id="waTplOverlay" class="wt-overlay" onclick="if(event.target===this)this.remove()">
+    <div class="wt-panel">
+      <div class="wt-title">WhatsApp šabloni
+        <button class="wt-close" onclick="document.getElementById('waTplOverlay').remove()">×</button>
+      </div>
+      <div class="wt-vars">Promenljive: <code>{ime}</code> ime leada · <code>{closer}</code> dodeljeni closer · <code>{zakazao}</code> dodaje ", vidim da si zakazao poziv" ako je poziv zakazan. Aktivan šablon se koristi na svakom WhatsApp dugmetu.</div>
+      ${rows}
+      <button class="mbtn wt-add" onclick="waTplAdd()">+ Novi šablon</button>
+    </div>
+  </div>`);
+}
+function waTplSetActive(i){const t=waTemplates();t.active=i;waTemplatesSave(t);openWaTemplates();}
+function waTplEdit(i,f,v){const t=waTemplates();if(!t.list[i])return;t.list[i][f]=v;waTemplatesSave(t);}
+function waTplDelete(i){const t=waTemplates();t.list.splice(i,1);if(t.active>=t.list.length)t.active=0;waTemplatesSave(t);openWaTemplates();}
+function waTplAdd(){const t=waTemplates();t.list.push({name:'Novi šablon',text:'Ćao {ime}, ovde {closer} iz STRALETKD tima. '});waTemplatesSave(t);openWaTemplates();}
+
+/* ── ASK FX AI: internal knowledge assistant over the three offers ── */
+let _afxThread = [];
+function renderAskFX(){
+  const mc=document.getElementById('mainContent');
+  const msgs=_afxThread.map(m=>`<div class="afx-msg ${m.role==='user'?'u':'a'}">${esc(m.content)}</div>`).join('');
+  mc.innerHTML=`<div class="afx-wrap">
+    <div class="afx-head">
+      <div class="afx-title">Ask FX AI</div>
+      <div class="afx-sub">Interna baza znanja za CJURE, MAMINJO i STRALE ponude: paketi, cene, funnel, garancije, pravila poziva. Pitaj bilo šta pre ili tokom poziva.</div>
+    </div>
+    ${_afxThread.length?'':`<div class="afx-chips">
+      <button class="afx-chip" onclick="askFX('Koji paketi postoje za CJURE i koje su cene?')">CJURE paketi</button>
+      <button class="afx-chip" onclick="askFX('Kako radi garancija zamene funded naloga?')">Garancija naloga</button>
+      <button class="afx-chip" onclick="askFX('Šta Strale nudi i gde lead zakazuje poziv?')">STRALE ponuda</button>
+      <button class="afx-chip" onclick="askFX('Šta se prodaje posle Maminjo webinara?')">MAMINJO</button>
+      <button class="afx-chip" onclick="askFX('Šta smem a šta ne smem da obećam na pozivu?')">Pravila poziva</button>
+    </div>`}
+    <div class="afx-thread" id="afxThread">${msgs}</div>
+    <div class="afx-inputrow">
+      <textarea class="afx-input" id="afxInput" rows="1" placeholder="Pitaj o bilo kojoj ponudi…"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();askFX();}"></textarea>
+      <button class="afx-send" id="afxSend" onclick="askFX()">Pitaj</button>
+    </div>
+  </div>`;
+  const t=document.getElementById('afxThread'); if(t) t.scrollTop=t.scrollHeight;
+}
+async function askFX(preset){
+  const input=document.getElementById('afxInput');
+  const q=(preset||input?.value||'').trim();
+  if(!q) return;
+  _afxThread.push({role:'user',content:q});
+  renderAskFX();
+  const thread=document.getElementById('afxThread');
+  thread.insertAdjacentHTML('beforeend','<div class="afx-msg a thinking" id="afxThinking">FX AI razmišlja…</div>');
+  const send=document.getElementById('afxSend'); if(send) send.disabled=true;
+  try{
+    const r=await fetch('/api/lead-message',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ask:true,messages:_afxThread})});
+    const json=await r.json();
+    if(!r.ok) throw new Error(json.error||r.status);
+    _afxThread.push({role:'assistant',content:json.answer});
+  }catch(e){
+    _afxThread.push({role:'assistant',content:'Greška: '+e.message+' — probaj ponovo.'});
+  }
+  renderAskFX();
+  window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+}
+
+
+function mapContact(c, lead_type){
+  const cf={};
+  (c.customFields||[]).forEach(f=>{if(GHL_CF[f.id])cf[GHL_CF[f.id]]=f.value;});
+  /* Attribution fallback: GHL attributions[] is empty for webhook-created
+     contacts ("CRM Workflows"), so read the utm_* CUSTOM FIELDS by name via
+     the cfNames map the API now returns. Click-ids imply paid traffic. */
+  const cfa={};
+  (c.customFields||[]).forEach(f=>{const k=(mapContact._cf||{})[f.id];if(k&&f.value!=null&&String(f.value).trim()!=='')cfa[k]=String(f.value).trim();});
+  const att=(c.attributions||[]).find(a=>a.isFirst)||(c.attributions||[])[0]||{};
+  const pick=(av,...keys)=>av||keys.map(k=>cfa[k]).find(Boolean)||null;
+  let _src=pick(att.utmSource,'utm_source','utmsource');
+  let _med=pick(att.utmMedium,'utm_medium','utmmedium');
+  const _cmp=pick(att.utmCampaign,'utm_campaign','utmcampaign');
+  const _cnt=pick(att.utmContent,'utm_content','utmcontent');
+  const clid=cfa.fbclid||cfa.gclid||cfa.ttclid||null;
+  if(clid&&!_med)_med='paid';
+  if(clid&&!_src)_src=cfa.fbclid?'facebook':cfa.gclid?'google':'tiktok';
+  return{
+    id:c.id, lead_type,
+    tags:c.tags||[],
+    name:[c.firstName,c.lastName].filter(Boolean).join(' ')||'Nepoznat',
+    email:c.email||null, phone:c.phone||null,
+    instagram:cf.instagram||null, experience:cf.experience||null,
+    pain_point:cf.pain_point||null, knowledge:cf.knowledge||null,
+    time_frame:cf.time_frame||null, qualification:cf.qualification||null,
+    date_added:c.dateAdded||new Date().toISOString(),
+    synced_at:new Date().toISOString(),
+    utm_source:_src,
+    utm_medium:_med,
+    utm_campaign:_cmp,
+    utm_content:_cnt,
+  };
+}
+
+
+async function loadCampaignData(){
+  const data=(await sbAllLeads()).filter(l=>tagsOverlap(l,TAGS_PIPELINE));
+  if(!data.length) return [];
+  const isId=v=>v&&/^\d{10,}$/.test(v.trim());
+  const fmt=v=>!v||isId(v)?null:v;
+  const fmtCampaign=v=>!v||isId(v)?'Nepoznata kampanja':v.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  const map={};
+  data.forEach(r=>{
+    const content=fmt(r.utm_content);
+    const hasUtm=!!(r.utm_campaign||r.utm_content||r.utm_source||r.utm_medium);
+    const paid=hasUtm&&/cpc|ppc|paid|ads?$/.test((r.utm_medium||'').toLowerCase()||((r.utm_campaign||r.utm_content)?'paid':''));
+    const key=hasUtm?((content||r.utm_campaign||'').toLowerCase()||'no-content'):'organic';
+    if(!map[key]) map[key]={
+      key, paid,
+      content:hasUtm?(content||fmtCampaign(r.utm_campaign)):'Organic / Direct',
+      campaign:hasUtm?fmtCampaign(r.utm_campaign):'Bez UTM podataka',
+      source:(r.utm_source||'').toLowerCase().replace(/^ig$/,'instagram'),
+      leads:0, closes:0, revenue: 0
+    };
+    map[key].leads++;
+    if(r.status==='Closed') {
+      map[key].closes++;
+      const rv=(r.deal_value!=null&&Number(r.deal_value)>0)?Number(r.deal_value):((r.deal&&DEAL_PRICES[r.deal])||0);
+      if (rv) map[key].revenue += rv;
+    }
+  });
+  return Object.values(map).sort((a,b)=>b.leads-a.leads);
+}
+
+
+async function renderAdsView(){
+  const el=document.getElementById('mainContent');
+  const _seq = ++_renderSeq;
+  const campaigns=await loadCampaignData();
+  if (staleRender(_seq, 'leads')) return;
+  const maxLeads=campaigns[0]?.leads||1;
+  const srcPill=s=>{
+    const cls=s.includes('facebook')||s.includes('fb')?'src-facebook':s.includes('instagram')?'src-instagram':s.includes('google')?'src-google':'';
+    return `<span class="src-pill ${cls}">${s||'organic'}</span>`;
+  };
+  const syncSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>`;
+  const spendMap = loadAdSpend();
+  const calc=c=>{
+    const cvr=c.leads?Math.round(c.closes/c.leads*100):0;
+    const spend=spendMap[c.key]||0;
+    return{cvr,cvrCls:cvr>=10?'cvr-high':cvr>=5?'cvr-mid':'cvr-low',
+      barW:Math.round(c.leads/maxLeads*100),spend,
+      cpl:(spend&&c.leads)?Math.round(spend/c.leads):0,
+      cpc:(spend&&c.closes)?Math.round(spend/c.closes):0,
+      roas:(spend&&c.revenue)?(c.revenue/spend).toFixed(2):null};
+  };
+  const roasCls=r=>!r?'':Number(r)>=2?'roas-good':Number(r)>=1?'roas-ok':'roas-bad';
+
+  const rows=campaigns.map(c=>{
+    const m=calc(c);
+    return `<tr>
+      <td><div class="cam-name">${esc(c.content)}</div><div class="cam-sub">${esc(c.campaign)}</div></td>
+      <td>${srcPill(c.source)}</td>
+      <td class="num">${c.leads}</td>
+      <td><div class="ads-bar"><div class="ads-bar-fill" style="transform:scaleX(${m.barW/100})"></div></div></td>
+      <td class="num">${c.closes}</td>
+      <td class="num"><span class="cvr-badge ${m.cvrCls}">${m.cvr}%</span></td>
+      <td class="num"><input type="number" class="ad-spend-input" min="0" step="10" value="${m.spend||''}" placeholder="0" onblur="updateAdSpendCell('${esc(c.key)}',this.value)" onclick="event.stopPropagation()" /></td>
+      <td class="num">${m.cpl?'$'+m.cpl.toLocaleString(_LOC):'\u00b7'}</td>
+      <td class="num">${m.cpc?'$'+m.cpc.toLocaleString(_LOC):'\u00b7'}</td>
+      <td class="num">${m.roas?`<span class="roas-badge ${roasCls(m.roas)}">${m.roas}\u00d7</span>`:'\u00b7'}</td>
+    </tr>`;
+  }).join('')||`<tr><td colspan="10" style="padding:48px 20px;text-align:center;color:var(--muted);font-size:13px;font-weight:700">Nema podataka: prvo sinhronizuj GHL</td></tr>`;
+
+  const cards=campaigns.map(c=>{
+    const m=calc(c);
+    return `<div class="ads-card">
+      <div class="ads-card-head">
+        <div><div class="cam-name">${esc(c.content)}</div><div class="cam-sub">${esc(c.campaign)}</div></div>
+        ${srcPill(c.source)}
+      </div>
+      <div class="ads-bar"><div class="ads-bar-fill" style="transform:scaleX(${m.barW/100})"></div></div>
+      <div class="ads-card-grid">
+        <div><b>${c.leads}</b><span>Leadovi</span></div>
+        <div><b>${c.closes}</b><span>Zatvoreni</span></div>
+        <div><b class="${m.cvrCls}">${m.cvr}%</b><span>CVR</span></div>
+        <div><b>${m.cpl?'$'+m.cpl.toLocaleString(_LOC):'\u00b7'}</b><span>CPL</span></div>
+        <div><b>${m.cpc?'$'+m.cpc.toLocaleString(_LOC):'\u00b7'}</b><span>CPC</span></div>
+        <div><b class="${roasCls(m.roas)}">${m.roas?m.roas+'\u00d7':'\u00b7'}</b><span>ROAS</span></div>
+      </div>
+      <label class="ads-card-spend">Spend ($)
+        <input type="number" class="ad-spend-input" min="0" step="10" value="${m.spend||''}" placeholder="0" onblur="updateAdSpendCell('${esc(c.key)}',this.value)" />
+      </label>
+    </div>`;
+  }).join('');
+
+  const total=campaigns.reduce((s,c)=>s+c.leads,0);
+  const totalCloses=campaigns.reduce((s,c)=>s+c.closes,0);
+  const totalCvr=total?Math.round(totalCloses/total*100):0;
+  const totalSpend=campaigns.reduce((s,c)=>s+(spendMap[c.key]||0),0);
+  const totalRev=campaigns.reduce((s,c)=>s+(c.revenue||0),0);
+  const totalRoas=totalSpend?(totalRev/totalSpend).toFixed(2):null;
+  const paidLeads=campaigns.filter(c=>c.paid).reduce((s,c)=>s+c.leads,0);
+  const orgLeads=total-paidLeads;
+  const noUtm=campaigns.length&&campaigns.every(c=>c.key==='organic');
+
+  const stat=(v,l,color)=>`<div class="ads-stat"><div class="ads-stat-v" ${color?`style="color:${color}"`:''}>${v}</div><div class="ads-stat-l">${l}</div></div>`;
+
+  el.innerHTML=`<div style="width:100%">
+    ${noUtm?`<div class="ads-hint">
+      <b>Svi leadovi stižu bez UTM podataka,</b> pa se sve vodi kao Organic / Direct.
+      Funnel već šalje utm_source / utm_medium / utm_campaign / utm_content u GHL webhook:
+      u GHL workflow-u ("cjure optin") dodaj <b>Update Contact Field</b> korak koji mapira ta polja
+      u custom polja kontakta i od tog trenutka se ovde razdvajaju ads i organic leadovi.
+    </div>`:''}
+    <div class="ads-stats">
+      ${stat(campaigns.length,'Kampanje')}
+      ${stat(total,'Ukupno leadova')}
+      ${stat(paidLeads,'Sa oglasa','var(--accent)')}
+      ${stat(orgLeads,'Organic / Direct')}
+      ${stat(totalCloses,'Zatvoreni','var(--green)')}
+      ${stat(totalCvr+'%','CVR',totalCvr>=10?'var(--green)':totalCvr>=5?'var(--yellow)':'var(--red)')}
+      ${totalSpend?stat('$'+totalSpend.toLocaleString(_LOC),'Ad spend','var(--red)'):''}
+      ${totalRev?stat('\u20ac'+totalRev.toLocaleString(_LOC),'Revenue','var(--green)'):''}
+      ${totalRoas?stat(totalRoas+'\u00d7','ROAS',Number(totalRoas)>=2?'var(--green)':Number(totalRoas)>=1?'var(--yellow)':'var(--red)'):''}
+    </div>
+    <div class="ads-actions">
+      <button class="ads-view-btn active" onclick="toggleAdsView()">\u2190 Nazad na Leads</button>
+      <button class="sync-btn" title="Sinhronizacija sa GHL radi automatski svakih 5 min, klikni za ru\u010dnu" onclick="syncLeadsFromGHL()">${syncSvg}<span class="sync-label">Auto-sync</span></button>
+    </div>
+    <div class="ads-tbl-wrap ads-desktop">
+      <table class="ads-tbl">
+        <thead><tr>
+          <th>Kampanja</th><th>Izvor</th><th class="num">Leadovi</th><th style="min-width:80px"></th>
+          <th class="num">Zatvoreni</th><th class="num">CVR</th><th class="num">Spend ($)</th>
+          <th class="num">CPL</th><th class="num">CPC</th><th class="num">ROAS</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="ads-cards ads-mobile">${cards||''}</div>
+  </div>`;
+}
+
 
 </script>
 </body>

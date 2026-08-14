@@ -27,12 +27,33 @@ async function fetchAllContacts() {
   return contacts;
 }
 
+/* Custom-field id -> normalized key (e.g. "contact.utm_source" -> "utm_source").
+   Lets the frontend read UTM fields by NAME without hardcoding ids, so the
+   moment the GHL workflow maps webhook utm data to contact fields, attribution
+   flows into the CRM with zero code changes. */
+async function fetchCustomFieldNames() {
+  try {
+    const res = await fetch(`${BASE}/locations/${GHL_LOC}/customFields`, {
+      headers: { Authorization: `Bearer ${GHL_TOKEN}`, Version: '2021-07-28' },
+    });
+    if (!res.ok) return {};
+    const json = await res.json();
+    const map = {};
+    (json.customFields || []).forEach(f => {
+      const key = String(f.fieldKey || f.name || '')
+        .replace(/^contact\./, '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+      if (f.id && key) map[f.id] = key;
+    });
+    return map;
+  } catch { return {}; }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=1200');
   res.setHeader('Access-Control-Allow-Origin', '*');
 
   try {
-    const all = await fetchAllContacts();
+    const [all, cfNames] = await Promise.all([fetchAllContacts(), fetchCustomFieldNames()]);
 
     const hasTag = (c, ...tags) => tags.some(t => c.tags?.includes(t));
 
