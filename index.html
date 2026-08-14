@@ -2797,12 +2797,10 @@ select option { background: #1C1C22; color: #f0f0f4; }
 .sidenav .nav-glider{border-radius:11px}
 /* — hover-expand sidebar (Aceternity pattern) — */
 @media (min-width:1100px){
-  .sidenav{width:64px;transition:width .3s cubic-bezier(.22,1,.36,1)}
-  .sidenav:hover{width:200px;box-shadow:24px 0 70px -30px rgba(0,0,0,.65)}
-  main{margin-left:64px!important}
-  .sn-item{white-space:nowrap;overflow:hidden}
-  .sn-label{opacity:0;transform:translateX(-6px);transition:opacity .22s,transform .22s;display:inline-block}
-  .sidenav:hover .sn-label{opacity:1;transform:none}
+  .sidenav{width:200px}
+  main{margin-left:200px!important}
+  .sn-item{white-space:nowrap}
+  .sn-label{display:inline-block}
 }
 /* — iOS glass toggle (Settings.app pattern, translated) — */
 .gsw{display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0}
@@ -8705,20 +8703,11 @@ function updateNavGliders(){
     g.style.width=a.offsetWidth+'px'; g.style.height=a.offsetHeight+'px';
     g.style.transform=`translate(${a.offsetLeft}px,${a.offsetTop}px)`;
   });
-  const sn=document.getElementById('sidenav');
-  if(sn){
-    const a=sn.querySelector('.sn-item.active');
-    if(a){const g=_ensureGlider(sn);
-      g.style.opacity='1';
-      g.style.width=a.offsetWidth+'px'; g.style.height=a.offsetHeight+'px';
-      g.style.transform=`translate(${a.offsetLeft}px,${a.offsetTop}px)`;}
-  }
+
 }
 window.addEventListener('resize',()=>requestAnimationFrame(updateNavGliders));
 document.addEventListener('DOMContentLoaded',()=>setTimeout(updateNavGliders,120));
-const _snEl=document.getElementById('sidenav');
-if(_snEl){_snEl.addEventListener('mouseenter',()=>setTimeout(updateNavGliders,320));
-  _snEl.addEventListener('mouseleave',()=>setTimeout(updateNavGliders,320));}
+
 </script>
 </body>
 </html>
