@@ -3257,7 +3257,7 @@ async function renderMetricsTab(){
     .then(r => r.ok ? r.json() : {events:[]}).catch(() => ({events:[]}));
   const appts = (apptData.events || []).filter(e => !e.deleted);
   // Closed leads + their tracker-entered close value (deal_value) → Cash Collected / Won
-  const { data: closedRaw } = await sb.from('ghl_leads').select('name, deal_value').eq('status', 'Closed');
+  const { data: closedRaw } = await sb.from('ghl_leads').select('id, name, deal_value, date_added').eq('status', 'Closed');
   const closedLeads = closedRaw || [];
   const { data: _actsRaw } = await sb.from('lead_activities').select('action_type,new_value,created_at').gte('created_at', new Date(Date.now() - 60 * 864e5).toISOString()).limit(8000);
   const acts = _actsRaw || [];
