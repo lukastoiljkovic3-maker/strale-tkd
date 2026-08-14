@@ -8404,7 +8404,7 @@ async function attachLastActivities(leads){
 
 
 /* ── WA message templates: presets editable in the CRM (localStorage).
-   Variables: {ime} = first name, {closer} = assigned closer (or "CjureFX tim"),
+   Variables: {ime} = first name, {closer} = assigned closer (or "STRALETKD tim"),
    {zakazao} = ", vidim da si zakazao poziv" when the lead has booked-call. ── */
 const WA_TPL_KEY='strale:wa-templates';
 const WA_TPL_DEFAULT={active:0,list:[
@@ -8421,7 +8421,7 @@ function waGreetingFor(lead){
   const t=waTemplates();
   const tpl=t.list[t.active]||t.list[0];
   const firstName=(lead.name||'').split(' ')[0]||'';
-  const repName=closerName(lead.assigned_to)||'CjureFX tim';
+  const repName=(lead.assigned_to==='nikola'?'closer-goat':'')||'STRALETKD tim';
   const booked=Array.isArray(lead.tags)&&lead.tags.includes('booked-call');
   return (tpl.text||'')
     .replace(/\{ime\}/g,firstName)
@@ -8655,7 +8655,7 @@ async function renderAdsView(){
     ${noUtm?`<div class="ads-hint">
       <b>Svi leadovi stižu bez UTM podataka,</b> pa se sve vodi kao Organic / Direct.
       Funnel već šalje utm_source / utm_medium / utm_campaign / utm_content u GHL webhook:
-      u GHL workflow-u ("cjure optin") dodaj <b>Update Contact Field</b> korak koji mapira ta polja
+      u GHL workflow-u (optin) dodaj <b>Update Contact Field</b> korak koji mapira ta polja
       u custom polja kontakta i od tog trenutka se ovde razdvajaju ads i organic leadovi.
     </div>`:''}
     <div class="ads-stats">

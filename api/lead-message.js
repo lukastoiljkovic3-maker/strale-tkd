@@ -148,36 +148,112 @@ SETTER VIBE — OBAVEZNO:
 
 Vrati SAMO tekst poruke, bez navodnika, bez objašnjenja, bez potpisa.`;
 
-const ASKFX_KB = `
-=== CJURE / CjureFX (Marko Ćurguz, @cjuree) ===
-Offer: AI Trading Bot (Trading AI Mind, tradingaimind.com) + funded nalozi. Jezik: srpski (ekavica).
-Funnel: cjurefx.org (webinar optin) -> /pitanja kvalifikacija -> WhatsApp grupa; poziv se zakazuje na cjurefx.org/zakazi (30 min, besplatan).
-Paketi: funded nalog (npr. 100.000 EUR nalog = 1.000 EUR jednokratno) + pristup botu: mesečni plan, godišnji plan ili doživotni (lifetime, npr. 2.000 EUR jednokratno). VIP grupa sa signalima kao bonus.
-Bot: radi automatizovano na MT5, XAUUSD fokus, klijent dobija podešavanja od tima (nikad sam ne podešava). Radi i na malim i na funded nalozima.
-Funded nalozi: preko prop firmi (npr. Tradova), do 500.000 EUR tuđeg kapitala. KYC obavezan. Isplate vrši prop firma po svojim pravilima.
-Garancija zamene: ako bot sa ZVANIČNIM podešavanjima spali funded nalog (bez ručnih trejdova/izmena), firma o svom trošku daje nov nalog iste vrednosti (30 dana, uz proveru istorije trgovanja).
-Pravno lice: CJR TOP STRIKER LLC. Ugovor se potpisuje pre uplate.
-Social proof: testimonijali na cjurefx.org/david (isplata $2.781) i /miodrag ($1.200 sa Tradove); rezultati članova u kanalima.
+const DEFAULT_BRAND = 'strale';
 
-=== MAMINJO / MaminjoFX (Leo Alagić, @maminjjo) ===
-Jezik: hrvatski (standardni HR). Zajednica 20.000+ članova, signali od 2018, 5-7 signala dnevno.
-Offer: besplatni webinar (maminjo.com) -> pitanja (/pitanja) -> WhatsApp grupa (/hvala). Na webinaru: kako čitaju tržište, ulasci/izlasci, risk management, AI bot uživo na pravom računu, put do funded računa.
-Posle webinara prodaja: pristup botu + signali + edukacija (uslovi po aktuelnoj ponudi tima).
-Ton: bez obećanja zarade, edukativno, "sustav iza signala".
+/* ── FX AI knowledge bases, one per brand ─────────────────────────
+   Each CRM deploy answers ONLY its own offer (DEFAULT_BRAND below is
+   rewritten per repo). body.brand can override so the maminjo deploy's
+   proxy hop to the cjure deployment still gets maminjo answers.
+   Built from live call transcripts (fx-kb-transcripts, 11 calls,
+   5.-10.8.2026) + contracts + funnel pages. Internal tool:
+   winrate/percent figures are closer orientation, never written promises. */
 
-=== STRALE / StraleTKD ===
-Jezik: srpski. Offer: precizni forex signali + pristup funded nalozima do $200.000 bez depozita.
-Funnel: straletkd.com (VSL + typeform prijava) -> kvalifikovani idu na /hvala sa GHL kalendarom (zakazivanje poziva) -> /booked potvrda; nekvalifikovani idu u besplatnu Telegram grupu (t.me/tkdvision1).
-Partnerstvo: Cjure uzima 20% od svakog Strale close-a (bot + funded); CPA dealovi bez provizije.
-Bot: isti AI trading bot (Tradova), H1 za forex parove, H4 za XAUUSD.
+const KB_ZAJEDNICKO = `
+=== PRAVILA ZA TIM (uvek važe) ===
+- NIKAD ne obećavaj zaradu, profit ni "garantovane" prinose, ni usmeno ni pismeno. Trading nosi rizik. Prošli rezultati nisu garancija.
+- Interni podaci (winrate, prosečni procenti) služe closeru za orijentaciju: klijentu se pokazuju REALNI primeri i testimonijali u EUR/$, ne procenti (procenti zbunjuju, iznosi konvertuju).
+- Cene i uslovi iz ugovora su merodavni; ako nisi siguran za cenu, reci da proveriš sa Lukom.
+- Isplate uvek radi prop firma / broker / platforma, nikad mi direktno.
+- DQ lead (dq / low-value tag): ne gurati na poziv, uputiti na besplatnu grupu i sadržaj.
+- Reč "besplatno" koristiti SAMO za lead-magnete (grupa, PDF), nikad za poziv/konsultaciju: lead koji čuje "besplatno" pa dobije cenu oseća se prevareno.
 
-=== ZAJEDNIČKA PRAVILA ZA TIM ===
-- NIKAD ne obećavaj zaradu, profit ni "garantovane" prinose. Trading nosi rizik. Prošli rezultati nisu garancija.
-- Cene i uslovi iz ugovora su merodavni; ako nisi siguran za cenu, reci da proveriš sa Lukom/Markom.
-- Poziv je konsultativan: situacija, cilj, kapital, pa preporuka paketa.
-- Isplate uvek radi prop firma / platforma, ne mi.
-- DQ lead (dq/low-value tag): ne gurati na poziv, uputiti na besplatnu grupu i sadržaj.
+=== STRUKTURA POZIVA ===
+1. Upoznavanje, opušteno ("mi ne jurimo nikoga").
+2. "3 problema" početnika: znanje, vreme, kapital: sam bi trebao 6-18 meseci učenja i gubljenja.
+3. Pitaj šta ga zanima i KOLIKI mu je okvirni kapital PRE nego što preporučiš paket.
+4. Demo ekrana / rezultata (live dashboard, istorija trejdova), pa cena + popust + rok.
+5. Ako nije spreman odmah: kapara/rezervacija 10% ukupne cene zaključava popust i mesto; ili se poziv ponovi kad kapital legne.
+
+=== ČESTE OBJEKCIJE ===
+- "Mogu li da povučem pare kad hoću?" -> Da, real novac na tvom nalogu, bez lock-ina; isplate po pravilima platforme.
+- "Zašto da platim kad mogu sam?" -> Sam gubiš 6-18 meseci na krivu učenja; sistem tu krivu preskače.
+- "Kako se vama isplati?" -> Zarada tima je od pristupa botu/funded nalozima i partnerstava, konsultacije su besplatne.
+- "Nemam kapital sada" -> Ponovi poziv kad legne, ili kapara 10% da zaključa uslove odmah.
+- "Moram li nešto tehnički da podešavam?" -> Ne, tim radi celo povezivanje, klijent samo prati rezultate.
+- Maloletan lead -> nalog se registruje na punoletnog (roditelj/sestra), uplata može preko bilo koga.
+- Loše iskustvo sa drugom grupom -> ne komentarišemo konkurenciju, "gledamo svoje dvorište": pokazujemo svoje transparentne rezultate.
 `;
+
+const KBS = {
+cjure: `
+=== CJURE / CjureFX (Marko Ćurguz, @cjuree) ===
+Offer: AI Trading Bot (Trading AI Mind, tradingaimind.com) + instant funded nalozi. Jezik: srpski (ekavica). Pravno lice: CJR TOP STRIKER LLC; ugovor se potpisuje PRE uplate.
+Funnel: cjurefx.org (webinar optin) -> /pitanja kvalifikacija -> WhatsApp grupa; poziv na cjurefx.org/zakazi (30 min, besplatan). Posle bukiranja lead dobija cjurefx.org/ljudi (video priče Stefan/David/Miodrag) i potvrđuje termin porukom "Odgledao".
+
+CENE (na pozivu, uz -50% popust "za prve koji su zakazali"; pun iznos je duplo):
+- Doživotna (lifetime) licenca bota: 4.000 EUR -> 2.000 EUR na pozivu.
+- Mesečna licenca bota: 1.000 EUR -> 500 EUR/mes.
+- Instant funding 50.000$ nalog: 550 EUR. Instant funding 100.000$ nalog: 1.000 EUR.
+- Minimalni preporučeni ulaz (kombo): ~1.050 EUR (mesečni bot 500 + 50k funding 550).
+- Kapara/rezervacija: 10% ukupne cene (najčešće ~100 EUR) zaključava popust i mesto.
+- Popusti su vremenski ograničeni; od 15.8.2026. najavljeno opšte poskupljenje.
+Plaćanje: IBAN, kartica, USDC (closer šalje link/wallet na samom pozivu).
+
+BOT (Trading AI Mind):
+- Radi isključivo na MetaTrader 5 (MT5). "Mozak" bota je Anthropic/Claude AI.
+- Strategija: martingale + grid, samo na prop firmama gde je pravilima dozvoljeno; H1 forex parovi, H4 XAUUSD.
+- Prosečno 2-5% mesečno (izuzeci 10-12% se pominju samo kao izolovani primeri, nikad kao očekivanje).
+- Auto-pauza kad ode ~0,5-1% u minus; tim re-optimizuje pa nastavlja. Pauza ±5 min oko high-impact vesti.
+- Adaptira ručno otvorene pozicije: ako klijent sam otvori trejd, bot ga preuzme i zatvori.
+- Dashboard: equity kriva 24h/7d/30d, istorija svakog trejda (razlog ulaska/izlaska), win rate po paru, podesiv daily drawdown, prop-firm safety pravila, allow buy/sell, zatvaranje korpe na promenu smera.
+- Setup: tim radi SVE povezivanje (MT5 login, podešavanja); klijent ništa ne dira. Aktivno isto veče/sutradan; ako je vikend, kreće u ponedeljak.
+
+FUNDED NALOZI:
+- Partner prop firma: Tradova: instant funding, BEZ evaluacije/challenge-a, nalog odmah spreman. KYC obavezan.
+- Opseg 10.000$-500.000$ (najčešće 50k-200k). Profit split 80% klijent / 20% prop firma. Isplate svakih 14 dana, bez ograničenja.
+- GARANCIJA ZAMENE: ako bot sa ZVANIČNIM podešavanjima (bez ručnih trejdova/izmena) spali funded nalog, firma o svom trošku daje nov nalog iste vrednosti (rok 30 dana, uz proveru istorije trgovanja).
+
+SOCIAL PROOF: ~98 aktivnih korisnika bota. Testimonijali: cjurefx.org/david ($2.781), /miodrag ($1.200, Tradova), /ljudi (+ Stefan $4.321 na agresivnom modu). Rezultati članova u WhatsApp kanalima.
+INTERNO: Cjure uzima 20% od svakog Strale close-a (partnerstvo); ne pominjati klijentima.
+` + KB_ZAJEDNICKO,
+
+maminjo: `
+=== MAMINJO / MaminjoFX (Leo Alagić, @maminjjo) ===
+Jezik: HRVATSKI (standardni HR): odgovaraj na hrvatskom. Zajednica 20.000+ članova, signali od 2018, 5-7 signala dnevno.
+Offer/funnel: besplatni webinar (maminjo.com) -> /pitanja kvalifikacija (video na 2. koraku) -> WhatsApp grupa (3. korak, samo dugme). Na webinaru: kako čitaju tržište, ulasci/izlasci, risk management, AI bot uživo na pravom računu, put do funded računa.
+Prodaja posle webinara: pristup botu + signali + edukacija, uslovi po aktuelnoj ponudi tima (cene potvrditi sa Lukom/Leom pre poziva).
+Bot: isti AI trading bot kao ostatak grupe: radi na MT5, tim radi sva podešavanja i povezivanje, klijent ništa ne dira; auto-pauza u minusu, pauza oko vesti. Prosečno 2-5% mesečno (interna orijentacija, ne obećavati).
+Funded nalozi: preko partner prop firme, instant funding bez evaluacije, KYC obavezan, isplate radi prop firma po svojim pravilima.
+Ton: edukativno, "sustav iza signala", bez obećanja zarade. Closer: Mateja.
+` + KB_ZAJEDNICKO,
+
+strale: `
+=== STRALE / StraleTKD ===
+Jezik: srpski. Offer: forex signali (BESPLATNA grupa uz uslov) + pristup botu i funded nalozima do 200.000$ bez depozita.
+Funnel: straletkd.com (VSL + typeform prijava) -> kvalifikovani na /hvala sa GHL kalendarom -> /booked potvrda; posle bukiranja lead dobija straletkd.com/ljudi i potvrđuje porukom "Odgledao". Nekvalifikovani idu u besplatnu Telegram grupu (t.me/tkdvision1).
+
+SIGNALI:
+- Grupa je besplatna: jedini uslov je REAL nalog kod partner brokera (AvaTrade; viđeno i T4Trade, server "T4Trade Real 16") sa minimalnim depozitom 300 EUR. Novac je klijentov, povlači ga kad hoće, nema članarine.
+- Aplikacija: MetaTrader 4 (MT4). MT5 je za bot/funded.
+- Signali samo u London i New York sesiji (~9-18h po srpskom vremenu), 15-25 signala mesečno.
+- Interna orijentacija: prolaznost 80-85% (ne obećavati klijentu; pokazivati screenshotove).
+- Format signala: first entry + second entry (za zakasnele), TP1-TP4, stop loss; podešavanje ~5 min, praćenje 20-30 min dnevno.
+- Time frame: H1 na zlatu (XAUUSD), H4 na valutnim parovima.
+- Okvirno šta ljudi rade sa 300-500 EUR: 200-500 EUR mesečno (izolovani primeri, ne obećanje).
+
+BOT + FUNDED (isti sistem kao Cjure): AI trading bot na MT5, tim radi sav setup; partner prop firma Tradova, instant funding bez evaluacije, split 80/20, isplate na 14 dana, KYC obavezan.
+INTERNO: Strale publika je manje edukovana (često ne zna šta je Forex): lakše ide ponuda signala/brokera (300 EUR) nego high-ticket bot; pre-call edukacioni video i dialing PRE bukiranja diskvalifikuju needukovane. Cjure uzima 20% svakog Strale close-a; ne pominjati klijentima.
+` + KB_ZAJEDNICKO,
+};
+
+const OFFER_NAMES = { cjure: 'CJURE / CjureFX', maminjo: 'MAMINJO / MaminjoFX', strale: 'STRALE / StraleTKD' };
+
+function askfxSystem(brand) {
+  const bk = (brand && KBS[brand]) ? brand : DEFAULT_BRAND;
+  const name = OFFER_NAMES[bk];
+  const lang = bk === 'maminjo' ? 'hrvatskom' : 'srpskom';
+  return `Ti si "FX AI", interni asistent za sales/dialer tim agencije 2Busy. Ovaj CRM pokriva ISKLJUČIVO ponudu ${name}: odgovaraš samo o njoj, isključivo na osnovu baze znanja ispod. Ako te pitaju o drugoj ponudi ili brendu, kratko reci da ovaj CRM pokriva samo ${name} i da pitanje postave u CRM-u te ponude. Odgovaraj kratko, konkretno i praktično, na ${lang}. Ako nešto nije u bazi, reci iskreno da ne znaš i da se proveri sa Lukom. Nikad ne obećavaj zaradu; interni brojevi (winrate, procenti) su orijentacija za closera, ne obećanja klijentu.\n\nBAZA ZNANJA:\n${KBS[bk]}`;
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -185,7 +261,19 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY missing' });
+  if (!apiKey) {
+    /* This project has no Anthropic key: forward to the cjure deployment,
+       which holds it. body.brand keeps the KB scoped to THIS brand. */
+    try {
+      const r = await fetch('https://cjure-crm.vercel.app/api/lead-message', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {}),
+      });
+      const text = await r.text();
+      res.status(r.status).setHeader('Content-Type', 'application/json');
+      return res.send(text);
+    } catch (e) { return res.status(502).json({ error: 'AI proxy: ' + e.message }); }
+  }
 
   let body;
   try { body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {}); }
@@ -201,7 +289,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           model: MODEL,
           max_tokens: 700,
-          system: `Ti si "FX AI", interni asistent za sales/dialer tim agencije 2Busy. Odgovaraš na pitanja o tri ponude: CJURE, MAMINJO i STRALE, isključivo na osnovu baze znanja ispod. Odgovaraj kratko, konkretno i praktično, na srpskom (za Maminjo pitanja možeš na hrvatskom). Ako nešto nije u bazi, reci iskreno da ne znaš i da se proveri sa Lukom. Nikad ne obećavaj zaradu.\n\nBAZA ZNANJA:\n${ASKFX_KB}`,
+          system: askfxSystem(body.brand),
           messages: messages.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content || '').slice(0, 4000) })),
         }),
       });
