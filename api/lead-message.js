@@ -150,13 +150,43 @@ Vrati SAMO tekst poruke, bez navodnika, bez objašnjenja, bez potpisa.`;
 
 const DEFAULT_BRAND = 'strale';
 
-/* ── FX AI knowledge bases, one per brand ─────────────────────────
-   Each CRM deploy answers ONLY its own offer (DEFAULT_BRAND below is
-   rewritten per repo). body.brand can override so the maminjo deploy's
-   proxy hop to the cjure deployment still gets maminjo answers.
-   Built from live call transcripts (fx-kb-transcripts, 11 calls,
-   5.-10.8.2026) + contracts + funnel pages. Internal tool:
-   winrate/percent figures are closer orientation, never written promises. */
+/* ── FX AI knowledge bases ────────────────────────────────────────
+   ALL THREE BRANDS SELL THE SAME OFFER (potvrdio Luka 14.8.2026): isti
+   AI Trading Bot + isti Tradova instant funded nalozi, po istim cenama.
+   Jedina brend-specifičnost: Strale dodatno ima partner brokera
+   (AvaTrade / T4Trade, min depozit 300 EUR) kao ulaz u premium signal grupu.
+   DEFAULT_BRAND se prepisuje po repo-u; body.brand može da ga pregazi
+   (maminjo proxy hop). Izvor: transkripti poziva + ugovori + funnel strane. */
+
+const KB_PONUDA = `
+=== PONUDA (ista za sve brendove: Cjure, Maminjo, Strale) ===
+Svi prodaju ISTI AI Trading Bot (Trading AI Mind, tradingaimind.com) i ISTE Tradova instant funded naloge, po ISTIM cenama.
+
+CENE (na pozivu, uz -50% popust "za prve koji su zakazali"; pun iznos je duplo):
+- Doživotna (lifetime) licenca bota: 4.000 EUR -> 2.000 EUR na pozivu.
+- Mesečna licenca bota: 1.000 EUR -> 500 EUR/mes.
+- Instant funding 50.000$ nalog: 550 EUR. Instant funding 100.000$ nalog: 1.000 EUR.
+- Minimalni preporučeni ulaz (kombo): ~1.050 EUR (mesečni bot 500 + 50k funding 550).
+- Kapara/rezervacija: 10% ukupne cene (najčešće ~100 EUR) zaključava popust i mesto.
+- Popusti vremenski ograničeni; od 15.8.2026. najavljeno opšte poskupljenje.
+Plaćanje: IBAN, kartica, USDC (closer šalje link/wallet na samom pozivu).
+
+BOT (Trading AI Mind):
+- Radi isključivo na MetaTrader 5 (MT5). "Mozak" bota je Anthropic/Claude AI.
+- Strategija: martingale + grid, samo na prop firmama gde je pravilima dozvoljeno; H1 forex parovi, H4 XAUUSD.
+- Prosečno 2-5% mesečno (izuzeci 10-12% samo kao izolovani primeri, nikad kao očekivanje).
+- Auto-pauza kad ode ~0,5-1% u minus; tim re-optimizuje pa nastavlja. Pauza ±5 min oko high-impact vesti.
+- Adaptira ručno otvorene pozicije: ako klijent sam otvori trejd, bot ga preuzme i zatvori.
+- Dashboard: equity kriva 24h/7d/30d, istorija svakog trejda (razlog ulaska/izlaska), win rate po paru, podesiv daily drawdown, prop-firm safety pravila, allow buy/sell, zatvaranje korpe na promenu smera.
+- Setup: tim radi SVE povezivanje (MT5 login, podešavanja); klijent ništa ne dira. Aktivno isto veče/sutradan; ako je vikend, kreće u ponedeljak.
+
+FUNDED NALOZI (Tradova):
+- Instant funding, BEZ evaluacije/challenge-a, nalog odmah spreman. KYC obavezan.
+- Opseg 10.000$-500.000$ (najčešće 50k-200k). Profit split 80% klijent / 20% prop firma. Isplate svakih 14 dana, bez ograničenja.
+- GARANCIJA ZAMENE: ako bot sa ZVANIČNIM podešavanjima (bez ručnih trejdova/izmena) spali funded nalog, firma o svom trošku daje nov nalog iste vrednosti (rok 30 dana, uz proveru istorije trgovanja).
+
+SOCIAL PROOF: ~98 aktivnih korisnika bota. Video testimonijali: cjurefx.org/david ($2.781), /miodrag ($1.200, Tradova), /ljudi (+ Stefan $4.321 na agresivnom modu).
+`;
 
 const KB_ZAJEDNICKO = `
 === PRAVILA ZA TIM (uvek važe) ===
@@ -187,63 +217,34 @@ const KB_ZAJEDNICKO = `
 const KBS = {
 cjure: `
 === CJURE / CjureFX (Marko Ćurguz, @cjuree) ===
-Offer: AI Trading Bot (Trading AI Mind, tradingaimind.com) + instant funded nalozi. Jezik: srpski (ekavica). Pravno lice: CJR TOP STRIKER LLC; ugovor se potpisuje PRE uplate.
+Jezik: srpski (ekavica). Pravno lice: CJR TOP STRIKER LLC; ugovor se potpisuje PRE uplate.
 Funnel: cjurefx.org (webinar optin) -> /pitanja kvalifikacija -> WhatsApp grupa; poziv na cjurefx.org/zakazi (30 min, besplatan). Posle bukiranja lead dobija cjurefx.org/ljudi (video priče Stefan/David/Miodrag) i potvrđuje termin porukom "Odgledao".
-
-CENE (na pozivu, uz -50% popust "za prve koji su zakazali"; pun iznos je duplo):
-- Doživotna (lifetime) licenca bota: 4.000 EUR -> 2.000 EUR na pozivu.
-- Mesečna licenca bota: 1.000 EUR -> 500 EUR/mes.
-- Instant funding 50.000$ nalog: 550 EUR. Instant funding 100.000$ nalog: 1.000 EUR.
-- Minimalni preporučeni ulaz (kombo): ~1.050 EUR (mesečni bot 500 + 50k funding 550).
-- Kapara/rezervacija: 10% ukupne cene (najčešće ~100 EUR) zaključava popust i mesto.
-- Popusti su vremenski ograničeni; od 15.8.2026. najavljeno opšte poskupljenje.
-Plaćanje: IBAN, kartica, USDC (closer šalje link/wallet na samom pozivu).
-
-BOT (Trading AI Mind):
-- Radi isključivo na MetaTrader 5 (MT5). "Mozak" bota je Anthropic/Claude AI.
-- Strategija: martingale + grid, samo na prop firmama gde je pravilima dozvoljeno; H1 forex parovi, H4 XAUUSD.
-- Prosečno 2-5% mesečno (izuzeci 10-12% se pominju samo kao izolovani primeri, nikad kao očekivanje).
-- Auto-pauza kad ode ~0,5-1% u minus; tim re-optimizuje pa nastavlja. Pauza ±5 min oko high-impact vesti.
-- Adaptira ručno otvorene pozicije: ako klijent sam otvori trejd, bot ga preuzme i zatvori.
-- Dashboard: equity kriva 24h/7d/30d, istorija svakog trejda (razlog ulaska/izlaska), win rate po paru, podesiv daily drawdown, prop-firm safety pravila, allow buy/sell, zatvaranje korpe na promenu smera.
-- Setup: tim radi SVE povezivanje (MT5 login, podešavanja); klijent ništa ne dira. Aktivno isto veče/sutradan; ako je vikend, kreće u ponedeljak.
-
-FUNDED NALOZI:
-- Partner prop firma: Tradova: instant funding, BEZ evaluacije/challenge-a, nalog odmah spreman. KYC obavezan.
-- Opseg 10.000$-500.000$ (najčešće 50k-200k). Profit split 80% klijent / 20% prop firma. Isplate svakih 14 dana, bez ograničenja.
-- GARANCIJA ZAMENE: ako bot sa ZVANIČNIM podešavanjima (bez ručnih trejdova/izmena) spali funded nalog, firma o svom trošku daje nov nalog iste vrednosti (rok 30 dana, uz proveru istorije trgovanja).
-
-SOCIAL PROOF: ~98 aktivnih korisnika bota. Testimonijali: cjurefx.org/david ($2.781), /miodrag ($1.200, Tradova), /ljudi (+ Stefan $4.321 na agresivnom modu). Rezultati članova u WhatsApp kanalima.
+Closeri: Luka i Dimitrije.
 INTERNO: Cjure uzima 20% od svakog Strale close-a (partnerstvo); ne pominjati klijentima.
-` + KB_ZAJEDNICKO,
+` + KB_PONUDA + KB_ZAJEDNICKO,
 
 maminjo: `
 === MAMINJO / MaminjoFX (Leo Alagić, @maminjjo) ===
 Jezik: HRVATSKI (standardni HR): odgovaraj na hrvatskom. Zajednica 20.000+ članova, signali od 2018, 5-7 signala dnevno.
-Offer/funnel: besplatni webinar (maminjo.com) -> /pitanja kvalifikacija (video na 2. koraku) -> WhatsApp grupa (3. korak, samo dugme). Na webinaru: kako čitaju tržište, ulasci/izlasci, risk management, AI bot uživo na pravom računu, put do funded računa.
-Prodaja posle webinara: pristup botu + signali + edukacija, uslovi po aktuelnoj ponudi tima (cene potvrditi sa Lukom/Leom pre poziva).
-Bot: isti AI trading bot kao ostatak grupe: radi na MT5, tim radi sva podešavanja i povezivanje, klijent ništa ne dira; auto-pauza u minusu, pauza oko vesti. Prosečno 2-5% mesečno (interna orijentacija, ne obećavati).
-Funded nalozi: preko partner prop firme, instant funding bez evaluacije, KYC obavezan, isplate radi prop firma po svojim pravilima.
-Ton: edukativno, "sustav iza signala", bez obećanja zarade. Closer: Mateja.
-` + KB_ZAJEDNICKO,
+Funnel: besplatni webinar (maminjo.com) -> /pitanja kvalifikacija (video na 2. koraku) -> WhatsApp grupa (3. korak, samo dugme). Na webinaru: kako čitaju tržište, ulasci/izlasci, risk management, AI bot uživo na pravom računu, put do funded računa.
+Prodaje ISTU ponudu kao svi (bot + Tradova funded, iste cene ispod). Ton: edukativno, "sustav iza signala". Closer: Mateja.
+` + KB_PONUDA + KB_ZAJEDNICKO,
 
 strale: `
 === STRALE / StraleTKD ===
-Jezik: srpski. Offer: forex signali (BESPLATNA grupa uz uslov) + pristup botu i funded nalozima do 200.000$ bez depozita.
+Jezik: srpski.
 Funnel: straletkd.com (VSL + typeform prijava) -> kvalifikovani na /hvala sa GHL kalendarom -> /booked potvrda; posle bukiranja lead dobija straletkd.com/ljudi i potvrđuje porukom "Odgledao". Nekvalifikovani idu u besplatnu Telegram grupu (t.me/tkdvision1).
+Prodaje ISTU ponudu kao svi (bot + Tradova funded, iste cene ispod). Closeri: Nikola i Dušica.
 
-SIGNALI:
-- Grupa je besplatna: jedini uslov je REAL nalog kod partner brokera (AvaTrade; viđeno i T4Trade, server "T4Trade Real 16") sa minimalnim depozitom 300 EUR. Novac je klijentov, povlači ga kad hoće, nema članarine.
-- Aplikacija: MetaTrader 4 (MT4). MT5 je za bot/funded.
+JEDINA STRALE SPECIFIČNOST - PARTNER BROKER I PREMIUM SIGNAL GRUPA:
+- Ulaz u premium signal grupu: real nalog kod partner brokera (AvaTrade ili T4Trade; viđen server "T4Trade Real 16") sa MINIMALNIM DEPOZITOM 300 EUR. Novac je klijentov, povlači ga kad hoće, nema članarine.
+- Aplikacija za signale: MetaTrader 4 (MT4). MT5 je za bot/funded.
 - Signali samo u London i New York sesiji (~9-18h po srpskom vremenu), 15-25 signala mesečno.
 - Interna orijentacija: prolaznost 80-85% (ne obećavati klijentu; pokazivati screenshotove).
 - Format signala: first entry + second entry (za zakasnele), TP1-TP4, stop loss; podešavanje ~5 min, praćenje 20-30 min dnevno.
 - Time frame: H1 na zlatu (XAUUSD), H4 na valutnim parovima.
-- Okvirno šta ljudi rade sa 300-500 EUR: 200-500 EUR mesečno (izolovani primeri, ne obećanje).
-
-BOT + FUNDED (isti sistem kao Cjure): AI trading bot na MT5, tim radi sav setup; partner prop firma Tradova, instant funding bez evaluacije, split 80/20, isplate na 14 dana, KYC obavezan.
-INTERNO: Strale publika je manje edukovana (često ne zna šta je Forex): lakše ide ponuda signala/brokera (300 EUR) nego high-ticket bot; pre-call edukacioni video i dialing PRE bukiranja diskvalifikuju needukovane. Cjure uzima 20% svakog Strale close-a; ne pominjati klijentima.
-` + KB_ZAJEDNICKO,
+INTERNO: publika je manje edukovana: broker put (300 EUR) je lakši ulaz, bot+funded je upsell na pozivu. Cjure uzima 20% svakog Strale close-a; ne pominjati klijentima.
+` + KB_PONUDA + KB_ZAJEDNICKO,
 };
 
 const OFFER_NAMES = { cjure: 'CJURE / CjureFX', maminjo: 'MAMINJO / MaminjoFX', strale: 'STRALE / StraleTKD' };
@@ -252,7 +253,7 @@ function askfxSystem(brand) {
   const bk = (brand && KBS[brand]) ? brand : DEFAULT_BRAND;
   const name = OFFER_NAMES[bk];
   const lang = bk === 'maminjo' ? 'hrvatskom' : 'srpskom';
-  return `Ti si "FX AI", interni asistent za sales/dialer tim agencije 2Busy. Ovaj CRM pokriva ISKLJUČIVO ponudu ${name}: odgovaraš samo o njoj, isključivo na osnovu baze znanja ispod. Ako te pitaju o drugoj ponudi ili brendu, kratko reci da ovaj CRM pokriva samo ${name} i da pitanje postave u CRM-u te ponude. Odgovaraj kratko, konkretno i praktično, na ${lang}. Ako nešto nije u bazi, reci iskreno da ne znaš i da se proveri sa Lukom. Nikad ne obećavaj zaradu; interni brojevi (winrate, procenti) su orijentacija za closera, ne obećanja klijentu.\n\nBAZA ZNANJA:\n${KBS[bk]}`;
+  return `Ti si "FX AI", interni asistent za sales/dialer tim agencije 2Busy. Ovaj CRM pripada brendu ${name}. Svi brendovi prodaju ISTU ponudu (isti bot, isti funded nalozi, iste cene), pa na pitanja o ceni i ponudi odgovaraš direktno iz baze. Brend-specifične stvari (funnel, jezik, closeri) drugih brendova ne pokrivaš: za njih uputi na CRM tog brenda. Odgovaraj kratko, konkretno i praktično, na ${lang}. Ako nešto nije u bazi, reci iskreno da ne znaš i da se proveri sa Lukom. Nikad ne obećavaj zaradu; interni brojevi (winrate, procenti) su orijentacija za closera, ne obećanja klijentu.\n\nBAZA ZNANJA:\n${KBS[bk]}`;
 }
 
 export default async function handler(req, res) {
