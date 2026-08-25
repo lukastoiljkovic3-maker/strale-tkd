@@ -210,6 +210,43 @@ async function handleReschedule(req, res) {
   return res.status(200).json({ ok: true, eventId: newId, startTime, endTime, created: true });
 }
 
+/* ── native bookings ────────────────────────────────────────
+   Ported from maminjo-crm. Calls taken through the custom calendar on
+   straletkd.com/hvala live in Supabase, not on a GHL calendar, so without this
+   the CRM's Kalendar would never show them. Rows are mapped into the same
+   event shape the GHL feed returns, which is why the calendar renders them
+   with no change to the UI.
+
+   Failure here is deliberately silent: a Supabase problem must not blank out
+   the GHL appointments that are already loading fine. */
+const SB_URL = 'https://gopysmvvfinuvaczyput.supabase.co';
+const NATIVE_STATUS = { booked: 'confirmed', completed: 'showed',
+                        no_show: 'noshow', cancelled: 'cancelled' };
+
+async function nativeBookings(startMs, endMs) {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!key) return [];
+  try {
+    const from = new Date(startMs).toISOString(), to = new Date(endMs).toISOString();
+    const r = await fetch(
+      `${SB_URL}/rest/v1/bookings?select=*&starts_at=gte.${from}&starts_at=lte.${to}&order=starts_at.asc`,
+      { headers: { apikey: key, Authorization: `Bearer ${key}` } });
+    if (!r.ok) return [];
+    return (await r.json()).map(b => ({
+      id: 'nb-' + b.id,
+      title: `${b.ime}${b.prezime ? ' ' + b.prezime : ''} · ${b.telefon}`,
+      contactId: null,
+      startTime: b.starts_at,
+      endTime: new Date(new Date(b.starts_at).getTime() + (b.duration_min || 30) * 60000).toISOString(),
+      appointmentStatus: NATIVE_STATUS[b.status] || 'confirmed',
+      calendarName: 'Rezervacije (straletkd.com)',
+      deleted: false,
+      email: b.email,
+      phone: b.telefon,
+    }));
+  } catch (e) { return []; }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method === 'GET') res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=120');
@@ -288,7 +325,10 @@ export default async function handler(req, res) {
       });
     }
 
-    let out = events;
+    // merge in the custom calendar's own bookings before filtering
+    const nativeStart = Number(req.query.start) || Date.now() - 7 * 864e5;
+    const nativeEnd   = Number(req.query.end)   || Date.now() + 30 * 864e5;
+    let out = events.concat(await nativeBookings(nativeStart, nativeEnd));
     if (contactId) out = out.filter(e => e.contactId === contactId);
     out.sort((a, b) => String(a.startTime).localeCompare(String(b.startTime)));
 
