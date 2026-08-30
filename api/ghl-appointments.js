@@ -272,13 +272,27 @@ export default async function handler(req, res) {
       + `&startTime=${start}&endTime=${end}`,
     );
     if (fast.ok) {
+      /* The straletkd.com bookings must be merged HERE too, not only on the
+         slow path below. This branch returns whenever the GHL request succeeds,
+         which is essentially always, so a merge that lived only in the slow
+         path never ran once and the Kalendar showed GHL appointments only. */
+      const fastNative = await nativeBookings(
+        Number(req.query.start) || (now - 7 * 864e5),
+        Number(req.query.end)   || (now + 30 * 864e5),
+      );
       let out = (fast.json?.events || []).map(e => ({ ...e, calendarName: BOOKING_CALENDAR_NAME }));
+      out = out.concat(fastNative.rows);
       if (contactId) out = out.filter(e => e.contactId === contactId);
       out.sort((a, b) => String(a.startTime).localeCompare(String(b.startTime)));
       return res.status(200).json({
-        calendars: [{ id: BOOKING_CALENDAR_ID, name: BOOKING_CALENDAR_NAME }],
+        calendars: [
+          { id: BOOKING_CALENDAR_ID, name: BOOKING_CALENDAR_NAME },
+          ...(fastNative.rows.length ? [{ id: 'native', name: 'Rezervacije (straletkd.com)' }] : []),
+        ],
         count: out.length,
+        nativeCount: fastNative.rows.length,
         events: out,
+        ...(fastNative.error ? { nativeError: fastNative.error } : {}),
       });
     }
 
