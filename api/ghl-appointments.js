@@ -225,14 +225,14 @@ const NATIVE_STATUS = { booked: 'confirmed', completed: 'showed',
 
 async function nativeBookings(startMs, endMs) {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!key) return [];
+  if (!key) return { rows: [], error: 'SUPABASE_SERVICE_ROLE_KEY is not set on this Vercel project, so straletkd.com bookings can never be read' };
   try {
     const from = new Date(startMs).toISOString(), to = new Date(endMs).toISOString();
     const r = await fetch(
       `${SB_URL}/rest/v1/bookings?select=*&starts_at=gte.${from}&starts_at=lte.${to}&order=starts_at.asc`,
       { headers: { apikey: key, Authorization: `Bearer ${key}` } });
-    if (!r.ok) return [];
-    return (await r.json()).map(b => ({
+    if (!r.ok) return { rows: [], error: `supabase ${r.status}: ${(await r.text()).slice(0, 200)}` };
+    return { rows: (await r.json()).map(b => ({
       id: 'nb-' + b.id,
       title: `${b.ime}${b.prezime ? ' ' + b.prezime : ''} · ${b.telefon}`,
       contactId: null,
@@ -243,8 +243,8 @@ async function nativeBookings(startMs, endMs) {
       deleted: false,
       email: b.email,
       phone: b.telefon,
-    }));
-  } catch (e) { return []; }
+    })) };
+  } catch (e) { return { rows: [], error: 'supabase fetch failed: ' + String(e && e.message || e).slice(0, 160) }; }
 }
 
 export default async function handler(req, res) {
@@ -328,15 +328,18 @@ export default async function handler(req, res) {
     // merge in the custom calendar's own bookings before filtering
     const nativeStart = Number(req.query.start) || Date.now() - 7 * 864e5;
     const nativeEnd   = Number(req.query.end)   || Date.now() + 30 * 864e5;
-    let out = events.concat(await nativeBookings(nativeStart, nativeEnd));
+    const native = await nativeBookings(nativeStart, nativeEnd);
+    let out = events.concat(native.rows);
     if (contactId) out = out.filter(e => e.contactId === contactId);
     out.sort((a, b) => String(a.startTime).localeCompare(String(b.startTime)));
 
     res.status(200).json({
       calendars: calendars.map(c => ({ id: c.id, name: c.name })),
       count: out.length,
+      nativeCount: native.rows.length,
       events: out,
       ...(errors.length ? { partialErrors: errors } : {}),
+      ...(native.error ? { nativeError: native.error } : {}),
     });
   } catch (e) {
     res.status(500).json({ error: e.message });
