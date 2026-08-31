@@ -3609,12 +3609,14 @@ async function renderKalendarTab(){
       .filter(e => !mirrored.has(e.id) && !(!e.contactId && String(e.title || '').trim() === CAL_BLOCK_TITLE))
       .sort((a, b) => String(a.startTime).localeCompare(String(b.startTime))),
     leadById: new Map(leadRows.map(l => [l.id, l])),
+    leadByPhone: calPhoneIndex(leadRows),
   };
   if (staleRender(_seq, 'kalendar')) return;
   renderCalUI();
   leadsP.then(rows => {
     if (!_calCache || !rows.length) return;
     _calCache.leadById = new Map(rows.map(l => [l.id, l]));
+    _calCache.leadByPhone = calPhoneIndex(rows);
     if (currentTab === 'kalendar') renderCalUI();
   });
 }
@@ -3814,7 +3816,7 @@ function renderCalUI(){
       const qk = qualOf(e);
       const qTag = qk === 'qual' ? ' · KVALIFIKOVAN' : qk === 'dq' ? ' · DISKVALIFIKOVAN' : '';
       const tip = `${nameOf(e)} · ${t(d0)}–${t(d1)}${phoneOf(e) ? ' · ' + phoneOf(e) : ''}${qTag}`;
-      return `<div class="tg-ev tg-ev-${variant}" style="top:${top.toFixed(1)}px;height:${h.toFixed(1)}px;left:calc(${lPct}% + 4px);width:calc(${wPct}% - 8px)" title="${esc(tip)}" ${/^[A-Za-z0-9_-]+$/.test(e.contactId || '') ? `onclick="fdrillOpenLead('${e.contactId}')"` : ''}>
+      return `<div class="tg-ev tg-ev-${variant}" style="top:${top.toFixed(1)}px;height:${h.toFixed(1)}px;left:calc(${lPct}% + 4px);width:calc(${wPct}% - 8px)" title="${esc(tip)}" onclick="calOpenEvent('${esc(String(e.id || ''))}')">
         <div class="tg-ev-top"><span class="tg-ev-name">${esc(nameOf(e))}</span>${lanes === 1 ? `<span class="tg-bdg">${label}</span>` : ''}</div>
         ${h >= 46 ? `<div class="tg-ev-time">${t(d0)} – ${t(d1)}</div>` : ''}
       </div>`;
@@ -3861,6 +3863,33 @@ function renderCalUI(){
    ═══════════════════════════════════════════════════════════════ */
 let _calBlocks = [];
 const CAL_BLOCK_TITLE = 'Zauzeto (CRM)';
+
+/* Bookings taken on straletkd.com carry no GHL contactId, so a tile could not
+   be wired to fdrillOpenLead and clicking it did nothing at all. Match those on
+   the phone number instead, keyed on the last 8 digits so that 0612569571,
+   +381612569571 and 381 61 256 9571 all land on the same lead. */
+function calPhoneKey(v){
+  const d = String(v || '').replace(/[^0-9]/g, '');
+  return d.length >= 8 ? d.slice(-8) : '';
+}
+function calPhoneIndex(rows){
+  const m = new Map();
+  (rows || []).forEach(l => { const k = calPhoneKey(l.phone); if (k && !m.has(k)) m.set(k, l); });
+  return m;
+}
+function calOpenEvent(id){
+  const c = _calCache; if (!c) return;
+  const e = (c.evs || []).filter(x => String(x.id) === String(id))[0];
+  if (!e) return;
+  if (e.contactId) { fdrillOpenLead(e.contactId); return; }
+  const lead = (c.leadByPhone || new Map()).get(calPhoneKey(e.phone));
+  if (lead) { fdrillOpenLead(lead.id); return; }
+  /* A booking with no lead behind it is real and worth acting on, so show who
+     it is and let the closer dial, rather than leaving a dead tile. */
+  const who = String(e.title || 'Poziv').split('\u00b7')[0].trim();
+  showToast({ variant: 'info', title: who || 'Rezervacija',
+    message: (e.phone ? e.phone + ' \u00b7 ' : '') + 'rezervacija sa sajta, jos nema lead u CRM-u' });
+}
 
 /** ISO 8601 in the browser's own timezone, e.g. 2026-08-05T16:00:00+02:00.
     GHL speaks offset-local time and the closer sits in the calendar's zone. */
